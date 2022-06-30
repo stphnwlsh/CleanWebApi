@@ -1,6 +1,5 @@
 namespace CleanWebApi.Application.Reviews.Commands.UpdateReview;
 
-using System.ComponentModel.DataAnnotations;
 using MediatR;
 
 public class UpdateReviewCommand : IRequest<bool>

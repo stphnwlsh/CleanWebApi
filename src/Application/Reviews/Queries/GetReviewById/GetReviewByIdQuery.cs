@@ -1,6 +1,5 @@
 namespace CleanWebApi.Application.Reviews.Queries.GetReviewById;
 
-using System.ComponentModel.DataAnnotations;
 using Entities;
 using MediatR;
 

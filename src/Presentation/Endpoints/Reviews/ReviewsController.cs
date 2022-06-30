@@ -1,7 +1,7 @@
 namespace CleanWebApi.Presentation.Endpoints.Reviews;
 
-using Errors;
 using Common;
+using Errors;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Requests;
@@ -89,7 +89,9 @@ public class ReviewsController : ApiControllerBase
     {
         var command = new Commands.CreateReview.CreateReviewCommand()
         {
-            AuthorId = request.AuthorId, MovieId = request.MovieId, Stars = request.Stars
+            AuthorId = request.AuthorId,
+            MovieId = request.MovieId,
+            Stars = request.Stars
         };
 
         return this.Created(this.HttpContext.Request.GetEncodedUrl(), await this.Mediator.Send(command));
@@ -142,7 +144,10 @@ public class ReviewsController : ApiControllerBase
     {
         var command = new Commands.UpdateReview.UpdateReviewCommand
         {
-            Id = id, AuthorId = request.AuthorId, MovieId = request.MovieId, Stars = request.Stars
+            Id = id,
+            AuthorId = request.AuthorId,
+            MovieId = request.MovieId,
+            Stars = request.Stars
         };
 
         _ = await this.Mediator.Send(command);

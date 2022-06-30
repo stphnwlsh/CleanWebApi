@@ -1,7 +1,7 @@
 namespace CleanWebApi.Presentation.Endpoints.Version;
 
-using Errors;
 using Common;
+using Errors;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Entity = Application.Versions.Entities;

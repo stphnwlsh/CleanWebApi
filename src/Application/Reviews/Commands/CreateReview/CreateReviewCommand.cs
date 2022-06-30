@@ -1,6 +1,5 @@
 namespace CleanWebApi.Application.Reviews.Commands.CreateReview;
 
-using System.ComponentModel.DataAnnotations;
 using Entities;
 using MediatR;
 
