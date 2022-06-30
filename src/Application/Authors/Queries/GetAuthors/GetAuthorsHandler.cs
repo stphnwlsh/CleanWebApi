@@ -16,7 +16,6 @@ public class GetAuthorsHandler : IRequestHandler<GetAuthorsQuery, List<Author>>
 
     public async Task<List<Author>> Handle(GetAuthorsQuery request, CancellationToken cancellationToken)
     {
-        var result = await this.repository.GetAuthors(cancellationToken);
-        return result;
+        return await this.repository.GetAuthors(cancellationToken);
     }
 }
