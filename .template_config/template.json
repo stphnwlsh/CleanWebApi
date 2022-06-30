@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Stephen Walsh",
+  "classifications": [
+    "Clean Architecture",
+    "Clean",
+    "Web API",
+    "Web",
+    "API",
+    "Dotnet",
+    "Docker"
+  ],
+  "identity": "CleanWebApi.Template",
+  "name": "Clean Web API Template",
+  "shortName": "CleanWebApi",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "CleanWebApi",
+  "preferNameDirectory": true,
+  "symbols": {
+    "author": {
+      "type": "parameter",
+      "displayName": "The name of the author of the solution.",
+      "defaultValue": "Stephen Walsh",
+      "replaces": "Stephen Walsh"
+    }
+  }
+}
