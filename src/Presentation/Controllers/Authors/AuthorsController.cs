@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Endpoints.Authors;
+namespace CleanWebApi.Presentation.Controllers.Authors;
 
 using Common;
 using Errors;

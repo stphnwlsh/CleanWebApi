@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Endpoints.Common;
+namespace CleanWebApi.Presentation.Controllers.Common;
 
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Endpoints.Version;
+namespace CleanWebApi.Presentation.Controllers.Version;
 
 using Common;
 using Errors;

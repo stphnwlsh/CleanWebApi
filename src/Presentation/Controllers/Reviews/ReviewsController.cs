@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Endpoints.Reviews;
+namespace CleanWebApi.Presentation.Controllers.Reviews;
 
 using Common;
 using Errors;

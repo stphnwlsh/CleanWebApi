@@ -1,13 +1,9 @@
-namespace CleanWebApi.Presentation.Endpoints.Movies;
+namespace CleanWebApi.Presentation.Controllers.Movies;
 
 using Common;
-
 using Errors;
-
 using Microsoft.AspNetCore.Mvc;
-
 using Swashbuckle.AspNetCore.Annotations;
-
 using Entities = Application.Movies.Entities;
 using Queries = Application.Movies.Queries;
 

@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Tests.Integration.Endpoints;
+namespace CleanWebApi.Presentation.Tests.Integration.Controllers;
 
 using System.Net;
 using System.Threading.Tasks;

@@ -1,8 +1,8 @@
-namespace CleanWebApi.Presentation.Endpoints.Reviews.Requests;
+namespace CleanWebApi.Presentation.Controllers.Reviews.Requests;
 
 using System.ComponentModel.DataAnnotations;
 
-public class CreateReviewRequest
+public class UpdateReviewRequest
 {
     [Required]
     public Guid AuthorId { get; init; }
