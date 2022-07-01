@@ -1,8 +1,8 @@
 namespace CleanWebApi.Infrastructure.Tests.Integration.Databases.MovieReviews.Extensions;
 
 using System;
-using CleanWebApi.Infrastructure.Databases.MoviesReviews.Models;
 using Infrastructure.Databases.MoviesReviews;
+using Infrastructure.Databases.MoviesReviews.Models;
 
 internal static class MovieReviewsDbContextExtensions
 {

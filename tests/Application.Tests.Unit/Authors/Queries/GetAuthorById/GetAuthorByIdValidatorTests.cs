@@ -1,6 +1,6 @@
 namespace CleanWebApi.Application.Tests.Unit.Authors.Queries.GetAuthorById;
 
-using CleanWebApi.Application.Authors.Queries.GetAuthorById;
+using Application.Authors.Queries.GetAuthorById;
 using FluentValidation.TestHelper;
 using Xunit;
 

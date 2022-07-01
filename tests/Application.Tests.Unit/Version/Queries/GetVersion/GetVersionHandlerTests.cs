@@ -2,7 +2,7 @@ namespace CleanWebApi.Application.Tests.Unit.Version.Queries.GetVersion;
 
 using System.Threading;
 using System.Threading.Tasks;
-using CleanWebApi.Application.Versions.Queries.GetVersion;
+using Application.Versions.Queries.GetVersion;
 using Shouldly;
 using Xunit;
 

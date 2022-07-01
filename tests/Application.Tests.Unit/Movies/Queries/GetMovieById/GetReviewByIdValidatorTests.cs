@@ -1,6 +1,6 @@
 namespace CleanWebApi.Application.Tests.Unit.Movies.Queries.GetMovieById;
 
-using CleanWebApi.Application.Reviews.Queries.GetReviewById;
+using Application.Reviews.Queries.GetReviewById;
 using FluentValidation.TestHelper;
 using Xunit;
 

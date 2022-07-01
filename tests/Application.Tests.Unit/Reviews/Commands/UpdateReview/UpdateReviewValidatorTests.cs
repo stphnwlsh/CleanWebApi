@@ -1,6 +1,6 @@
 namespace CleanWebApi.Application.Tests.Unit.Reviews.Commands.UpdateReview;
 
-using CleanWebApi.Application.Reviews.Commands.UpdateReview;
+using Application.Reviews.Commands.UpdateReview;
 using FluentValidation.TestHelper;
 using Xunit;
 

@@ -2,9 +2,9 @@ namespace CleanWebApi.Application.Tests.Unit.Reviews.Commands.UpdateReview;
 
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Common.Exceptions;
 using Application.Reviews;
-using CleanWebApi.Application.Common.Exceptions;
-using CleanWebApi.Application.Reviews.Commands.UpdateReview;
+using Application.Reviews.Commands.UpdateReview;
 using NSubstitute;
 using Shouldly;
 using Xunit;

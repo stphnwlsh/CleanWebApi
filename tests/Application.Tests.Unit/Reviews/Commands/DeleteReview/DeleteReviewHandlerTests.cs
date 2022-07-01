@@ -2,9 +2,9 @@ namespace CleanWebApi.Application.Tests.Unit.Reviews.Commands.DeleteReview;
 
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Common.Exceptions;
 using Application.Reviews;
-using CleanWebApi.Application.Common.Exceptions;
-using CleanWebApi.Application.Reviews.Commands.DeleteReview;
+using Application.Reviews.Commands.DeleteReview;
 using NSubstitute;
 using Shouldly;
 using Xunit;

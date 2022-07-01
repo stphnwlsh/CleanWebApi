@@ -2,9 +2,9 @@ namespace CleanWebApi.Infrastructure.Tests.Integration.Databases.MovieReviews;
 
 using System;
 using AutoMapper;
-using CleanWebApi.Infrastructure.Databases.MoviesReviews.Mapping;
 using Extensions;
 using Infrastructure.Databases.MoviesReviews;
+using Infrastructure.Databases.MoviesReviews.Mapping;
 using Microsoft.EntityFrameworkCore;
 using SimpleDateTimeProvider;
 using Xunit;

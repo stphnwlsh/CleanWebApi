@@ -1,8 +1,8 @@
 namespace CleanWebApi.Application.Reviews.Entities;
 
-using CleanWebApi.Application.Authors.Entities;
-using CleanWebApi.Application.Common.Entities;
-using CleanWebApi.Application.Movies.Entities;
+using Application.Authors.Entities;
+using Application.Common.Entities;
+using Application.Movies.Entities;
 
 public record Review : Entity
 {

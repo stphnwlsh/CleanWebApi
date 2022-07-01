@@ -2,10 +2,10 @@ namespace CleanWebApi.Application.Tests.Unit.Authors.Queries.GetAuthorById;
 
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Authors;
 using Application.Authors.Entities;
-using CleanWebApi.Application.Authors;
-using CleanWebApi.Application.Authors.Queries.GetAuthorById;
-using CleanWebApi.Application.Common.Exceptions;
+using Application.Authors.Queries.GetAuthorById;
+using Application.Common.Exceptions;
 using NSubstitute;
 using Shouldly;
 using Xunit;

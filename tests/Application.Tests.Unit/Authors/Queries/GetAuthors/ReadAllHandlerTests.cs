@@ -2,9 +2,9 @@ namespace CleanWebApi.Application.Tests.Unit.Authors.Queries.GetAuthors;
 
 using System.Threading;
 using System.Threading.Tasks;
-using CleanWebApi.Application.Authors;
-using CleanWebApi.Application.Authors.Entities;
-using CleanWebApi.Application.Authors.Queries.GetAuthors;
+using Application.Authors;
+using Application.Authors.Entities;
+using Application.Authors.Queries.GetAuthors;
 using NSubstitute;
 using Shouldly;
 using Xunit;
