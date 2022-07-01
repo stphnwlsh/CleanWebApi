@@ -1,0 +1,15 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "CleanWebApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "local"
+      },
+      "applicationUrl": "https://localhost:7072;http://localhost:5097",
+      "dotnetRunMessages": true
+    }
+  }
+}
