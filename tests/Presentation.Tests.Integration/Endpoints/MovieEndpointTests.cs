@@ -10,7 +10,7 @@ using Xunit;
 
 public class MovieEndpointTests
 {
-    private static readonly MinimalApiApplication Application = new();
+    private static readonly WebApiApplication Application = new();
 
     [Fact]
     public async Task GetMovies_ShouldReturn_Ok()

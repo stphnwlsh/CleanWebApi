@@ -14,7 +14,7 @@ using Xunit;
 
 public class ReviewEndpointTests
 {
-    private static readonly MinimalApiApplication Application = new();
+    private static readonly WebApiApplication Application = new();
 
     [Fact]
     public async Task CreateReview_ShouldReturn_Created()

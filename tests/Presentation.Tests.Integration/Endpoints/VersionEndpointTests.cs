@@ -9,7 +9,7 @@ using Xunit;
 
 public class VersionEndpointTests
 {
-    private static readonly MinimalApiApplication Application = new();
+    private static readonly WebApiApplication Application = new();
 
     [Fact]
     public async Task GetVersion_ShouldReturn_Ok()

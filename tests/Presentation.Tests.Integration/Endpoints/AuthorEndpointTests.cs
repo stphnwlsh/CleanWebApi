@@ -10,7 +10,7 @@ using Xunit;
 
 public class AuthorEndpointTests
 {
-    private static readonly MinimalApiApplication Application = new();
+    private static readonly WebApiApplication Application = new();
 
     [Fact]
     public async Task GetAuthors_ShouldReturn_Ok()
