@@ -64,7 +64,7 @@ public class ReviewsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Create an Review by its Id
+    /// Create a Review
     /// </summary>
     /// <param name="request"></param>
     /// <returns>
