@@ -3,13 +3,13 @@
   "profiles": {
     "CleanWebApi": {
       "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:8081;http://localhost:8080",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "local"
-      },
-      "applicationUrl": "https://localhost:7072;http://localhost:5097",
-      "dotnetRunMessages": true
+      }
     }
   }
 }
