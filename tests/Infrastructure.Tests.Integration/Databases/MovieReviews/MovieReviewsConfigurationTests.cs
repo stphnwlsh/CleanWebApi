@@ -6,22 +6,13 @@ using Shouldly;
 using Xunit;
 
 [Collection("MovieReviews")]
-public class MovieReviewsConfigurationTests
+public class MovieReviewsConfigurationTests(MovieReviewsDataFixture fixture)
 {
-    private readonly MovieReviewsDataFixture fixture;
-
-    public MovieReviewsConfigurationTests(MovieReviewsDataFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
-    #region Configuration
-
     [Fact]
     public async void Database_ShouldBe_Configured()
     {
         // Arrange
-        var context = this.fixture.Context;
+        var context = fixture.Context;
         var token = new CancellationTokenSource().Token;
 
         // Act
@@ -51,6 +42,4 @@ public class MovieReviewsConfigurationTests
         _ = review.ReviewedMovieId.ShouldBeOfType<Guid>();
         _ = review.ReviewedMovie.ShouldBeOfType<Movie>();
     }
-
-    #endregion Configuration
 }

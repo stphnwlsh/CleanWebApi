@@ -21,14 +21,14 @@ public class GetAuthorsHandlerTests
         var handler = new GetAuthorsHandler(context);
         var token = new CancellationTokenSource().Token;
 
-        _ = context.GetAuthors(token).Returns(new List<Author> {
+        _ = context.GetAuthors(token).Returns([
             new Author
             {
                 Id = Guid.Empty,
                 FirstName = "FirstName",
                 LastName = "LastName"
             }
-        });
+        ]);
 
         // Act
         var result = await handler.Handle(query, token);
@@ -36,8 +36,12 @@ public class GetAuthorsHandlerTests
         // Assert
         _ = await context.Received(1).GetAuthors(token);
 
+        _ = result.ShouldNotBeNull();
+        _ = result.ShouldBeOfType<List<Author>>();
+
         result.ShouldNotBeEmpty();
         result.Count.ShouldBe(1);
+
         result[0].Id.ShouldBe(Guid.Empty);
         result[0].FirstName.ShouldBe("FirstName");
         result[0].LastName.ShouldBe("LastName");

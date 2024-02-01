@@ -6,7 +6,7 @@ using Extensions;
 using Infrastructure.Databases.MoviesReviews;
 using Infrastructure.Databases.MoviesReviews.Mapping;
 using Microsoft.EntityFrameworkCore;
-using SimpleDateTimeProvider;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 [CollectionDefinition("MovieReviews")]
@@ -19,25 +19,21 @@ public class MovieReviewsCollectionFixture : ICollectionFixture<MovieReviewsData
 
 public class MovieReviewsDataFixture : IDisposable
 {
-    private bool disposedValue;
-
     internal MovieReviewsDbContext Context { get; set; }
-    internal IDateTimeProvider DateTimeProvider { get; set; }
+    internal FakeTimeProvider TimeProvider { get; set; }
     internal IMapper Mapper { get; set; }
     internal EntityFrameworkMovieReviewsRepository Repository { get; set; }
 
     public MovieReviewsDataFixture()
     {
-        var options = new DbContextOptionsBuilder<MovieReviewsDbContext>().UseInMemoryDatabase($"TestMovies-{Guid.NewGuid()}").Options;
+        var options = new DbContextOptionsBuilder<MovieReviewsDbContext>()
+            .UseInMemoryDatabase($"TestMovies-{Guid.NewGuid()}")
+            .Options;
 
         this.Context = new MovieReviewsDbContext(options);
 
-        this.DateTimeProvider = new MockDateTimeProvider
-        {
-            Now = new DateTime(2000, 01, 01, 01, 01, 01),
-            Today = new DateTime(2000, 01, 01, 00, 00, 00),
-            UtcNow = new DateTime(1999, 12, 31, 23, 51, 01)
-        };
+        this.TimeProvider = new FakeTimeProvider();
+        this.TimeProvider.SetUtcNow(new DateTime(2009, 12, 31, 23, 51, 01));
 
         this.Mapper = new MapperConfiguration(cfg =>
             cfg
@@ -50,7 +46,7 @@ public class MovieReviewsDataFixture : IDisposable
                 }))
                 .CreateMapper();
 
-        this.Repository = new EntityFrameworkMovieReviewsRepository(this.Context, this.DateTimeProvider, this.Mapper);
+        this.Repository = new EntityFrameworkMovieReviewsRepository(this.Context, this.TimeProvider, this.Mapper);
 
         if (this.Context != null)
         {
@@ -68,14 +64,13 @@ public class MovieReviewsDataFixture : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!this.disposedValue)
+        if (disposing)
         {
-            if (disposing)
+            if (this.Context != null)
             {
-                this.Context?.Dispose();
+                this.Context.Dispose();
+                this.Context = null;
             }
-
-            this.disposedValue = true;
         }
     }
 }

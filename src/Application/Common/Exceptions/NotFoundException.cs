@@ -1,25 +1,11 @@
 namespace CleanWebApi.Application.Common.Exceptions;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 using Enums;
 
-[Serializable]
-[ExcludeFromCodeCoverage]
-public class NotFoundException : Exception
+public class NotFoundException(string message) : Exception(message)
 {
-    public NotFoundException(string message)
-        : base(message)
-    {
-    }
-
-    protected NotFoundException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
-
-    /// <summary>Throws an <see cref="NotFoundException"/> if <paramref name="argument"/> is null.</summary>
+    /// <summary>Throws a <see cref="NotFoundException"/> if <paramref name="argument"/> is null.</summary>
     /// <param name="argument">The reference type argument to validate as non-null.</param>
     /// <param name="entityType">The entity type of the <paramref name="argument"/> parameter.</param>
     public static void ThrowIfNull(object argument, EntityType entityType)
@@ -30,7 +16,7 @@ public class NotFoundException : Exception
         }
     }
 
-    /// <summary>Throws an <see cref="NotFoundException"/></summary>
+    /// <summary>Throws a <see cref="NotFoundException"/></summary>
     /// <param name="entityType">The entity type of the <paramref name="argument"/> parameter.</param>
     public static void Throw(EntityType entityType)
     {
