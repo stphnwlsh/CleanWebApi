@@ -2,6 +2,7 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/stphnwlsh/CleanWebApi/Build%20Pipeline?label=Build%20Pipeline&logo=github&logoColor=white&style=for-the-badge)](https://github.com/stphnwlsh/CleanWebApi/actions/workflows/build-pipeline.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/stphnwlsh/CleanWebApi?label=Code%20Coverage&logo=codecov&logoColor=white&style=for-the-badge)](https://codecov.io/gh/stphnwlsh/CleanWebApi)
+[![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/stphnwlsh/CleanWebApi?label=OpenSSF%20Scorecard&style=for-the-badge)](https://scorecard.dev/viewer/?uri=github.com/stphnwlsh/CleanWebApi)
 ![Nuget](https://img.shields.io/nuget/v/CleanWebApi.Template?label=nuget%20template&logo=nuget&logoColor=white&style=for-the-badge)
 
 This is a template API using a streamlined version of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) alongside .NET's [Web APIs](https://docs.microsoft.com/en-au/aspnet/core/web-api/?WT.mc_id=dotnet-35129-website&view=aspnetcore-10.0).
