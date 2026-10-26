@@ -1,6 +1,6 @@
 # Clean Web API
 
-This is a template API using a streamlined version of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) alongside .NET's [Web APIs](https://docs.microsoft.com/en-au/aspnet/core/web-api/?WT.mc_id=dotnet-35129-website&view=aspnetcore-6.0).
+This is a template API using a streamlined version of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) alongside .NET's [Web APIs](https://docs.microsoft.com/en-au/aspnet/core/web-api/?WT.mc_id=dotnet-35129-website&view=aspnetcore-10.0).
 
 ## Installation
 
