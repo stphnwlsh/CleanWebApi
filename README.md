@@ -4,11 +4,11 @@
 [![Codecov](https://img.shields.io/codecov/c/github/stphnwlsh/CleanWebApi?label=Code%20Coverage&logo=codecov&logoColor=white&style=for-the-badge)](https://codecov.io/gh/stphnwlsh/CleanWebApi)
 ![Nuget](https://img.shields.io/nuget/v/CleanWebApi.Template?label=nuget%20template&logo=nuget&logoColor=white&style=for-the-badge)
 
-This is a template API using a streamlined version of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) alongside .NET's [Web APIs](https://docs.microsoft.com/en-au/aspnet/core/web-api/?WT.mc_id=dotnet-35129-website&view=aspnetcore-6.0).
+This is a template API using a streamlined version of [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) alongside .NET's [Web APIs](https://docs.microsoft.com/en-au/aspnet/core/web-api/?WT.mc_id=dotnet-35129-website&view=aspnetcore-10.0).
 
 ## Prerequisites
 
-This solution in built on the [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0), you need to install that before it will work for you.  If you want to build the Dockerfile you will need to install  [Docker](https://www.docker.com/products/docker-desktop) as well.
+This solution in built on the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), you need to install that before it will work for you.  If you want to build the Dockerfile you will need to install  [Docker](https://www.docker.com/products/docker-desktop) as well.
 
 ## Installation
 
@@ -69,7 +69,7 @@ There are plenty of handy implementations of features throughout this solution, 
 
 This sample would not have been possible without gaining inspiration from the following resources.  If you are on your own learning adventure please read the following blogs and documentation.
 
-- [Microsoft - Get started with Swashbuckle and ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-6.0&tabs=visual-studio)
+- [Microsoft - Get started with Swashbuckle and ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-10.0&tabs=visual-studio)
 - [Code Maze - Configuring and Using Swagger UI in ASP.NET Core Web API](https://code-maze.com/swagger-ui-asp-net-core-web-api/)
 - [Andrew Lock - Reducing log verbosity with Serilog RequestLogging](https://andrewlock.net/using-serilog-aspnetcore-in-asp-net-core-3-reducing-log-verbosity/)
 

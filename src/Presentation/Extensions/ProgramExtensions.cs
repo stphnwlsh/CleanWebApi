@@ -68,7 +68,7 @@ public static class ProgramExtensions
             {
                 Version = "v1",
                 Title = $"CleanWebApi API - {ti.ToTitleCase(builder.Environment.EnvironmentName)} ",
-                Description = "An example to share an implementation of Web API in .NET 6.",
+                Description = "An example to share an implementation of Web API in .NET 10.",
                 Contact = new OpenApiContact
                 {
                     Name = "CleanWebApi API",
