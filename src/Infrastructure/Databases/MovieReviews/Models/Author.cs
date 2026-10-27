@@ -1,13 +1,13 @@
-namespace CleanWebApi.Infrastructure.Databases.MoviesReviews.Models;
+namespace CleanWebApi.Infrastructure.Databases.MovieReviews.Models;
 
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 internal record Author : Entity
 {
     public string FirstName { get; init; }
 
     public string LastName { get; init; }
 
-    [InverseProperty("ReviewAuthor")]
     public ICollection<Review> Reviews { get; init; }
 }
