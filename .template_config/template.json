@@ -12,7 +12,7 @@
   ],
   "identity": "CleanWebApi.Template",
   "name": "Clean Web API Template",
-  "shortName": "CleanWebApi",
+  "shortName": "cleanwebapi",
   "tags": {
     "language": "C#",
     "type": "project"
