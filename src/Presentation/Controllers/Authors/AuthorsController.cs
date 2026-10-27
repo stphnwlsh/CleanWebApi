@@ -1,7 +1,6 @@
 namespace CleanWebApi.Presentation.Controllers.Authors;
 
 using Common;
-using Errors;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Entities = Application.Authors.Entities;
@@ -31,7 +30,7 @@ public class AuthorsController : ApiControllerBase
     /// </remarks>
     [HttpGet]
     [ProducesResponseType(typeof(List<Entities.Author>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IList<Entities.Author>>> GetAuthors()
     {
         return await this.Mediator.Send(new Queries.GetAuthors.GetAuthorsQuery());
@@ -52,9 +51,9 @@ public class AuthorsController : ApiControllerBase
     /// </remarks>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(Entities.Author), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Entities.Author>> GetAuthorsById(Guid id)
     {
         return this.Ok(await this.Mediator.Send(new Queries.GetAuthorById.GetAuthorByIdQuery { Id = id }));

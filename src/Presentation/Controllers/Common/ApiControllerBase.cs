@@ -1,6 +1,6 @@
 namespace CleanWebApi.Presentation.Controllers.Common;
 
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]

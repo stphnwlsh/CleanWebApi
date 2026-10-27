@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Application.Authors.Entities;
 using Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 using Xunit;
 
@@ -84,5 +86,44 @@ public class AuthorEndpointTests
             _ = review.ReviewedMovie.Title.ShouldBeOfType<string>();
             review.ReviewedMovie.Title.ShouldNotBeNullOrWhiteSpace();
         }
+    }
+
+    [Fact]
+    public async Task GetAuthorById_ShouldReturn_ValidationProblem()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/authors/{Guid.Empty}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status400BadRequest);
+        result.Errors.ShouldContainKey("Id");
+        result.Errors["Id"].ShouldBe(["An Author Id was not supplied."]);
+    }
+
+    [Fact]
+    public async Task GetAuthorById_ShouldReturn_NotFound()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/authors/{Guid.NewGuid()}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status404NotFound);
+        result.Detail.ShouldBe("The Author with the supplied id was not found.");
     }
 }

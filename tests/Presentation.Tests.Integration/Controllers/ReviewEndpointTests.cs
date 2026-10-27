@@ -9,6 +9,8 @@ using Application.Authors.Entities;
 using Application.Movies.Entities;
 using Application.Reviews.Entities;
 using Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 using Xunit;
 
@@ -179,5 +181,86 @@ public class ReviewEndpointTests
         _ = validateResult.ReviewedMovie.ShouldNotBeNull();
         validateResult.ReviewedMovie.Id.ShouldBe(movieResult.Id);
         validateResult.ReviewedMovie.Title.ShouldBe(movieResult.Title);
+    }
+
+    [Fact]
+    public async Task GetReviewById_ShouldReturn_ValidationProblem()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/reviews/{Guid.Empty}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status400BadRequest);
+        result.Errors.ShouldContainKey("Id");
+        result.Errors["Id"].ShouldBe(["A Review Id was not supplied."]);
+    }
+
+    [Fact]
+    public async Task GetReviewById_ShouldReturn_NotFound()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/reviews/{Guid.NewGuid()}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status404NotFound);
+        result.Detail.ShouldBe("The Review with the supplied id was not found.");
+    }
+
+    [Fact]
+    public async Task CreateReview_ShouldReturn_ValidationProblem()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+        var json = (new { Stars = 0, AuthorId = Guid.Empty, MovieId = Guid.Empty }).Serialize();
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        // Act
+        using var response = await client.PostAsync("/api/reviews", content);
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Errors["AuthorId"].ShouldBe(["An author id was not supplied to create the review."]);
+        result.Errors["MovieId"].ShouldBe(["A movie id was not supplied to create the review."]);
+        result.Errors["Stars"].ShouldBe(["A star rating must be between 1 and 5."]);
+    }
+
+    [Fact]
+    public async Task CreateReview_ShouldReturn_NotFound()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+        var json = (new { Stars = 5, AuthorId = Guid.NewGuid(), MovieId = Guid.NewGuid() }).Serialize();
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        // Act
+        using var response = await client.PostAsync("/api/reviews", content);
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Detail.ShouldBe("The Author with the supplied id was not found.");
     }
 }

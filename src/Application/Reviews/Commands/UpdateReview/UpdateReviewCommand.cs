@@ -1,6 +1,6 @@
 namespace CleanWebApi.Application.Reviews.Commands.UpdateReview;
 
-using MediatR;
+using Mediator;
 
 public class UpdateReviewCommand : IRequest<bool>
 {

@@ -1,7 +1,7 @@
 namespace CleanWebApi.Application.Authors.Queries.GetAuthors;
 
 using Entities;
-using MediatR;
+using Mediator;
 
 public class GetAuthorsQuery : IRequest<List<Author>>
 {
