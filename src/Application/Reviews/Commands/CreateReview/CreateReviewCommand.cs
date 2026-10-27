@@ -1,11 +1,13 @@
 namespace CleanWebApi.Application.Reviews.Commands.CreateReview;
 
 using Entities;
-using MediatR;
+using Mediator;
 
 public class CreateReviewCommand : IRequest<Review>
 {
     public Guid AuthorId { get; init; }
+
     public Guid MovieId { get; init; }
+
     public int Stars { get; init; }
 }

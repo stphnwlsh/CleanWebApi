@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Application.Movies.Entities;
 using Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 using Xunit;
 
@@ -58,7 +60,7 @@ public class MovieEndpointTests
         // Arrange
         using var client = Application.CreateClient();
         using var authorResponse = await client.GetAsync("/api/movies");
-        var authorResult = (await authorResponse.Content.ReadAsStringAsync()).Deserialize<List<Movie>>()[0];
+        var authorResult = (await authorResponse.Content.ReadAsStringAsync()).Deserialize<List<Movie>>().First(m => m.Reviews.Count > 0);
 
         // Act
         using var response = await client.GetAsync($"/api/movies/{authorResult.Id}");
@@ -86,5 +88,44 @@ public class MovieEndpointTests
             _ = review.ReviewAuthor.LastName.ShouldBeOfType<string>();
             review.ReviewAuthor.LastName.ShouldNotBeNullOrWhiteSpace();
         }
+    }
+
+    [Fact]
+    public async Task GetMovieById_ShouldReturn_ValidationProblem()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/movies/{Guid.Empty}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status400BadRequest);
+        result.Errors.ShouldContainKey("Id");
+        result.Errors["Id"].ShouldBe(["A Movie Id was not supplied."]);
+    }
+
+    [Fact]
+    public async Task GetMovieById_ShouldReturn_NotFound()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/movies/{Guid.NewGuid()}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status404NotFound);
+        result.Detail.ShouldBe("The Movie with the supplied id was not found.");
     }
 }

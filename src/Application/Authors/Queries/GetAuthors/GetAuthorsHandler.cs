@@ -3,19 +3,12 @@ namespace CleanWebApi.Application.Authors.Queries.GetAuthors;
 using System.Threading;
 using System.Threading.Tasks;
 using Entities;
-using MediatR;
+using Mediator;
 
-public class GetAuthorsHandler : IRequestHandler<GetAuthorsQuery, List<Author>>
+public class GetAuthorsHandler(IAuthorsRepository repository) : IRequestHandler<GetAuthorsQuery, List<Author>>
 {
-    private readonly IAuthorsRepository repository;
-
-    public GetAuthorsHandler(IAuthorsRepository repository)
+    public async ValueTask<List<Author>> Handle(GetAuthorsQuery request, CancellationToken cancellationToken)
     {
-        this.repository = repository;
-    }
-
-    public async Task<List<Author>> Handle(GetAuthorsQuery request, CancellationToken cancellationToken)
-    {
-        return await this.repository.GetAuthors(cancellationToken);
+        return await repository.GetAuthors(cancellationToken);
     }
 }

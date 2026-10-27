@@ -1,7 +1,6 @@
 namespace CleanWebApi.Presentation.Controllers.Version;
 
 using Common;
-using Errors;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Entity = Application.Versions.Entities;
@@ -31,7 +30,7 @@ public class VersionController : ApiControllerBase
     /// </remarks>
     [HttpGet]
     [ProducesResponseType(typeof(Entity.Version), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Entity.Version>> Get()
     {
         return await this.Mediator.Send(new Queries.GetVersion.GetVersionQuery());

@@ -5,20 +5,13 @@ using System.Threading.Tasks;
 using Common.Enums;
 using Common.Exceptions;
 using Entities;
-using MediatR;
+using Mediator;
 
-public class GetMovieByIdHandler : IRequestHandler<GetMovieByIdQuery, Movie>
+public class GetMovieByIdHandler(IMoviesRepository repository) : IRequestHandler<GetMovieByIdQuery, Movie>
 {
-    private readonly IMoviesRepository repository;
-
-    public GetMovieByIdHandler(IMoviesRepository repository)
+    public async ValueTask<Movie> Handle(GetMovieByIdQuery request, CancellationToken cancellationToken)
     {
-        this.repository = repository;
-    }
-
-    public async Task<Movie> Handle(GetMovieByIdQuery request, CancellationToken cancellationToken)
-    {
-        var result = await this.repository.GetMovieById(request.Id, cancellationToken);
+        var result = await repository.GetMovieById(request.Id, cancellationToken);
 
         NotFoundException.ThrowIfNull(result, EntityType.Movie);
 

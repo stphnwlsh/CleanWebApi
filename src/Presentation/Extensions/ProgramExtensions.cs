@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application;
+using Errors;
 using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -93,8 +94,16 @@ public static class ProgramExtensions
 
         #endregion Swagger
 
+        #region Errors
+
+        _ = builder.Services.AddProblemDetails();
+        _ = builder.Services.AddExceptionHandler<ApplicationExceptionHandler>();
+
+        #endregion Errors
+
         #region Project Dependencies
 
+        _ = builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
         _ = builder.Services.AddInfrastructure();
         _ = builder.Services.AddApplication();
 
@@ -105,17 +114,18 @@ public static class ProgramExtensions
 
     public static WebApplication ConfigureApplication(this WebApplication app)
     {
+        #region Errors
+
+        _ = app.UseExceptionHandler();
+        _ = app.UseStatusCodePages();
+
+        #endregion Errors
+
         #region Controllers
 
         _ = app.MapControllers();
 
         #endregion Controllers
-
-        #region Exceptions
-
-        _ = app.UseGlobalExceptionHandler();
-
-        #endregion Exceptions
 
         #region Logging
 

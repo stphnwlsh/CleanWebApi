@@ -3,19 +3,12 @@ namespace CleanWebApi.Application.Reviews.Queries.GetReviews;
 using System.Threading;
 using System.Threading.Tasks;
 using Entities;
-using MediatR;
+using Mediator;
 
-public class GetReviewsHandler : IRequestHandler<GetReviewsQuery, List<Review>>
+public class GetReviewsHandler(IReviewsRepository repository) : IRequestHandler<GetReviewsQuery, List<Review>>
 {
-    private readonly IReviewsRepository repository;
-
-    public GetReviewsHandler(IReviewsRepository repository)
+    public async ValueTask<List<Review>> Handle(GetReviewsQuery request, CancellationToken cancellationToken)
     {
-        this.repository = repository;
-    }
-
-    public async Task<List<Review>> Handle(GetReviewsQuery request, CancellationToken cancellationToken)
-    {
-        return await this.repository.GetReviews(cancellationToken);
+        return await repository.GetReviews(cancellationToken);
     }
 }

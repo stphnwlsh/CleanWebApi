@@ -1,7 +1,6 @@
 namespace CleanWebApi.Presentation.Controllers.Reviews;
 
 using Common;
-using Errors;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Requests;
@@ -34,7 +33,7 @@ public class ReviewsController : ApiControllerBase
     /// </remarks>
     [HttpGet]
     [ProducesResponseType(typeof(List<Entities.Review>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IList<Entities.Review>>> GetReviews()
     {
         return await this.Mediator.Send(new Queries.GetReviews.GetReviewsQuery());
@@ -55,9 +54,9 @@ public class ReviewsController : ApiControllerBase
     /// </remarks>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(Entities.Review), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Entities.Review>> GetReviewsById(Guid id)
     {
         return this.Ok(await this.Mediator.Send(new Queries.GetReviewById.GetReviewByIdQuery { Id = id }));
@@ -83,8 +82,8 @@ public class ReviewsController : ApiControllerBase
     /// </remarks>
     [HttpPost]
     [ProducesResponseType(typeof(Entities.Review), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Entities.Review>> CreateReview(CreateReviewRequest request)
     {
         var command = new Commands.CreateReview.CreateReviewCommand()
@@ -109,9 +108,9 @@ public class ReviewsController : ApiControllerBase
     /// </remarks>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(Entities.Review), StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Entities.Review>> DeleteReviewById(Guid id)
     {
         _ = await this.Mediator.Send(new Commands.DeleteReview.DeleteReviewCommand { Id = id });
@@ -137,9 +136,9 @@ public class ReviewsController : ApiControllerBase
     /// </remarks>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(Entities.Review), StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Entities.Review>> UpdateReviewById(Guid id, UpdateReviewRequest request)
     {
         var command = new Commands.UpdateReview.UpdateReviewCommand

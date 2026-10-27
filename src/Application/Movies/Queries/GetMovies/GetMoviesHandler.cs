@@ -3,19 +3,12 @@ namespace CleanWebApi.Application.Movies.Queries.GetMovies;
 using System.Threading;
 using System.Threading.Tasks;
 using Entities;
-using MediatR;
+using Mediator;
 
-public class GetMoviesHandler : IRequestHandler<GetMoviesQuery, List<Movie>>
+public class GetMoviesHandler(IMoviesRepository repository) : IRequestHandler<GetMoviesQuery, List<Movie>>
 {
-    private readonly IMoviesRepository repository;
-
-    public GetMoviesHandler(IMoviesRepository repository)
+    public async ValueTask<List<Movie>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
     {
-        this.repository = repository;
-    }
-
-    public async Task<List<Movie>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
-    {
-        return await this.repository.GetMovies(cancellationToken);
+        return await repository.GetMovies(cancellationToken);
     }
 }

@@ -5,20 +5,13 @@ using System.Threading.Tasks;
 using Common.Enums;
 using Common.Exceptions;
 using Entities;
-using MediatR;
+using Mediator;
 
-public class GetReviewByIdHandler : IRequestHandler<GetReviewByIdQuery, Review>
+public class GetReviewByIdHandler(IReviewsRepository repository) : IRequestHandler<GetReviewByIdQuery, Review>
 {
-    private readonly IReviewsRepository repository;
-
-    public GetReviewByIdHandler(IReviewsRepository repository)
+    public async ValueTask<Review> Handle(GetReviewByIdQuery request, CancellationToken cancellationToken)
     {
-        this.repository = repository;
-    }
-
-    public async Task<Review> Handle(GetReviewByIdQuery request, CancellationToken cancellationToken)
-    {
-        var result = await this.repository.GetReviewById(request.Id, cancellationToken);
+        var result = await repository.GetReviewById(request.Id, cancellationToken);
 
         NotFoundException.ThrowIfNull(result, EntityType.Review);
 

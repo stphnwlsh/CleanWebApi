@@ -1,4 +1,4 @@
-namespace CleanWebApi.Infrastructure.Databases.MoviesReviews.Configuration;
+namespace CleanWebApi.Infrastructure.Databases.MovieReviews.Configuration;
 
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models;
