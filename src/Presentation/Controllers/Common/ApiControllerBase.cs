@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Route("api/[controller]")]
 [Consumes("application/json")]
-[Produces("application/json")]
 public abstract class ApiControllerBase : ControllerBase
 {
     private IMediator mediator = null!;

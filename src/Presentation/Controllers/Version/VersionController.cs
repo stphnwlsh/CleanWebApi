@@ -2,11 +2,9 @@ namespace CleanWebApi.Presentation.Controllers.Version;
 
 using Common;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using Entity = Application.Versions.Entities;
 using Queries = Application.Versions.Queries;
 
-[SwaggerTag("Lookup the application version details", "https://github.com/stphnwlsh/cleanwebapi")]
 public class VersionController : ApiControllerBase
 {
     private readonly ILogger<VersionController> logger;
@@ -19,19 +17,20 @@ public class VersionController : ApiControllerBase
     /// <summary>
     /// Lookup the application version details
     /// </summary>
-    /// <returns>
-    /// The current application version details
-    /// </returns>
     /// <remarks>
+    /// Returns the file and informational versions of the running application.
+    ///
     /// Sample request:
     ///
-    ///     GET /Version
-    ///
+    ///     GET /api/Version
     /// </remarks>
+    /// <response code="200">The current application version details.</response>
+    /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(Entity.Version), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Entity.Version>> Get()
+    [EndpointName(nameof(GetVersion))]
+    [ProducesResponseType(typeof(Entity.Version), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
+    public async Task<ActionResult<Entity.Version>> GetVersion()
     {
         return await this.Mediator.Send(new Queries.GetVersion.GetVersionQuery());
     }
