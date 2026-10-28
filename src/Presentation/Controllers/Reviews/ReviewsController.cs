@@ -1,5 +1,6 @@
 namespace CleanWebApi.Presentation.Controllers.Reviews;
 
+using Application.Common.Paging;
 using Common;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,45 @@ public class ReviewsController : ApiControllerBase
     public async Task<ActionResult<IList<Entities.Review>>> GetReviews()
     {
         return await this.Mediator.Send(new Queries.GetReviews.GetReviewsQuery());
+    }
+
+    /// <summary>
+    /// Search Reviews by movie or author
+    /// </summary>
+    /// <remarks>
+    /// Returns one page of reviews, optionally only those of one movie, by one author, or both,
+    /// ordered by movie then author. When more results remain, the response holds a nextCursor.
+    /// Send it back as the cursor to fetch the next page.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/Reviews/search?movieId=3fa85f64-5717-4562-b3fc-2c963f66afa6&amp;limit=10
+    /// </remarks>
+    /// <param name="movieId">Only return reviews of this movie. Leave it out for every movie.</param>
+    /// <param name="authorId">Only return reviews by this author. Leave it out for every author.</param>
+    /// <param name="limit">The largest number of reviews to return, from 1 to 50.</param>
+    /// <param name="cursor">The nextCursor from a previous page. Leave it out for the first page.</param>
+    /// <response code="200">One page of matching Reviews.</response>
+    /// <response code="400">An Id, the limit or the cursor is not valid.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("search")]
+    [EndpointName(nameof(SearchReviews))]
+    [ProducesResponseType(typeof(Page<Entities.Review>), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
+    public async Task<ActionResult<Page<Entities.Review>>> SearchReviews(
+        [FromQuery] Guid? movieId,
+        [FromQuery] Guid? authorId,
+        [FromQuery] int limit = Paging.DefaultLimit,
+        [FromQuery] string cursor = null)
+    {
+        return this.Ok(await this.Mediator.Send(new Queries.SearchReviews.SearchReviewsQuery
+        {
+            MovieId = movieId,
+            AuthorId = authorId,
+            Limit = limit,
+            Cursor = cursor
+        }));
     }
 
     /// <summary>
