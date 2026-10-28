@@ -7,17 +7,18 @@ using Entity = Application.Versions.Entities;
 using Queries = Application.Versions.Queries;
 
 [AllowAnonymous]
+[Route("api/version")]
 public class VersionController : ApiControllerBase
 {
     /// <summary>
-    /// Lookup the application version details
+    /// Look up the application version details
     /// </summary>
     /// <remarks>
     /// Returns the file and informational versions of the running application.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Version
+    ///     GET /api/version
     /// </remarks>
     /// <response code="200">The current application version details.</response>
     /// <response code="500">An unexpected error occurred.</response>
@@ -25,8 +26,8 @@ public class VersionController : ApiControllerBase
     [EndpointName("GetVersion")]
     [ProducesResponseType(typeof(Entity.Version), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entity.Version>> Get()
+    public async Task<ActionResult<Entity.Version>> Get(CancellationToken cancellationToken)
     {
-        return await this.Mediator.Send(new Queries.GetVersion.GetVersionQuery());
+        return await this.Sender.Send(new Queries.GetVersion.GetVersionQuery(), cancellationToken);
     }
 }

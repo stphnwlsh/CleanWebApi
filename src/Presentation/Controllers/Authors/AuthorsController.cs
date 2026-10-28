@@ -6,75 +6,55 @@ using Microsoft.AspNetCore.Mvc;
 using Entities = Application.Authors.Entities;
 using Queries = Application.Authors.Queries;
 
+[Route("api/authors")]
 public class AuthorsController : ApiControllerBase
 {
     /// <summary>
-    /// Lookup all Authors
+    /// List Authors
     /// </summary>
     /// <remarks>
-    /// Returns every author along with the reviews they have written.
+    /// Returns one page of authors, ordered by last name then first name, along with the reviews they have
+    /// written. Add a search term to return only the authors whose first, last or full name contains it,
+    /// ignoring case. To fetch the next page, add the limit to the offset.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Authors
+    ///     GET /api/authors?query=smith&amp;offset=0&amp;limit=10
     /// </remarks>
-    /// <response code="200">A list of all the Authors.</response>
+    /// <param name="query">The words to look for in the name, ignoring case. Leave it out to list every author.</param>
+    /// <param name="offset">The number of authors to skip, 0 for the first page.</param>
+    /// <param name="limit">The largest number of authors to return, from 1 to 50.</param>
+    /// <response code="200">One page of Authors.</response>
+    /// <response code="400">The search term, offset or limit is not valid.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
     [EndpointName(nameof(GetAuthors))]
-    [ProducesResponseType(typeof(List<Entities.Author>), StatusCodes.Status200OK, "application/json")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<IList<Entities.Author>>> GetAuthors()
-    {
-        return await this.Mediator.Send(new Queries.GetAuthors.GetAuthorsQuery());
-    }
-
-    /// <summary>
-    /// Search Authors by name
-    /// </summary>
-    /// <remarks>
-    /// Returns one page of authors whose first name, last name or full name contains the search term,
-    /// ignoring case, ordered by last name then first name. Leave the search term out to page through
-    /// every author. When more results remain, the response holds a nextCursor. Send it back as the
-    /// cursor to fetch the next page.
-    ///
-    /// Sample request:
-    ///
-    ///     GET /api/Authors/search?query=smith&amp;limit=10
-    /// </remarks>
-    /// <param name="query">The words to look for in the name, ignoring case. Leave it out to list every author.</param>
-    /// <param name="limit">The largest number of authors to return, from 1 to 50.</param>
-    /// <param name="cursor">The nextCursor from a previous page. Leave it out for the first page.</param>
-    /// <response code="200">One page of matching Authors.</response>
-    /// <response code="400">The search term, limit or cursor is not valid.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("search")]
-    [EndpointName(nameof(SearchAuthors))]
     [ProducesResponseType(typeof(Page<Entities.Author>), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Page<Entities.Author>>> SearchAuthors(
-        [FromQuery] string query,
-        [FromQuery] int limit = Paging.DefaultLimit,
-        [FromQuery] string cursor = null)
+    public async Task<ActionResult<Page<Entities.Author>>> GetAuthors(
+        [FromQuery] string? query,
+        CancellationToken cancellationToken,
+        [FromQuery] int offset = 0,
+        [FromQuery] int limit = Paging.DefaultLimit)
     {
-        return this.Ok(await this.Mediator.Send(new Queries.SearchAuthors.SearchAuthorsQuery
+        return this.Ok(await this.Sender.Send(new Queries.GetAuthors.GetAuthorsQuery
         {
             Query = query,
-            Limit = limit,
-            Cursor = cursor
-        }));
+            Offset = offset,
+            Limit = limit
+        }, cancellationToken));
     }
 
     /// <summary>
-    /// Lookup an Author by their Id
+    /// Look up an Author by their Id
     /// </summary>
     /// <remarks>
     /// Returns a single author along with the reviews they have written.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Authors/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///     GET /api/authors/3fa85f64-5717-4562-b3fc-2c963f66afa6
     /// </remarks>
     /// <param name="id">The unique identifier of the author.</param>
     /// <response code="200">The Author with the specified Id.</response>
@@ -82,13 +62,13 @@ public class AuthorsController : ApiControllerBase
     /// <response code="404">No Author exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id:guid}")]
-    [EndpointName("GetAuthorById")]
+    [EndpointName(nameof(GetAuthorById))]
     [ProducesResponseType(typeof(Entities.Author), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entities.Author>> GetAuthorsById(Guid id)
+    public async Task<ActionResult<Entities.Author>> GetAuthorById(Guid id, CancellationToken cancellationToken)
     {
-        return this.Ok(await this.Mediator.Send(new Queries.GetAuthorById.GetAuthorByIdQuery { Id = id }));
+        return this.Ok(await this.Sender.Send(new Queries.GetAuthorById.GetAuthorByIdQuery { Id = id }, cancellationToken));
     }
 }

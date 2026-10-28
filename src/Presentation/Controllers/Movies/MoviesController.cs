@@ -6,74 +6,55 @@ using Microsoft.AspNetCore.Mvc;
 using Entities = Application.Movies.Entities;
 using Queries = Application.Movies.Queries;
 
+[Route("api/movies")]
 public class MoviesController : ApiControllerBase
 {
     /// <summary>
-    /// Lookup all Movies
+    /// List Movies
     /// </summary>
     /// <remarks>
-    /// Returns every movie along with the reviews written about it.
+    /// Returns one page of movies, ordered by title, along with the reviews written about them. Add a search
+    /// term to return only the movies whose title contains it, ignoring case. To fetch the next page, add the
+    /// limit to the offset.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Movies
+    ///     GET /api/movies?query=the&amp;offset=0&amp;limit=10
     /// </remarks>
-    /// <response code="200">A list of all the Movies.</response>
+    /// <param name="query">The words to look for in the title, ignoring case. Leave it out to list every movie.</param>
+    /// <param name="offset">The number of movies to skip, 0 for the first page.</param>
+    /// <param name="limit">The largest number of movies to return, from 1 to 50.</param>
+    /// <response code="200">One page of Movies.</response>
+    /// <response code="400">The search term, offset or limit is not valid.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
     [EndpointName(nameof(GetMovies))]
-    [ProducesResponseType(typeof(List<Entities.Movie>), StatusCodes.Status200OK, "application/json")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<IList<Entities.Movie>>> GetMovies()
-    {
-        return await this.Mediator.Send(new Queries.GetMovies.GetMoviesQuery());
-    }
-
-    /// <summary>
-    /// Search Movies by title
-    /// </summary>
-    /// <remarks>
-    /// Returns one page of movies whose title contains the search term, ignoring case, ordered by title.
-    /// Leave the search term out to page through every movie. When more results remain, the response
-    /// holds a nextCursor. Send it back as the cursor to fetch the next page.
-    ///
-    /// Sample request:
-    ///
-    ///     GET /api/Movies/search?query=the&amp;limit=10
-    /// </remarks>
-    /// <param name="query">The words to look for in the title, ignoring case. Leave it out to list every movie.</param>
-    /// <param name="limit">The largest number of movies to return, from 1 to 50.</param>
-    /// <param name="cursor">The nextCursor from a previous page. Leave it out for the first page.</param>
-    /// <response code="200">One page of matching Movies.</response>
-    /// <response code="400">The search term, limit or cursor is not valid.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("search")]
-    [EndpointName(nameof(SearchMovies))]
     [ProducesResponseType(typeof(Page<Entities.Movie>), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Page<Entities.Movie>>> SearchMovies(
-        [FromQuery] string query,
-        [FromQuery] int limit = Paging.DefaultLimit,
-        [FromQuery] string cursor = null)
+    public async Task<ActionResult<Page<Entities.Movie>>> GetMovies(
+        [FromQuery] string? query,
+        CancellationToken cancellationToken,
+        [FromQuery] int offset = 0,
+        [FromQuery] int limit = Paging.DefaultLimit)
     {
-        return this.Ok(await this.Mediator.Send(new Queries.SearchMovies.SearchMoviesQuery
+        return this.Ok(await this.Sender.Send(new Queries.GetMovies.GetMoviesQuery
         {
             Query = query,
-            Limit = limit,
-            Cursor = cursor
-        }));
+            Offset = offset,
+            Limit = limit
+        }, cancellationToken));
     }
 
     /// <summary>
-    /// Lookup a Movie by its Id
+    /// Look up a Movie by its Id
     /// </summary>
     /// <remarks>
     /// Returns a single movie along with the reviews written about it.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Movies/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///     GET /api/movies/3fa85f64-5717-4562-b3fc-2c963f66afa6
     /// </remarks>
     /// <param name="id">The unique identifier of the movie.</param>
     /// <response code="200">The Movie with the specified Id.</response>
@@ -81,13 +62,13 @@ public class MoviesController : ApiControllerBase
     /// <response code="404">No Movie exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id:guid}")]
-    [EndpointName("GetMovieById")]
+    [EndpointName(nameof(GetMovieById))]
     [ProducesResponseType(typeof(Entities.Movie), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entities.Movie>> GetMoviesById(Guid id)
+    public async Task<ActionResult<Entities.Movie>> GetMovieById(Guid id, CancellationToken cancellationToken)
     {
-        return this.Ok(await this.Mediator.Send(new Queries.GetMovieById.GetMovieByIdQuery { Id = id }));
+        return this.Ok(await this.Sender.Send(new Queries.GetMovieById.GetMovieByIdQuery { Id = id }, cancellationToken));
     }
 }

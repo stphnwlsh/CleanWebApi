@@ -6,11 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Authorize]
-[Route("api/[controller]")]
 [Consumes("application/json")]
 public abstract class ApiControllerBase : ControllerBase
 {
-    private IMediator mediator = null!;
+    private ISender? sender;
 
-    protected IMediator Mediator => this.mediator ??= this.HttpContext.RequestServices.GetRequiredService<IMediator>();
+    protected ISender Sender => this.sender ??= this.HttpContext.RequestServices.GetRequiredService<ISender>();
 }
