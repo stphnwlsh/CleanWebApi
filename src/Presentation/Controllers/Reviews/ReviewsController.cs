@@ -54,12 +54,12 @@ public class ReviewsController : ApiControllerBase
     /// <response code="404">No Review exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id:guid}")]
-    [EndpointName(nameof(GetReviewById))]
+    [EndpointName("GetReviewById")]
     [ProducesResponseType(typeof(Entities.Review), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entities.Review>> GetReviewById(Guid id)
+    public async Task<ActionResult<Entities.Review>> GetReviewsById(Guid id)
     {
         return this.Ok(await this.Mediator.Send(new Queries.GetReviewById.GetReviewByIdQuery { Id = id }));
     }
@@ -119,12 +119,12 @@ public class ReviewsController : ApiControllerBase
     /// <response code="404">No Review exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpDelete("{id:guid}")]
-    [EndpointName(nameof(DeleteReview))]
+    [EndpointName("DeleteReview")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<IActionResult> DeleteReview(Guid id)
+    public async Task<IActionResult> DeleteReviewById(Guid id)
     {
         _ = await this.Mediator.Send(new Commands.DeleteReview.DeleteReviewCommand { Id = id });
 
@@ -154,12 +154,12 @@ public class ReviewsController : ApiControllerBase
     /// <response code="404">The review, the author or the movie does not exist.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpPut("{id:guid}")]
-    [EndpointName(nameof(UpdateReview))]
+    [EndpointName("UpdateReview")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<IActionResult> UpdateReview(Guid id, UpdateReviewRequest request)
+    public async Task<IActionResult> UpdateReviewById(Guid id, UpdateReviewRequest request)
     {
         var command = new Commands.UpdateReview.UpdateReviewCommand
         {

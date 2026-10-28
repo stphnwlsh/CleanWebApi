@@ -51,12 +51,12 @@ public class MoviesController : ApiControllerBase
     /// <response code="404">No Movie exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id:guid}")]
-    [EndpointName(nameof(GetMovieById))]
+    [EndpointName("GetMovieById")]
     [ProducesResponseType(typeof(Entities.Movie), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entities.Movie>> GetMovieById(Guid id)
+    public async Task<ActionResult<Entities.Movie>> GetMoviesById(Guid id)
     {
         return this.Ok(await this.Mediator.Send(new Queries.GetMovieById.GetMovieByIdQuery { Id = id }));
     }
