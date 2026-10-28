@@ -5,8 +5,11 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application;
+using Authentication;
 using Errors;
 using Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,9 +65,43 @@ public static class ProgramExtensions
 
         #region OpenApi
 
-        _ = builder.Services.AddOpenApi(options => options.AddDocumentTransformer<DocumentInfoTransformer>());
+        var authentication = AuthenticationSettings.FromConfiguration(builder.Configuration);
+
+        _ = builder.Services.AddOpenApi(options =>
+        {
+            _ = options.AddDocumentTransformer<DocumentInfoTransformer>();
+
+            if (authentication.Enabled)
+            {
+                _ = options.AddDocumentTransformer<BearerSecurityTransformer>();
+                _ = options.AddOperationTransformer<BearerSecurityTransformer>();
+            }
+        });
 
         #endregion OpenApi
+
+        #region Authentication
+
+        if (authentication.Enabled)
+        {
+            _ = builder.Services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = authentication.Authority;
+                    options.Audience = authentication.Audience;
+                    options.MapInboundClaims = false;
+                });
+            _ = builder.Services.AddAuthorization();
+        }
+        else
+        {
+            // Controllers always ask for authorization, so without an authority every request is let through.
+            _ = builder.Services.AddAuthorizationBuilder()
+                .SetDefaultPolicy(new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build());
+        }
+
+        #endregion Authentication
 
         #region Errors
 
@@ -123,6 +160,17 @@ public static class ProgramExtensions
         _ = app.UseHsts();
 
         #endregion Security
+
+        #region Authentication
+
+        if (AuthenticationSettings.FromConfiguration(app.Configuration).Enabled)
+        {
+            _ = app.UseAuthentication();
+        }
+
+        _ = app.UseAuthorization();
+
+        #endregion Authentication
 
         #region API Configuration
 

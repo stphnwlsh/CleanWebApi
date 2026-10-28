@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[AllowAnonymous]
+[Authorize]
 [Route("api/[controller]")]
 [Consumes("application/json")]
 public abstract class ApiControllerBase : ControllerBase
