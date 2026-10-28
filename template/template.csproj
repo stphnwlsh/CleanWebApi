@@ -6,8 +6,8 @@
     <PackageId>CleanWebApi.Template</PackageId>
     <Title>Clean Web API Template</Title>
     <Authors>Stephen Walsh</Authors>
-    <Description>A template for an API using a streamlined version of Clean Architecture and .NET Web APIs.</Description>
-    <PackageTags>dotnet;api;csharp;template;clean;clean-architecture;web-api;web</PackageTags>
+    <Description>A dotnet new template for an ASP.NET Core Web API with controllers, built with a streamlined Clean Architecture on .NET 10.</Description>
+    <PackageTags>dotnet;csharp;dotnet-template;template;clean-architecture;cqrs;mediator;fluentvalidation;mapperly;entity-framework-core;docker;aspnetcore;web-api;rest-api;openapi</PackageTags>
     <PackageProjectUrl>https://github.com/stphnwlsh/CleanWebApi</PackageProjectUrl>
     <RepositoryUrl>https://github.com/stphnwlsh/CleanWebApi</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
