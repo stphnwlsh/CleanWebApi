@@ -1,7 +1,6 @@
 namespace CleanWebApi.Presentation.Extensions;
 
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,9 +8,10 @@ using Application;
 using Errors;
 using Infrastructure;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi;
+using OpenApi;
+using Scalar.AspNetCore;
 using Serilog;
 
 [ExcludeFromCodeCoverage]
@@ -27,6 +27,7 @@ public static class ProgramExtensions
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         });
 
@@ -49,50 +50,21 @@ public static class ProgramExtensions
 
         _ = builder.Services.Configure<JsonOptions>(options =>
         {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            options.SerializerOptions.PropertyNameCaseInsensitive = true;
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         });
 
         #endregion Serialisation
 
-        #region Swagger
+        #region OpenApi
 
-        var ti = CultureInfo.CurrentCulture.TextInfo;
+        _ = builder.Services.AddOpenApi(options => options.AddDocumentTransformer<DocumentInfoTransformer>());
 
-        _ = builder.Services.AddEndpointsApiExplorer();
-        _ = builder.Services.AddSwaggerGen(options =>
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = $"CleanWebApi API - {ti.ToTitleCase(builder.Environment.EnvironmentName)} ",
-                Description = "An example to share an implementation of Web API in .NET 10.",
-                Contact = new OpenApiContact
-                {
-                    Name = "CleanWebApi API",
-                    Email = "cleanwebapi@stphnwlsh.dev",
-                    Url = new Uri("https://github.com/stphnwlsh/cleanwebapi")
-                },
-                License = new OpenApiLicense()
-                {
-                    Name = "CleanWebApi API - License - MIT",
-                    Url = new Uri("https://opensource.org/licenses/MIT")
-                },
-                TermsOfService = new Uri("https://github.com/stphnwlsh/cleanwebapi")
-            });
-
-            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-
-            options.EnableAnnotations();
-            //options.TagActionsBy(api => new[] { api.GroupName });
-            //options.DocInclusionPredicate((name, api) => true);
-        });
-
-        #endregion Swagger
+        #endregion OpenApi
 
         #region Errors
 
@@ -133,16 +105,18 @@ public static class ProgramExtensions
 
         #endregion Logging
 
-        #region Swagger
+        #region OpenApi
 
-        var ti = CultureInfo.CurrentCulture.TextInfo;
+        _ = app.MapOpenApi();
+        _ = app.MapScalarApiReference(options => options
+            .WithTitle("CleanWebApi API")
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+            .HideDeveloperTools()
+            .DisableAgent()
+            .DisableMcp()
+            .DisableTelemetry());
 
-        _ = app.UseSwagger();
-        _ = app.UseSwaggerUI(c =>
-            c.SwaggerEndpoint("/swagger/v1/swagger.json",
-            $"CleanWebApi - {ti.ToTitleCase(app.Environment.EnvironmentName)} - V1"));
-
-        #endregion Swagger
+        #endregion OpenApi
 
         #region Security
 
