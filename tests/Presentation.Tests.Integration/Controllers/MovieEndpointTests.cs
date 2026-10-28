@@ -13,7 +13,7 @@ using Entities = Application.Movies.Entities;
 
 public class MovieEndpointTests : IDisposable
 {
-    private WebApiApplication application;
+    private readonly WebApiApplication application;
 
     public MovieEndpointTests()
     {
