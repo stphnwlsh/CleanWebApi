@@ -14,15 +14,20 @@ using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 using Xunit;
 
-public class ReviewEndpointTests
+public class ReviewEndpointTests : IDisposable
 {
-    private static readonly WebApiApplication Application = new();
+    private WebApiApplication application;
+
+    public ReviewEndpointTests()
+    {
+        this.application = new();
+    }
 
     [Fact]
     public async Task CreateReview_ShouldReturn_Created()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         using var authorResponse = await client.GetAsync("/api/authors");
         var authorResult = (await authorResponse.Content.ReadAsStringAsync()).Deserialize<List<Author>>()[0];
@@ -58,7 +63,7 @@ public class ReviewEndpointTests
     public async Task DeleteReview_ShouldDelete_Review()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
         using var reviewResponse = await client.GetAsync("/api/reviews");
         var reviewResult = (await reviewResponse.Content.ReadAsStringAsync()).Deserialize<List<Review>>()[0];
 
@@ -75,7 +80,7 @@ public class ReviewEndpointTests
     public async Task GetReviews_ShouldReturn_Ok()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
         using var response = await client.GetAsync("/api/reviews");
@@ -114,7 +119,7 @@ public class ReviewEndpointTests
     public async Task GetReviewById_ShouldReturn_Ok()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
         using var reviewResponse = await client.GetAsync("/api/reviews");
         var reviewResult = (await reviewResponse.Content.ReadAsStringAsync()).Deserialize<List<Review>>()[0];
 
@@ -149,7 +154,7 @@ public class ReviewEndpointTests
     public async Task UpdateReview_ShouldReturn_NoContent()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
         using var authorResponse = await client.GetAsync("/api/authors");
         var authorResult = (await authorResponse.Content.ReadAsStringAsync()).Deserialize<List<Author>>()[0];
         using var movieResponse = await client.GetAsync("/api/movies");
@@ -187,7 +192,7 @@ public class ReviewEndpointTests
     public async Task GetReviewById_ShouldReturn_ValidationProblem()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
         using var response = await client.GetAsync($"/api/reviews/{Guid.Empty}");
@@ -207,7 +212,7 @@ public class ReviewEndpointTests
     public async Task GetReviewById_ShouldReturn_NotFound()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
         using var response = await client.GetAsync($"/api/reviews/{Guid.NewGuid()}");
@@ -226,7 +231,7 @@ public class ReviewEndpointTests
     public async Task CreateReview_ShouldReturn_ValidationProblem()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
         var json = (new { Stars = 0, AuthorId = Guid.Empty, MovieId = Guid.Empty }).Serialize();
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -248,7 +253,7 @@ public class ReviewEndpointTests
     public async Task CreateReview_ShouldReturn_NotFound()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
         var json = (new { Stars = 5, AuthorId = Guid.NewGuid(), MovieId = Guid.NewGuid() }).Serialize();
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -262,5 +267,20 @@ public class ReviewEndpointTests
         _ = result.ShouldNotBeNull();
 
         result.Detail.ShouldBe("The Author with the supplied id was not found.");
+    }
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            this.application?.Dispose();
+            this.application = null;
+        }
     }
 }
