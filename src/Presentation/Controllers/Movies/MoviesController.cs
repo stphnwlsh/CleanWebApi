@@ -8,13 +8,6 @@ using Queries = Application.Movies.Queries;
 
 public class MoviesController : ApiControllerBase
 {
-    private readonly ILogger<MoviesController> logger;
-
-    public MoviesController(ILogger<MoviesController> logger)
-    {
-        this.logger = logger;
-    }
-
     /// <summary>
     /// Lookup all Movies
     /// </summary>
