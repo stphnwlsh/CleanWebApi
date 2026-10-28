@@ -9,7 +9,5 @@ using Microsoft.AspNetCore.Mvc;
 [Consumes("application/json")]
 public abstract class ApiControllerBase : ControllerBase
 {
-    private ISender? sender;
-
-    protected ISender Sender => this.sender ??= this.HttpContext.RequestServices.GetRequiredService<ISender>();
+    protected ISender Sender => this.HttpContext.RequestServices.GetRequiredService<ISender>();
 }
