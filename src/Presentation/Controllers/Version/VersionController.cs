@@ -9,13 +9,6 @@ using Queries = Application.Versions.Queries;
 [AllowAnonymous]
 public class VersionController : ApiControllerBase
 {
-    private readonly ILogger<VersionController> logger;
-
-    public VersionController(ILogger<VersionController> logger)
-    {
-        this.logger = logger;
-    }
-
     /// <summary>
     /// Lookup the application version details
     /// </summary>

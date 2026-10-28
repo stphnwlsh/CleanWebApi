@@ -8,13 +8,6 @@ using Queries = Application.Authors.Queries;
 
 public class AuthorsController : ApiControllerBase
 {
-    private readonly ILogger<AuthorsController> logger;
-
-    public AuthorsController(ILogger<AuthorsController> logger)
-    {
-        this.logger = logger;
-    }
-
     /// <summary>
     /// Lookup all Authors
     /// </summary>

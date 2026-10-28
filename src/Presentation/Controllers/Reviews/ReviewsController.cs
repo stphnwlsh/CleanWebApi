@@ -11,13 +11,6 @@ using Queries = Application.Reviews.Queries;
 
 public class ReviewsController : ApiControllerBase
 {
-    private readonly ILogger<ReviewsController> logger;
-
-    public ReviewsController(ILogger<ReviewsController> logger)
-    {
-        this.logger = logger;
-    }
-
     /// <summary>
     /// Lookup all Reviews
     /// </summary>
