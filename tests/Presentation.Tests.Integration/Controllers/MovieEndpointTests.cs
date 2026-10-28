@@ -3,6 +3,7 @@ namespace CleanWebApi.Presentation.Tests.Integration.Controllers;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Application.Common.Paging;
 using Application.Movies.Entities;
 using Extensions;
 using Microsoft.AspNetCore.Http;
@@ -127,5 +128,95 @@ public class MovieEndpointTests
 
         result.Status.ShouldBe(StatusCodes.Status404NotFound);
         result.Detail.ShouldBe("The Movie with the supplied id was not found.");
+    }
+
+    [Fact]
+    public async Task SearchMovies_ShouldReturn_FirstPage()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync("/api/movies/search");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Items.Count.ShouldBe(Paging.DefaultLimit);
+        result.TotalCount.ShouldBe(50);
+        result.NextCursor.ShouldNotBeNullOrWhiteSpace();
+        result.Items.Select(m => m.Title).ShouldBe(result.Items.Select(m => m.Title).Order());
+    }
+
+    [Fact]
+    public async Task SearchMovies_ShouldReturn_NextPage()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+        using var firstResponse = await client.GetAsync("/api/movies/search?limit=20");
+        var first = (await firstResponse.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+
+        // Act
+        using var response = await client.GetAsync($"/api/movies/search?limit=40&cursor={Uri.EscapeDataString(first.NextCursor)}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Items.Count.ShouldBe(30);
+        result.TotalCount.ShouldBe(50);
+        result.NextCursor.ShouldBeNull();
+        result.Items.Select(m => m.Id).Intersect(first.Items.Select(m => m.Id)).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task SearchMovies_ShouldReturn_Matches()
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+        using var moviesResponse = await client.GetAsync("/api/movies");
+        var title = (await moviesResponse.Content.ReadAsStringAsync())
+            .Deserialize<List<Movie>>()
+            .First().Title;
+
+        // Act
+        using var response = await client.GetAsync($"/api/movies/search?query={Uri.EscapeDataString(title.ToUpperInvariant())}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Items.ShouldNotBeEmpty();
+        result.Items.ShouldAllBe(m => m.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory]
+    [InlineData("limit=0", "Limit", "A limit must be between 1 and 50.")]
+    [InlineData("limit=51", "Limit", "A limit must be between 1 and 50.")]
+    [InlineData("cursor=fake", "Cursor", "The cursor is not valid. Use the nextCursor from a previous page, or leave it empty for the first page.")]
+    public async Task SearchMovies_ShouldReturn_ValidationProblem(string queryString, string key, string message)
+    {
+        // Arrange
+        using var client = Application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/movies/search?{queryString}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status400BadRequest);
+        result.Errors.ShouldContainKey(key);
+        result.Errors[key].ShouldBe([message]);
     }
 }

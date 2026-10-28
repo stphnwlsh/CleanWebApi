@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Authors.Entities;
+using Application.Common.Paging;
 using Application.Movies.Entities;
 using Application.Reviews.Entities;
 using Extensions;
@@ -267,6 +268,92 @@ public class ReviewEndpointTests : IDisposable
         _ = result.ShouldNotBeNull();
 
         result.Detail.ShouldBe("The Author with the supplied id was not found.");
+    }
+
+    [Fact]
+    public async Task SearchReviews_ShouldReturn_FirstPage()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync("/api/reviews/search");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Review>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Items.Count.ShouldBe(Paging.DefaultLimit);
+        result.TotalCount.ShouldBe(150);
+        result.NextCursor.ShouldNotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task SearchReviews_ShouldReturn_ReviewsOfMovie()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+        using var reviewsResponse = await client.GetAsync("/api/reviews");
+        var reviews = (await reviewsResponse.Content.ReadAsStringAsync()).Deserialize<List<Review>>();
+        var movieId = reviews.First().ReviewedMovie.Id;
+
+        // Act
+        using var response = await client.GetAsync($"/api/reviews/search?movieId={movieId}&limit=50");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Review>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        _ = result.ShouldNotBeNull();
+
+        result.TotalCount.ShouldBe(reviews.Count(r => r.ReviewedMovie.Id == movieId));
+        result.Items.ShouldNotBeEmpty();
+        result.Items.ShouldAllBe(r => r.ReviewedMovie.Id == movieId);
+    }
+
+    [Fact]
+    public async Task SearchReviews_ShouldReturn_ReviewsByAuthor()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+        using var reviewsResponse = await client.GetAsync("/api/reviews");
+        var reviews = (await reviewsResponse.Content.ReadAsStringAsync()).Deserialize<List<Review>>();
+        var authorId = reviews.First().ReviewAuthor.Id;
+
+        // Act
+        using var response = await client.GetAsync($"/api/reviews/search?authorId={authorId}&limit=50");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Review>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        _ = result.ShouldNotBeNull();
+
+        result.TotalCount.ShouldBe(reviews.Count(r => r.ReviewAuthor.Id == authorId));
+        result.Items.ShouldNotBeEmpty();
+        result.Items.ShouldAllBe(r => r.ReviewAuthor.Id == authorId);
+    }
+
+    [Fact]
+    public async Task SearchReviews_ShouldReturn_ValidationProblem()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/reviews/search?movieId={Guid.Empty}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status400BadRequest);
+        result.Errors.ShouldContainKey("MovieId");
+        result.Errors["MovieId"].ShouldBe(["A Movie Id can't be empty. Leave it out to search every movie."]);
     }
 
     public void Dispose()

@@ -1,5 +1,6 @@
 namespace CleanWebApi.Presentation.Controllers.Authors;
 
+using Application.Common.Paging;
 using Common;
 using Microsoft.AspNetCore.Mvc;
 using Entities = Application.Authors.Entities;
@@ -33,6 +34,43 @@ public class AuthorsController : ApiControllerBase
     public async Task<ActionResult<IList<Entities.Author>>> GetAuthors()
     {
         return await this.Mediator.Send(new Queries.GetAuthors.GetAuthorsQuery());
+    }
+
+    /// <summary>
+    /// Search Authors by name
+    /// </summary>
+    /// <remarks>
+    /// Returns one page of authors whose first name, last name or full name contains the search term,
+    /// ignoring case, ordered by last name then first name. Leave the search term out to page through
+    /// every author. When more results remain, the response holds a nextCursor. Send it back as the
+    /// cursor to fetch the next page.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/Authors/search?query=smith&amp;limit=10
+    /// </remarks>
+    /// <param name="query">The words to look for in the name, ignoring case. Leave it out to list every author.</param>
+    /// <param name="limit">The largest number of authors to return, from 1 to 50.</param>
+    /// <param name="cursor">The nextCursor from a previous page. Leave it out for the first page.</param>
+    /// <response code="200">One page of matching Authors.</response>
+    /// <response code="400">The search term, limit or cursor is not valid.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("search")]
+    [EndpointName(nameof(SearchAuthors))]
+    [ProducesResponseType(typeof(Page<Entities.Author>), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
+    public async Task<ActionResult<Page<Entities.Author>>> SearchAuthors(
+        [FromQuery] string query,
+        [FromQuery] int limit = Paging.DefaultLimit,
+        [FromQuery] string cursor = null)
+    {
+        return this.Ok(await this.Mediator.Send(new Queries.SearchAuthors.SearchAuthorsQuery
+        {
+            Query = query,
+            Limit = limit,
+            Cursor = cursor
+        }));
     }
 
     /// <summary>
