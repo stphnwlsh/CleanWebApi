@@ -1,12 +1,12 @@
-namespace CleanWebApi.Application.Tests.Unit.Movies.Queries.SearchMovies;
+namespace CleanWebApi.Application.Tests.Unit.Authors.Queries.GetAuthors;
 
-using Application.Movies.Queries.SearchMovies;
+using Application.Authors.Queries.GetAuthors;
 using FluentValidation.TestHelper;
 using Xunit;
 
-public class SearchMoviesValidatorTests
+public class GetAuthorsValidatorTests
 {
-    private static readonly SearchMoviesValidator Validator = new();
+    private static readonly GetAuthorsValidator Validator = new();
 
     [Theory]
     [InlineData(0)]
@@ -14,7 +14,7 @@ public class SearchMoviesValidatorTests
     public void Validator_ShouldHaveValidationErrorFor_Limit(int limit)
     {
         // Arrange
-        var query = new SearchMoviesQuery { Limit = limit };
+        var query = new GetAuthorsQuery { Limit = limit };
 
         // Act
         var result = Validator.TestValidate(query);
@@ -24,23 +24,23 @@ public class SearchMoviesValidatorTests
     }
 
     [Fact]
-    public void Validator_ShouldHaveValidationErrorFor_Cursor()
+    public void Validator_ShouldHaveValidationErrorFor_Offset()
     {
         // Arrange
-        var query = new SearchMoviesQuery { Cursor = "not a cursor" };
+        var query = new GetAuthorsQuery { Offset = -1 };
 
         // Act
         var result = Validator.TestValidate(query);
 
         // Assert
-        _ = result.ShouldHaveValidationErrorFor(query => query.Cursor);
+        _ = result.ShouldHaveValidationErrorFor(query => query.Offset);
     }
 
     [Fact]
     public void Validator_ShouldHaveValidationErrorFor_Query()
     {
         // Arrange
-        var query = new SearchMoviesQuery { Query = new string('a', 101) };
+        var query = new GetAuthorsQuery { Query = new string('a', 101) };
 
         // Act
         var result = Validator.TestValidate(query);
@@ -50,12 +50,12 @@ public class SearchMoviesValidatorTests
     }
 
     [Theory]
-    [InlineData(null, 1, null)]
-    [InlineData("Lorem", 50, "b2Zmc2V0OjEw")]
-    public void Validator_ShouldNotHaveValidationErrors(string search, int limit, string cursor)
+    [InlineData(null, 0, 1)]
+    [InlineData("Lorem", 100, 50)]
+    public void Validator_ShouldNotHaveValidationErrors(string? search, int offset, int limit)
     {
         // Arrange
-        var query = new SearchMoviesQuery { Query = search, Limit = limit, Cursor = cursor };
+        var query = new GetAuthorsQuery { Query = search, Offset = offset, Limit = limit };
 
         // Act
         var result = Validator.TestValidate(query);

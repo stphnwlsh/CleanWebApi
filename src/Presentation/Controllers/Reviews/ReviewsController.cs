@@ -2,84 +2,64 @@ namespace CleanWebApi.Presentation.Controllers.Reviews;
 
 using Application.Common.Paging;
 using Common;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Requests;
 using Commands = Application.Reviews.Commands;
 using Entities = Application.Reviews.Entities;
 using Queries = Application.Reviews.Queries;
 
+[Route("api/reviews")]
 public class ReviewsController : ApiControllerBase
 {
     /// <summary>
-    /// Lookup all Reviews
+    /// List Reviews
     /// </summary>
     /// <remarks>
-    /// Returns every review along with the movie it is about and the author who wrote it.
+    /// Returns one page of reviews, ordered by movie then author, along with the movie each is about and the
+    /// author who wrote it. Optionally return only the reviews of one movie, by one author, or both. To fetch
+    /// the next page, add the limit to the offset.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Reviews
-    /// </remarks>
-    /// <response code="200">A list of all the Reviews.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet]
-    [EndpointName(nameof(GetReviews))]
-    [ProducesResponseType(typeof(List<Entities.Review>), StatusCodes.Status200OK, "application/json")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<IList<Entities.Review>>> GetReviews()
-    {
-        return await this.Mediator.Send(new Queries.GetReviews.GetReviewsQuery());
-    }
-
-    /// <summary>
-    /// Search Reviews by movie or author
-    /// </summary>
-    /// <remarks>
-    /// Returns one page of reviews, optionally only those of one movie, by one author, or both,
-    /// ordered by movie then author. When more results remain, the response holds a nextCursor.
-    /// Send it back as the cursor to fetch the next page.
-    ///
-    /// Sample request:
-    ///
-    ///     GET /api/Reviews/search?movieId=3fa85f64-5717-4562-b3fc-2c963f66afa6&amp;limit=10
+    ///     GET /api/reviews?movieId=3fa85f64-5717-4562-b3fc-2c963f66afa6&amp;offset=0&amp;limit=10
     /// </remarks>
     /// <param name="movieId">Only return reviews of this movie. Leave it out for every movie.</param>
     /// <param name="authorId">Only return reviews by this author. Leave it out for every author.</param>
+    /// <param name="offset">The number of reviews to skip, 0 for the first page.</param>
     /// <param name="limit">The largest number of reviews to return, from 1 to 50.</param>
-    /// <param name="cursor">The nextCursor from a previous page. Leave it out for the first page.</param>
-    /// <response code="200">One page of matching Reviews.</response>
-    /// <response code="400">An Id, the limit or the cursor is not valid.</response>
+    /// <response code="200">One page of Reviews.</response>
+    /// <response code="400">An Id, the offset or the limit is not valid.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("search")]
-    [EndpointName(nameof(SearchReviews))]
+    [HttpGet]
+    [EndpointName(nameof(GetReviews))]
     [ProducesResponseType(typeof(Page<Entities.Review>), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Page<Entities.Review>>> SearchReviews(
+    public async Task<ActionResult<Page<Entities.Review>>> GetReviews(
         [FromQuery] Guid? movieId,
         [FromQuery] Guid? authorId,
-        [FromQuery] int limit = Paging.DefaultLimit,
-        [FromQuery] string cursor = null)
+        CancellationToken cancellationToken,
+        [FromQuery] int offset = 0,
+        [FromQuery] int limit = Paging.DefaultLimit)
     {
-        return this.Ok(await this.Mediator.Send(new Queries.SearchReviews.SearchReviewsQuery
+        return this.Ok(await this.Sender.Send(new Queries.GetReviews.GetReviewsQuery
         {
             MovieId = movieId,
             AuthorId = authorId,
-            Limit = limit,
-            Cursor = cursor
-        }));
+            Offset = offset,
+            Limit = limit
+        }, cancellationToken));
     }
 
     /// <summary>
-    /// Lookup a Review by its Id
+    /// Look up a Review by its Id
     /// </summary>
     /// <remarks>
     /// Returns a single review along with the movie it is about and the author who wrote it.
     ///
     /// Sample request:
     ///
-    ///     GET /api/Reviews/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///     GET /api/reviews/3fa85f64-5717-4562-b3fc-2c963f66afa6
     /// </remarks>
     /// <param name="id">The unique identifier of the review.</param>
     /// <response code="200">The Review with the specified Id.</response>
@@ -87,14 +67,14 @@ public class ReviewsController : ApiControllerBase
     /// <response code="404">No Review exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id:guid}")]
-    [EndpointName("GetReviewById")]
+    [EndpointName(nameof(GetReviewById))]
     [ProducesResponseType(typeof(Entities.Review), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entities.Review>> GetReviewsById(Guid id)
+    public async Task<ActionResult<Entities.Review>> GetReviewById(Guid id, CancellationToken cancellationToken)
     {
-        return this.Ok(await this.Mediator.Send(new Queries.GetReviewById.GetReviewByIdQuery { Id = id }));
+        return this.Ok(await this.Sender.Send(new Queries.GetReviewById.GetReviewByIdQuery { Id = id }, cancellationToken));
     }
 
     /// <summary>
@@ -106,7 +86,7 @@ public class ReviewsController : ApiControllerBase
     ///
     /// Sample request:
     ///
-    ///     POST /api/Reviews
+    ///     POST /api/reviews
     ///     {
     ///         "authorId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
     ///         "movieId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -124,7 +104,7 @@ public class ReviewsController : ApiControllerBase
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entities.Review>> CreateReview(CreateReviewRequest request)
+    public async Task<ActionResult<Entities.Review>> CreateReview(CreateReviewRequest request, CancellationToken cancellationToken)
     {
         var command = new Commands.CreateReview.CreateReviewCommand()
         {
@@ -133,7 +113,9 @@ public class ReviewsController : ApiControllerBase
             Stars = request.Stars
         };
 
-        return this.Created(this.HttpContext.Request.GetEncodedUrl(), await this.Mediator.Send(command));
+        var response = await this.Sender.Send(command, cancellationToken);
+
+        return this.CreatedAtAction(nameof(this.GetReviewById), new { id = response.Id }, response);
     }
 
     /// <summary>
@@ -144,7 +126,7 @@ public class ReviewsController : ApiControllerBase
     ///
     /// Sample request:
     ///
-    ///     DELETE /api/Reviews/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///     DELETE /api/reviews/3fa85f64-5717-4562-b3fc-2c963f66afa6
     /// </remarks>
     /// <param name="id">The unique identifier of the review.</param>
     /// <response code="204">The Review was deleted.</response>
@@ -152,57 +134,53 @@ public class ReviewsController : ApiControllerBase
     /// <response code="404">No Review exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpDelete("{id:guid}")]
-    [EndpointName("DeleteReview")]
+    [EndpointName(nameof(DeleteReview))]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<IActionResult> DeleteReviewById(Guid id)
+    public async Task<IActionResult> DeleteReview(Guid id, CancellationToken cancellationToken)
     {
-        _ = await this.Mediator.Send(new Commands.DeleteReview.DeleteReviewCommand { Id = id });
+        _ = await this.Sender.Send(new Commands.DeleteReview.DeleteReviewCommand { Id = id }, cancellationToken);
 
         return this.NoContent();
     }
 
     /// <summary>
-    /// Update a Review by its Id
+    /// Update the star rating of a Review
     /// </summary>
     /// <remarks>
-    /// Replaces the author, movie and star rating of an existing review. The author and the movie
-    /// must already exist, and the star rating must be between 1 and 5.
+    /// Changes the star rating of an existing review, which must be between 1 and 5. The author and the
+    /// movie of a review can't change. To review a different movie, create a new review.
     ///
     /// Sample request:
     ///
-    ///     PUT /api/Reviews/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///     PUT /api/reviews/3fa85f64-5717-4562-b3fc-2c963f66afa6
     ///     {
-    ///         "authorId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///         "movieId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
     ///         "stars": 5
     ///     }
     /// </remarks>
     /// <param name="id">The unique identifier of the review.</param>
-    /// <param name="request">The new details of the review.</param>
+    /// <param name="request">The new star rating of the review.</param>
     /// <response code="204">The Review was updated.</response>
     /// <response code="400">The request is not valid, for example the star rating is out of range.</response>
-    /// <response code="404">The review, the author or the movie does not exist.</response>
+    /// <response code="404">No Review exists with the specified Id.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpPut("{id:guid}")]
-    [EndpointName("UpdateReview")]
+    [EndpointName(nameof(UpdateReview))]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<IActionResult> UpdateReviewById(Guid id, UpdateReviewRequest request)
+    public async Task<IActionResult> UpdateReview(Guid id, UpdateReviewRequest request, CancellationToken cancellationToken)
     {
         var command = new Commands.UpdateReview.UpdateReviewCommand
         {
             Id = id,
-            AuthorId = request.AuthorId,
-            MovieId = request.MovieId,
             Stars = request.Stars
         };
 
-        _ = await this.Mediator.Send(command);
+        _ = await this.Sender.Send(command, cancellationToken);
 
         return this.NoContent();
     }

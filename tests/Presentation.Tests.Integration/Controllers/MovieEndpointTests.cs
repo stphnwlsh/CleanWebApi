@@ -1,29 +1,34 @@
 namespace CleanWebApi.Presentation.Tests.Integration.Controllers;
 
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Application.Common.Paging;
-using Application.Movies.Entities;
 using Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 using Xunit;
+using Entities = Application.Movies.Entities;
 
-public class MovieEndpointTests
+public class MovieEndpointTests : IDisposable
 {
-    private static readonly WebApiApplication Application = new();
+    private readonly WebApiApplication application;
+
+    public MovieEndpointTests()
+    {
+        this.application = new();
+    }
 
     [Fact]
     public async Task GetMovies_ShouldReturn_Ok()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
-        using var response = await client.GetAsync("/api/movies");
-        var result = (await response.Content.ReadAsStringAsync()).Deserialize<List<Movie>>();
+        using var response = await client.GetAsync("/api/movies?limit=50");
+        var result = (await response.Content.ReadAsStringAsync())
+            .Deserialize<Page<Entities.MovieSummary>>().Items;
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -40,18 +45,9 @@ public class MovieEndpointTests
             _ = movie.Title.ShouldBeOfType<string>();
             movie.Title.ShouldNotBeNullOrWhiteSpace();
 
-            foreach (var review in movie.Reviews)
-            {
-                _ = review.Stars.ShouldBeOfType<int>();
-                review.Stars.ShouldBeInRange(1, 5);
-
-                _ = review.ReviewAuthor.ShouldNotBeNull();
-                _ = review.ReviewAuthor.Id.ShouldBeOfType<Guid>();
-                _ = review.ReviewAuthor.FirstName.ShouldBeOfType<string>();
-                review.ReviewAuthor.FirstName.ShouldNotBeNullOrWhiteSpace();
-                _ = review.ReviewAuthor.LastName.ShouldBeOfType<string>();
-                review.ReviewAuthor.LastName.ShouldNotBeNullOrWhiteSpace();
-            }
+            movie.ReviewCount.ShouldBeGreaterThanOrEqualTo(0);
+            (movie.AverageStars is null || movie.AverageStars is >= 1 and <= 5).ShouldBeTrue();
+            (movie.AverageStars is null).ShouldBe(movie.ReviewCount == 0);
         }
     }
 
@@ -59,43 +55,45 @@ public class MovieEndpointTests
     public async Task GetMovieById_ShouldReturn_Ok()
     {
         // Arrange
-        using var client = Application.CreateClient();
-        using var authorResponse = await client.GetAsync("/api/movies");
-        var authorResult = (await authorResponse.Content.ReadAsStringAsync()).Deserialize<List<Movie>>().First(m => m.Reviews.Count > 0);
+        using var client = this.application.CreateClient();
+        using var movieResponse = await client.GetAsync("/api/movies?limit=50");
+        var movieResult = (await movieResponse.Content.ReadAsStringAsync())
+            .Deserialize<Page<Entities.MovieSummary>>().Items
+            .First(m => m.ReviewCount > 0);
 
         // Act
-        using var response = await client.GetAsync($"/api/movies/{authorResult.Id}");
-        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Movie>();
+        using var response = await client.GetAsync($"/api/movies/{movieResult.Id}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Entities.Movie>();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         _ = result.ShouldNotBeNull();
 
-        result.Id.ShouldBe(authorResult.Id);
+        result.Id.ShouldBe(movieResult.Id);
         _ = result.Title.ShouldBeOfType<string>();
         result.Title.ShouldNotBeNullOrWhiteSpace();
-        result.Reviews.ShouldNotBeEmpty();
+        result.Reviews.Count.ShouldBe(movieResult.ReviewCount);
 
-        foreach (var review in result.Reviews)
+        foreach (var review in result.Reviews.ShouldNotBeNull())
         {
             _ = review.Stars.ShouldBeOfType<int>();
             review.Stars.ShouldBeInRange(1, 5);
 
             _ = review.ReviewAuthor.ShouldNotBeNull();
-            _ = review.ReviewAuthor.Id.ShouldBeOfType<Guid>();
-            _ = review.ReviewAuthor.FirstName.ShouldBeOfType<string>();
-            review.ReviewAuthor.FirstName.ShouldNotBeNullOrWhiteSpace();
-            _ = review.ReviewAuthor.LastName.ShouldBeOfType<string>();
-            review.ReviewAuthor.LastName.ShouldNotBeNullOrWhiteSpace();
+            _ = review.ReviewAuthor!.Id.ShouldBeOfType<Guid>();
+            _ = review.ReviewAuthor!.FirstName.ShouldBeOfType<string>();
+            review.ReviewAuthor!.FirstName.ShouldNotBeNullOrWhiteSpace();
+            _ = review.ReviewAuthor!.LastName.ShouldBeOfType<string>();
+            review.ReviewAuthor!.LastName.ShouldNotBeNullOrWhiteSpace();
         }
     }
 
     [Fact]
-    public async Task GetMovieById_ShouldReturn_ValidationProblem()
+    public async Task GetMovieId_ShouldReturn_ValidationProblem()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
         using var response = await client.GetAsync($"/api/movies/{Guid.Empty}");
@@ -112,10 +110,10 @@ public class MovieEndpointTests
     }
 
     [Fact]
-    public async Task GetMovieById_ShouldReturn_NotFound()
+    public async Task GetMovieId_ShouldReturn_NotFound()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
         using var response = await client.GetAsync($"/api/movies/{Guid.NewGuid()}");
@@ -130,15 +128,35 @@ public class MovieEndpointTests
         result.Detail.ShouldBe("The Movie with the supplied id was not found.");
     }
 
-    [Fact]
-    public async Task SearchMovies_ShouldReturn_FirstPage()
+    [Theory]
+    [InlineData("1")]
+    [InlineData("fake")]
+    public async Task GetMovieId_ShouldReturn_NotFound_WhenIdIsNotAGuid(string input)
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
-        using var response = await client.GetAsync("/api/movies/search");
-        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+        using var response = await client.GetAsync($"/api/movies/{input}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Status.ShouldBe(StatusCodes.Status404NotFound);
+    }
+
+    [Fact]
+    public async Task GetMovies_ShouldReturn_FirstPage()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync("/api/movies");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Entities.MovieSummary>>();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -146,22 +164,23 @@ public class MovieEndpointTests
         _ = result.ShouldNotBeNull();
 
         result.Items.Count.ShouldBe(Paging.DefaultLimit);
+        result.Offset.ShouldBe(0);
+        result.Limit.ShouldBe(Paging.DefaultLimit);
         result.TotalCount.ShouldBe(50);
-        result.NextCursor.ShouldNotBeNullOrWhiteSpace();
         result.Items.Select(m => m.Title).ShouldBe(result.Items.Select(m => m.Title).Order());
     }
 
     [Fact]
-    public async Task SearchMovies_ShouldReturn_NextPage()
+    public async Task GetMovies_ShouldReturn_NextPage()
     {
         // Arrange
-        using var client = Application.CreateClient();
-        using var firstResponse = await client.GetAsync("/api/movies/search?limit=20");
-        var first = (await firstResponse.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+        using var client = this.application.CreateClient();
+        using var firstResponse = await client.GetAsync("/api/movies?limit=20");
+        var first = (await firstResponse.Content.ReadAsStringAsync()).Deserialize<Page<Entities.MovieSummary>>();
 
         // Act
-        using var response = await client.GetAsync($"/api/movies/search?limit=40&cursor={Uri.EscapeDataString(first.NextCursor)}");
-        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+        using var response = await client.GetAsync($"/api/movies?offset={first.Offset + first.Limit}&limit=40");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Entities.MovieSummary>>();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -170,23 +189,23 @@ public class MovieEndpointTests
 
         result.Items.Count.ShouldBe(30);
         result.TotalCount.ShouldBe(50);
-        result.NextCursor.ShouldBeNull();
+        result.Offset.ShouldBe(20);
         result.Items.Select(m => m.Id).Intersect(first.Items.Select(m => m.Id)).ShouldBeEmpty();
     }
 
     [Fact]
-    public async Task SearchMovies_ShouldReturn_Matches()
+    public async Task GetMovies_ShouldReturn_Matches()
     {
         // Arrange
-        using var client = Application.CreateClient();
-        using var moviesResponse = await client.GetAsync("/api/movies");
+        using var client = this.application.CreateClient();
+        using var moviesResponse = await client.GetAsync("/api/movies?limit=50");
         var title = (await moviesResponse.Content.ReadAsStringAsync())
-            .Deserialize<List<Movie>>()
+            .Deserialize<Page<Entities.MovieSummary>>().Items
             .First().Title;
 
         // Act
-        using var response = await client.GetAsync($"/api/movies/search?query={Uri.EscapeDataString(title.ToUpperInvariant())}");
-        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Movie>>();
+        using var response = await client.GetAsync($"/api/movies?query={Uri.EscapeDataString(title.ToUpperInvariant())}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Entities.MovieSummary>>();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -200,14 +219,14 @@ public class MovieEndpointTests
     [Theory]
     [InlineData("limit=0", "Limit", "A limit must be between 1 and 50.")]
     [InlineData("limit=51", "Limit", "A limit must be between 1 and 50.")]
-    [InlineData("cursor=fake", "Cursor", "The cursor is not valid. Use the nextCursor from a previous page, or leave it empty for the first page.")]
-    public async Task SearchMovies_ShouldReturn_ValidationProblem(string queryString, string key, string message)
+    [InlineData("offset=-1", "Offset", "An offset can't be negative. Use 0 for the first page.")]
+    public async Task GetMovies_ShouldReturn_ValidationProblem(string queryString, string key, string message)
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
-        using var response = await client.GetAsync($"/api/movies/search?{queryString}");
+        using var response = await client.GetAsync($"/api/movies?{queryString}");
         var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
 
         // Assert
@@ -218,5 +237,19 @@ public class MovieEndpointTests
         result.Status.ShouldBe(StatusCodes.Status400BadRequest);
         result.Errors.ShouldContainKey(key);
         result.Errors[key].ShouldBe([message]);
+    }
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            this.application.Dispose();
+        }
     }
 }

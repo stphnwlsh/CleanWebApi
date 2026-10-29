@@ -6,21 +6,26 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-public class OpenApiDocumentTests
+public class OpenApiDocumentTests : IDisposable
 {
-    private static readonly WebApiApplication Application = new();
+    private readonly WebApiApplication application;
+
+    public OpenApiDocumentTests()
+    {
+        this.application = new();
+    }
 
     [Fact]
     public async Task GetOpenApiDocument_ShouldDescribe_Api()
     {
         // Arrange
-        using var document = await GetOpenApiDocument();
+        using var document = await this.GetOpenApiDocument();
 
         // Act
         var info = document.RootElement.GetProperty("info");
 
         // Assert
-        info.GetProperty("title").GetString().ShouldStartWith("CleanWebApi API");
+        info.GetProperty("title").GetString()!.ShouldStartWith("CleanWebApi API");
         info.GetProperty("description").GetString().ShouldNotBeNullOrWhiteSpace();
         info.GetProperty("license").GetProperty("name").GetString().ShouldNotBeNullOrWhiteSpace();
     }
@@ -29,7 +34,7 @@ public class OpenApiDocumentTests
     public async Task GetOpenApiDocument_ShouldDescribe_Tags()
     {
         // Arrange
-        using var document = await GetOpenApiDocument();
+        using var document = await this.GetOpenApiDocument();
 
         // Act
         var tags = document.RootElement.GetProperty("tags").EnumerateArray().ToList();
@@ -47,7 +52,7 @@ public class OpenApiDocumentTests
     public async Task GetOpenApiDocument_ShouldDescribe_EveryOperation()
     {
         // Arrange
-        using var document = await GetOpenApiDocument();
+        using var document = await this.GetOpenApiDocument();
 
         // Act
         var operations = document.RootElement.GetProperty("paths").EnumerateObject()
@@ -56,13 +61,13 @@ public class OpenApiDocumentTests
             .ToList();
 
         // Assert
-        operations.Count.ShouldBe(13);
+        operations.Count.ShouldBe(10);
 
         foreach (var operation in operations)
         {
             operation.GetProperty("operationId").GetString().ShouldNotBeNullOrWhiteSpace();
             operation.GetProperty("summary").GetString().ShouldNotBeNullOrWhiteSpace();
-            operation.GetProperty("description").GetString().ShouldContain("Sample request:");
+            operation.GetProperty("description").GetString()!.ShouldContain("Sample request:");
 
             if (operation.TryGetProperty("parameters", out var parameters))
             {
@@ -79,7 +84,7 @@ public class OpenApiDocumentTests
 
             foreach (var response in operation.GetProperty("responses").EnumerateObject())
             {
-                response.Value.GetProperty("description").GetString().ShouldEndWith(".");
+                response.Value.GetProperty("description").GetString()!.ShouldEndWith(".");
             }
         }
     }
@@ -89,15 +94,17 @@ public class OpenApiDocumentTests
     [InlineData("Movie")]
     [InlineData("Review")]
     [InlineData("Version")]
-    [InlineData("PageOfAuthor")]
-    [InlineData("PageOfMovie")]
+    [InlineData("AuthorSummary")]
+    [InlineData("PageOfAuthorSummary")]
+    [InlineData("MovieSummary")]
+    [InlineData("PageOfMovieSummary")]
     [InlineData("PageOfReview")]
     [InlineData("CreateReviewRequest")]
     [InlineData("UpdateReviewRequest")]
     public async Task GetOpenApiDocument_ShouldDescribe_Schema(string name)
     {
         // Arrange
-        using var document = await GetOpenApiDocument();
+        using var document = await this.GetOpenApiDocument();
 
         // Act
         var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty(name);
@@ -107,15 +114,28 @@ public class OpenApiDocumentTests
 
         foreach (var property in schema.GetProperty("properties").EnumerateObject())
         {
-            property.Value.GetProperty("description").GetString().ShouldNotBeNullOrWhiteSpace();
+            Description(property.Value).ShouldNotBeNullOrWhiteSpace();
         }
+    }
+
+    // A nullable reference to another schema is written as oneOf null or the schema, with the description on the schema.
+    private static string? Description(JsonElement property)
+    {
+        if (property.TryGetProperty("description", out var description))
+        {
+            return description.GetString();
+        }
+
+        return property.GetProperty("oneOf").EnumerateArray()
+            .Select(option => option.TryGetProperty("description", out var value) ? value.GetString() : null)
+            .FirstOrDefault(value => value is not null);
     }
 
     [Fact]
     public async Task GetScalar_ShouldReturn_Ok()
     {
         // Arrange
-        using var client = Application.CreateClient();
+        using var client = this.application.CreateClient();
 
         // Act
         using var response = await client.GetAsync("/scalar");
@@ -125,9 +145,23 @@ public class OpenApiDocumentTests
         response.Content.Headers.ContentType?.MediaType.ShouldBe("text/html");
     }
 
-    private static async Task<JsonDocument> GetOpenApiDocument()
+    public void Dispose()
     {
-        using var client = Application.CreateClient();
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            this.application.Dispose();
+        }
+    }
+
+    private async Task<JsonDocument> GetOpenApiDocument()
+    {
+        using var client = this.application.CreateClient();
         using var response = await client.GetAsync("/openapi/v1.json");
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
