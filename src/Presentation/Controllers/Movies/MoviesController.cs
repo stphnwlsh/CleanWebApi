@@ -13,9 +13,9 @@ public class MoviesController : ApiControllerBase
     /// List Movies
     /// </summary>
     /// <remarks>
-    /// Returns one page of movies, ordered by title, along with the reviews written about them. Add a search
+    /// Returns one page of movies, ordered by title, each with its review count and average stars. Add a search
     /// term to return only the movies whose title contains it, ignoring case. To fetch the next page, add the
-    /// limit to the offset.
+    /// limit to the offset. Look up a movie by its Id to get its reviews.
     ///
     /// Sample request:
     ///
@@ -29,10 +29,10 @@ public class MoviesController : ApiControllerBase
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
     [EndpointName(nameof(GetMovies))]
-    [ProducesResponseType(typeof(Page<Entities.Movie>), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(Page<Entities.MovieSummary>), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Page<Entities.Movie>>> GetMovies(
+    public async Task<ActionResult<Page<Entities.MovieSummary>>> GetMovies(
         [FromQuery] string? query,
         CancellationToken cancellationToken,
         [FromQuery] int offset = 0,

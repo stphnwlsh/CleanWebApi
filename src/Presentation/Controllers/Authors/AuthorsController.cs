@@ -13,9 +13,9 @@ public class AuthorsController : ApiControllerBase
     /// List Authors
     /// </summary>
     /// <remarks>
-    /// Returns one page of authors, ordered by last name then first name, along with the reviews they have
-    /// written. Add a search term to return only the authors whose first, last or full name contains it,
-    /// ignoring case. To fetch the next page, add the limit to the offset.
+    /// Returns one page of authors, ordered by last name then first name, each with their review count and average
+    /// stars. Add a search term to return only the authors whose first, last or full name contains it, ignoring
+    /// case. To fetch the next page, add the limit to the offset. Look up an author by their Id to get their reviews.
     ///
     /// Sample request:
     ///
@@ -29,10 +29,10 @@ public class AuthorsController : ApiControllerBase
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
     [EndpointName(nameof(GetAuthors))]
-    [ProducesResponseType(typeof(Page<Entities.Author>), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(Page<Entities.AuthorSummary>), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Page<Entities.Author>>> GetAuthors(
+    public async Task<ActionResult<Page<Entities.AuthorSummary>>> GetAuthors(
         [FromQuery] string? query,
         CancellationToken cancellationToken,
         [FromQuery] int offset = 0,
