@@ -2,7 +2,7 @@
 
 A `dotnet new` template for an API built with a streamlined version of Clean Architecture and ASP.NET Core [Web API controllers](https://learn.microsoft.com/aspnet/core/web-api/).
 
-It's one of five templates, for Minimal APIs, Web API controllers, GraphQL, Model Context Protocol and AWS Lambda, that share the same Application and Infrastructure layers, tests and CI pipeline.
+It's one of five [Lean Mean Clean Apps](https://leanmeancleanapps.github.io/) templates, for Minimal APIs, Model Context Protocol, GraphQL, Web API controllers and AWS Lambda, that share the same Application and Infrastructure layers, tests and CI pipeline. Full docs live at [leanmeancleanapps.github.io/webapi](https://leanmeancleanapps.github.io/webapi/).
 
 ## Requirements
 
@@ -58,7 +58,7 @@ Run the tests with `dotnet test`. Every way to run the solution is in `docs/RUN.
 
 ## Updates
 
-A new version is released on the 1st of each month with every change merged since the previous release, as long as something has changed. To update an installed template:
+A new version is released on the 1st of each month with every change merged since the previous release, as long as something has changed. No change, no new version number. We're not here to pad the download stats. To update an installed template:
 
 ``` bash
 dotnet new update
@@ -68,6 +68,7 @@ What changed in each version is in the [release notes](https://github.com/stphnw
 
 ## More help
 
+- [Docs site](https://leanmeancleanapps.github.io/webapi/) for guides, a reference and why it's built this way
 - [README on GitHub](https://github.com/stphnwlsh/CleanWebApi#readme) for the architecture, every feature and the Docker build options
 - [Running guide](https://github.com/stphnwlsh/CleanWebApi/blob/main/docs/RUN.md) for every way to run, configure and test the solution
 - [GitHub issues](https://github.com/stphnwlsh/CleanWebApi/issues) for bugs and ideas
@@ -75,4 +76,4 @@ What changed in each version is in the [release notes](https://github.com/stphnw
 
 ## Support
 
-If this template saves you time, please consider [sponsoring me on GitHub](https://github.com/sponsors/stphnwlsh).
+If this template saves you time, please consider [sponsoring the work on GitHub](https://github.com/sponsors/stphnwlsh). It keeps all five templates current, and the coffee flowing.
