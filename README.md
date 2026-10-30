@@ -2,7 +2,6 @@
 
 [![Build Pipeline](https://img.shields.io/github/actions/workflow/status/stphnwlsh/CleanWebApi/build-pipeline.yml?branch=main&label=Build%20Pipeline&logo=github&style=for-the-badge)](https://github.com/stphnwlsh/CleanWebApi/actions/workflows/build-pipeline.yml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/stphnwlsh/CleanWebApi?label=Code%20Coverage&logo=codecov&logoColor=white&style=for-the-badge)](https://codecov.io/gh/stphnwlsh/CleanWebApi)
-[![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/stphnwlsh/CleanWebApi?label=OpenSSF%20Scorecard&style=for-the-badge)](https://scorecard.dev/viewer/?uri=github.com/stphnwlsh/CleanWebApi)
 [![NuGet](https://img.shields.io/nuget/v/CleanWebApi.Template?label=NuGet&logo=nuget&logoColor=white&style=for-the-badge)](https://www.nuget.org/packages/CleanWebApi.Template)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/CleanWebApi.Template?label=Downloads&logo=nuget&logoColor=white&style=for-the-badge)](https://www.nuget.org/packages/CleanWebApi.Template)
 [![License](https://img.shields.io/github/license/stphnwlsh/CleanWebApi?label=License&style=for-the-badge)](LICENSE.md)
