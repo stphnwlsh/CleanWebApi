@@ -17,7 +17,7 @@ services:
     depends_on:
       - seq
   seq:
-    image: datalust/seq:2026.1.17473
+    image: datalust/seq:2026.1.17526
     ports:
       - "5341:80"
     environment:
