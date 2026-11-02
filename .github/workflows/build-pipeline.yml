@@ -305,7 +305,11 @@ jobs:
           # Start the image the way the README does and ask it for a page of movies. Scanning an
           # image proves nothing about whether it runs, so this is the check that it actually does.
           echo "smoke=failed" >> "$GITHUB_OUTPUT"
-          docker run --detach --name api --publish 8080:8080 --env Database__SeedSampleData=true "$IMAGE"
+          # The database goes in /app/data, the only folder the non-root user can write to, as it does
+          # in docker-compose.yml. Logs stay on the console so a failure shows up below.
+          docker run --detach --name api --publish 8080:8080 \
+            --env ConnectionStrings__MovieReviews="Data Source=/app/data/movie-reviews.db" \
+            --env Database__SeedSampleData=true "$IMAGE"
           for attempt in $(seq 1 30); do
             if curl --silent --fail --max-time 5 http://localhost:8080/health/ready > /dev/null; then
               break
