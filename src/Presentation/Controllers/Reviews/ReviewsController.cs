@@ -2,6 +2,7 @@ namespace CleanWebApi.Presentation.Controllers.Reviews;
 
 using Application.Common.Paging;
 using Common;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Requests;
 using Commands = Application.Reviews.Commands;
@@ -9,7 +10,7 @@ using Entities = Application.Reviews.Entities;
 using Queries = Application.Reviews.Queries;
 
 [Route("api/reviews")]
-public class ReviewsController : ApiControllerBase
+public class ReviewsController(ISender sender) : ApiControllerBase(sender)
 {
     /// <summary>
     /// List Reviews

@@ -1,0 +1,51 @@
+---
+name: database-migrations
+description: How to change the data model and add an EF Core migration for the SQLite database, including the namespace, folder and naming fixes the tools need. Use when adding a column, table, index or relationship.
+metadata:
+  scope: shared
+---
+
+# Database migrations
+
+## The rule
+
+The schema comes only from migrations in `src/Infrastructure/Databases/MovieReviews/Migrations`. The app applies pending migrations at startup in `InitialiseInfrastructure()`, and the tests build their databases from the same migrations, so a model change without a migration fails the tests. `MovieReviewsDbContextFactory` lets the EF Core tools create the context at design time.
+
+## Steps
+
+1. Change the database model in `Models/` and its configuration in `Configuration/`. Relationships and keys are configured with the fluent API in an `EntityConfiguration<T>` subclass.
+2. Install the tool once: `dotnet tool install --global dotnet-ef`.
+3. Add the migration from the repository root:
+
+   ``` bash
+   dotnet ef migrations add <Name> \
+     --project ./src/Infrastructure \
+     --output-dir Databases/MovieReviews/Migrations \
+     --namespace CleanWebApi.Infrastructure.Databases.MovieReviews.Migrations
+   ```
+
+4. Check where the files landed. If `MovieReviewsDbContextModelSnapshot.cs` was written somewhere else or in another namespace, move it into `Migrations/` and fix its namespace.
+5. Strip the byte order mark the tool adds, so `dotnet format` and the diff stay clean:
+
+   ``` bash
+   sed -i '1s/^\xEF\xBB\xBF//' src/Infrastructure/Databases/MovieReviews/Migrations/*.cs
+   ```
+
+6. Name the migration for what it does (`AddReviewComment`), in PascalCase.
+7. Update `MovieReviewsDbContextExtensions.AddData` and the test data if the new column needs a value (`sample-data`).
+8. Run every test project. Migrations are excluded from coverage.
+
+## Don't
+
+- Edit a migration that has already been released. Add a new one.
+- Call `EnsureCreated()` anywhere. It skips migrations.
+- Use `ValueGeneratedOnAdd()` on `DateCreated` or `DateModified`. SQLite then tries to insert NULL into a NOT NULL column; the repository sets both.
+- Add data annotations like `[Required]` or `[MaxLength]` to models. Configure in `Configuration/`.
+
+## Check
+
+``` bash
+dotnet build
+dotnet test
+dotnet format --verify-no-changes
+```

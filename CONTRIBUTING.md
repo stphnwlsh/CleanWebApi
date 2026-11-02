@@ -56,6 +56,10 @@ dotnet new uninstall ./
 1. Follow the style in `.editorconfig` and `Directory.Build.props`. Warnings are treated as errors, so the build must be clean. A warning is just an error that hasn't been caught yet.
 1. Update the README or docs if behaviour changes.
 
+## Working with an AI agent
+
+Agents are welcome here, as long as a person stays in charge. [AGENTS.md](AGENTS.md) is the agent's map of the repository, [Sous](.agents/agents/sous.md) is the persona they work as, and [.agents/skills](.agents/skills) holds one skill per kind of change, in the open Agent Skills format that most coding agents understand. If you change how something is done, update its skill in the same pull request. Out-of-date recipes are how kitchens catch fire.
+
 ## Pull requests
 
 1. Open the pull request against `main` and fill in the template.

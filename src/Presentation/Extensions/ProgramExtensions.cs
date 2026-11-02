@@ -2,8 +2,6 @@ namespace CleanWebApi.Presentation.Extensions;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Application;
 using Authentication;
 using Errors;
@@ -18,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenApi;
 using Scalar.AspNetCore;
+using Serialization;
 using Serilog;
 
 [ExcludeFromCodeCoverage]
@@ -27,42 +26,31 @@ public static class ProgramExtensions
     {
         #region Controllers
 
-        _ = builder.Services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-        });
+        _ = builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.UseApiDefaults());
 
         #endregion Controllers
 
         #region Logging
 
-        _ = builder.Host.UseSerilog((hostContext, loggerConfiguration) =>
+        _ = builder.Services.AddSerilog((services, loggerConfiguration) =>
         {
             var assembly = Assembly.GetEntryAssembly();
 
-            _ = loggerConfiguration.ReadFrom.Configuration(hostContext.Configuration)
-                    .Enrich.WithProperty("Assembly Version", assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version)
-                    .Enrich.WithProperty("Assembly Informational Version", assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+            _ = loggerConfiguration.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>())
+                .Enrich.WithProperty(
+                    "AssemblyVersion",
+                    assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version)
+                .Enrich.WithProperty(
+                    "AssemblyInformationalVersion",
+                    assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
         });
 
         #endregion Logging
 
         #region Serialisation
 
-        _ = builder.Services.Configure<JsonOptions>(options =>
-        {
-            options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.SerializerOptions.PropertyNameCaseInsensitive = true;
-            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
-            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-        });
+        // Problem details from outside the controllers, such as a 404 for an unknown route, use these options, so they match.
+        _ = builder.Services.Configure<JsonOptions>(options => options.SerializerOptions.UseApiDefaults());
 
         #endregion Serialisation
 

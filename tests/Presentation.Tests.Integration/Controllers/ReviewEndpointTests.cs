@@ -236,6 +236,26 @@ public class ReviewEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task CreateReview_ShouldReturn_ValidationProblem_StarsSentAsString()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+        var json = (new { Stars = "5", AuthorId = Guid.NewGuid(), MovieId = Guid.NewGuid() }).Serialize();
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        // Act
+        using var response = await client.PostAsync("/api/reviews", content);
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<ValidationProblemDetails>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        _ = result.ShouldNotBeNull();
+
+        result.Errors.ShouldContainKey("$.stars");
+    }
+
+    [Fact]
     public async Task CreateReview_ShouldReturn_NotFound()
     {
         // Arrange
