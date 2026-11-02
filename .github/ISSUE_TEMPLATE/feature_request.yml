@@ -57,5 +57,5 @@ body:
       options:
         - label: I searched the existing issues and this hasn't been suggested yet.
           required: true
-        - label: I agree to follow this project's [code of conduct](https://github.com/stphnwlsh/CleanWebApi/blob/main/CODE_OF_CONDUCT.md).
+        - label: I agree to follow this project's [code of conduct](https://github.com/LeanMeanCleanApps/CleanWebApi/blob/main/CODE_OF_CONDUCT.md).
           required: true

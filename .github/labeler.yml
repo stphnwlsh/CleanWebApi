@@ -1,0 +1,15 @@
+# Labels for the release notes categories in release.yml. Branch names do most of the work,
+# which is why the repository's branch ruleset insists on feature/, fix/ or chore/.
+enhancement:
+  - head-branch: ['^feature/']
+
+bug:
+  - head-branch: ['^fix/']
+
+build:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/**', 'Dockerfile', 'docker-compose.yml']
+
+documentation:
+  - changed-files:
+      - all-globs-to-all-files: ['**/*.md', 'docs/**']

@@ -6,12 +6,23 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: "0 9 15 * *"
+    # Maintenance build on the 15th, after Dependabot's monthly pull request.
+    - cron: "17 9 15 * *"
       timezone: "America/Chicago"
-    - cron: "0 9 1 * *"
+    # Monthly release on the 1st. Off the hour, because GitHub delays more runs at :00.
+    - cron: "17 9 1 * *"
       timezone: "America/Chicago"
   workflow_dispatch:
     inputs:
+      run:
+        description: Which monthly run to rehearse or trigger
+        type: choice
+        options: [release, maintenance]
+        default: release
+      dry-run:
+        description: Rehearse only. Packs and logs in to NuGet, but publishes nothing
+        type: boolean
+        default: true
       force:
         description: Release even if only .github/ has changed since the last release
         type: boolean
@@ -24,9 +35,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  COVERAGE_THRESHOLD: 95
+  TEMPLATE_MAX_SIZE: 1048576
+
 jobs:
   build:
-    name: Build and Test
+    name: Build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,6 +49,9 @@ jobs:
     outputs:
       name: ${{ steps.initialize.outputs.name }}
       version: ${{ steps.initialize.outputs.version }}
+      version_prefix: ${{ steps.initialize.outputs.version_prefix }}
+      version_suffix: ${{ steps.initialize.outputs.version_suffix }}
+      package_size: ${{ steps.pack.outputs.size }}
 
     steps:
       - name: Checkout
@@ -43,54 +61,25 @@ jobs:
       - name: Initialize
         id: initialize
         run: |
-          NAME=$(echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')
+          NAME=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
           VERSION_PREFIX=$(date +'%Y.%m.%d').${GITHUB_RUN_NUMBER}
+          VERSION_SUFFIX=""
 
-          if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
             VERSION_SUFFIX="pr-${PR_NUMBER}"
           fi
 
-          if [[ $VERSION_SUFFIX == '' ]]; then
-            VERSION=$VERSION_PREFIX
-          else
-            VERSION=$VERSION_PREFIX-$VERSION_SUFFIX
-          fi
+          VERSION=$VERSION_PREFIX${VERSION_SUFFIX:+-$VERSION_SUFFIX}
 
-          echo "name=$(eval printf "%s" "$NAME")" >> $GITHUB_OUTPUT
-          echo "version_prefix=$(eval printf "%s" "$VERSION_PREFIX")" >> $GITHUB_OUTPUT
-          echo "version_suffix=$(eval printf "%s" "$VERSION_SUFFIX")" >> $GITHUB_OUTPUT
-          echo "version=$(eval printf "%s" "$VERSION")" >> $GITHUB_OUTPUT
+          {
+            echo "name=$NAME"
+            echo "version_prefix=$VERSION_PREFIX"
+            echo "version_suffix=$VERSION_SUFFIX"
+            echo "version=$VERSION"
+          } >> "$GITHUB_OUTPUT"
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         shell: bash
-
-      - name: Test
-        id: test
-        run: docker build .
-          --target coverage
-          --output type=local,dest=out
-          --build-arg VERSION_PREFIX=$VERSION_PREFIX
-          --build-arg VERSION_SUFFIX=$VERSION_SUFFIX
-        env:
-          DOCKER_BUILDKIT: 1
-          VERSION_PREFIX: ${{ steps.initialize.outputs.version_prefix }}
-          VERSION_SUFFIX: ${{ steps.initialize.outputs.version_suffix }}
-
-      - name: Build
-        id: build
-        run: |
-          docker build . \
-            --target run \
-            --tag $NAME:$VERSION \
-            --build-arg VERSION_PREFIX=$VERSION_PREFIX \
-            --build-arg VERSION_SUFFIX=$VERSION_SUFFIX
-          docker save $NAME:$VERSION --output image.tar
-        env:
-          DOCKER_BUILDKIT: 1
-          NAME: ${{ steps.initialize.outputs.name }}
-          VERSION_PREFIX: ${{ steps.initialize.outputs.version_prefix }}
-          VERSION_SUFFIX: ${{ steps.initialize.outputs.version_suffix }}
-          VERSION: ${{ steps.initialize.outputs.version }}
 
       - name: Setup .NET
         id: setup
@@ -102,42 +91,40 @@ jobs:
         id: format
         run: dotnet format --verify-no-changes --verbosity diagnostic
 
+      - name: Build
+        id: build
+        run: |
+          docker build . \
+            --target run \
+            --tag "$NAME:$VERSION" \
+            --build-arg VERSION_PREFIX="$VERSION_PREFIX" \
+            --build-arg VERSION_SUFFIX="$VERSION_SUFFIX"
+          docker save "$NAME:$VERSION" --output image.tar
+        env:
+          DOCKER_BUILDKIT: 1
+          NAME: ${{ steps.initialize.outputs.name }}
+          VERSION: ${{ steps.initialize.outputs.version }}
+          VERSION_PREFIX: ${{ steps.initialize.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.initialize.outputs.version_suffix }}
+
       - name: Pack
         id: pack
         run: |
-          if [ -z "$SUFFIX" ]; then
-            dotnet pack template/template.csproj -p:PackageVersion=$VERSION --configuration Release --output packages
-          else
-            dotnet pack template/template.csproj -p:PackageVersion=$VERSION-$SUFFIX --configuration Release --output packages
-          fi
-        env:
-          VERSION: ${{ steps.initialize.outputs.version_prefix }}
-          SUFFIX: ${{ steps.initialize.outputs.version_suffix }}
-        shell: bash
-
-      - name: Verify Template
-        id: verify-template
-        run: |
+          dotnet pack template/template.csproj -p:PackageVersion="$VERSION" --configuration Release --output packages
           SIZE=$(stat --format=%s packages/*.nupkg)
+          echo "size=$SIZE" >> "$GITHUB_OUTPUT"
           echo "Template package is $SIZE bytes"
-          if [ "$SIZE" -gt "$MAX_SIZE" ]; then
-            echo "::error::Template package is larger than $MAX_SIZE bytes"
+          if [ "$SIZE" -gt "$TEMPLATE_MAX_SIZE" ]; then
+            echo "::error::Template package is $SIZE bytes, over the $TEMPLATE_MAX_SIZE byte limit"
             exit 1
           fi
-          dotnet new install packages/*.nupkg
-          dotnet new $(jq -r .shortName .template.config/template.json) --name Template.Verification --output verification
-          dotnet build verification --configuration Release
         env:
-          MAX_SIZE: 1048576
+          VERSION: ${{ steps.initialize.outputs.version }}
         shell: bash
 
-      - name: Upload Coverage
-        id: upload-coverage
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage
-          path: out/coverage.opencover.xml
-          retention-days: 1
+      - name: Test Pipeline Report
+        id: test-report
+        run: python3 -m unittest discover --start-directory .github/actions/pipeline-report --verbose
 
       - name: Upload Image
         id: upload-image
@@ -155,141 +142,81 @@ jobs:
           path: packages/*.nupkg
           retention-days: 1
 
-  coverage:
-    name: Code Coverage
+  test:
+    name: Test
     runs-on: ubuntu-latest
     needs: build
     permissions:
       contents: read
+
+    outputs:
+      tests: ${{ steps.report.outputs.tests }}
 
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
-      - name: Download Coverage
-        id: download
-        uses: actions/download-artifact@v8
-        with:
-          name: coverage
-          path: out
-
-      - name: Upload to Codecov
-        id: codecov
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
-        with:
-          files: ./out/coverage.opencover.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Enforce Threshold
-        id: threshold
+      - name: Test
+        id: test
         run: |
-          python3 - <<'PY'
-          import os, re, subprocess, sys, xml.etree.ElementTree as ET
-          from collections import defaultdict
-          root = ET.parse("out/coverage.opencover.xml").getroot()
-          lines = {}
-          for module in root.iter("Module"):
-              files = {f.get("uid"): f.get("fullPath").replace("\\", "/").split("/sln/", 1)[-1] for f in module.iter("File")}
-              for method in module.iter("Method"):
-                  ref = method.find("FileRef")
-                  default = ref.get("uid") if ref is not None else None
-                  for point in method.iter("SequencePoint"):
-                      path = files.get(point.get("fileid", default))
-                      if path is None or not os.path.isfile(path):
-                          continue
-                      key = (path, int(point.get("sl")))
-                      lines[key] = max(lines.get(key, 0), int(point.get("vc")))
-          per_file = defaultdict(lambda: [0, 0])
-          for (path, _), hits in lines.items():
-              per_file[path][1] += 1
-              per_file[path][0] += hits > 0
-          for path, (hit, total) in sorted(per_file.items(), key=lambda item: item[1][0] / item[1][1])[:10]:
-              print(f"{100 * hit / total:6.2f}%  {hit}/{total}  {path}")
-          total = len(lines)
-          hit = sum(1 for hits in lines.values() if hits > 0)
-          coverage = 100 * hit / total if total else 0
-          threshold = float(os.environ["THRESHOLD"])
-          print(f"Line coverage {coverage:.2f}% ({hit}/{total}), threshold {threshold}%")
-          passed = coverage >= threshold
-          base = os.environ.get("BASE_REF")
-          if base:
-              diff = subprocess.run(["git", "diff", "--unified=0", f"origin/{base}...HEAD"], capture_output=True, text=True, check=True).stdout
-              changed, path = set(), None
-              for line in diff.splitlines():
-                  if line.startswith("+++ "):
-                      path = line[6:] if line.startswith("+++ b/") else None
-                  elif line.startswith("@@") and path:
-                      start, count = re.match(r"@@ -\S+ \+(\d+)(?:,(\d+))? @@", line).groups()
-                      changed.update((path, n) for n in range(int(start), int(start) + int(count or 1)))
-              patch = [hits for key, hits in lines.items() if key in changed]
-              if patch:
-                  patch_coverage = 100 * sum(1 for hits in patch if hits > 0) / len(patch)
-                  patch_threshold = float(os.environ["PATCH_THRESHOLD"])
-                  print(f"Patch coverage {patch_coverage:.2f}% ({sum(1 for hits in patch if hits > 0)}/{len(patch)}), threshold {patch_threshold}%")
-                  passed = passed and patch_coverage >= patch_threshold
-              else:
-                  print("Patch coverage: no coverable lines changed")
-          sys.exit(0 if passed else 1)
-          PY
+          docker build . \
+            --target results \
+            --output type=local,dest=results \
+            --build-arg VERSION_PREFIX="$VERSION_PREFIX" \
+            --build-arg VERSION_SUFFIX="$VERSION_SUFFIX"
         env:
-          THRESHOLD: 95
-          PATCH_THRESHOLD: 90
-          BASE_REF: ${{ github.base_ref }}
+          DOCKER_BUILDKIT: 1
+          VERSION_PREFIX: ${{ needs.build.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ needs.build.outputs.version_suffix }}
 
-  scan:
-    name: Container Scan
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      contents: read
-      security-events: write
+      - name: Report
+        id: report
+        uses: ./.github/actions/pipeline-report
+        with:
+          command: test
+          results: results
+          coverage-threshold: ${{ env.COVERAGE_THRESHOLD }}
 
-    steps:
-      - name: Download Image
-        id: download
+      - name: Upload Results
+        id: upload-results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: |
+            results/*.trx
+            results/coverage.opencover.xml
+            results/exit-code
+          retention-days: 7
+
+      - name: Setup .NET
+        id: setup
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download Template
+        id: download-template
         uses: actions/download-artifact@v8
         with:
-          name: image
+          name: template
+          path: packages
 
-      - name: Load Image
-        id: load
-        run: docker load --input image.tar
-
-      - name: Scan
-        id: scan
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: ${{ needs.build.outputs.name }}:${{ needs.build.outputs.version }}
-          format: sarif
-          output: trivy-results.sarif
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-
-      - name: Upload Scan
-        id: upload-scan
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: trivy-results.sarif
-          category: trivy
-
-      - name: Enforce Findings
-        id: enforce
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: ${{ needs.build.outputs.name }}:${{ needs.build.outputs.version }}
-          format: table
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-          exit-code: 1
-          skip-setup-trivy: true
+      - name: Verify Template
+        id: verify-template
+        run: |
+          dotnet new install packages/*.nupkg
+          dotnet new "$(jq -r .shortName .template.config/template.json)" --name Template.Verification --output verification
+          dotnet test verification --configuration Release
+          echo "### Template" >> "$GITHUB_STEP_SUMMARY"
+          echo "The packed template installs, and the generated solution builds and passes its tests." >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
 
   analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
-    needs: build
+    needs: test
     permissions:
       actions: read
       contents: read
@@ -319,15 +246,213 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
 
+  dependencies:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      contents: read
+      pull-requests: write
+
+    outputs:
+      vulnerable: ${{ steps.review.outputs.vulnerable-changes }}
+      licences: ${{ steps.review.outputs.invalid-license-changes }}
+
+    steps:
+      - name: Review
+        id: review
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause
+          comment-summary-in-pr: on-failure
+          show-openssf-scorecard: false
+
+  scan:
+    name: Container Scan
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    permissions:
+      contents: read
+      security-events: write
+
+    outputs:
+      smoke: ${{ steps.smoke.outputs.smoke }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v7
+
+      - name: Download Image
+        id: download
+        uses: actions/download-artifact@v8
+        with:
+          name: image
+
+      - name: Load Image
+        id: load
+        run: docker load --input image.tar
+
+      - name: Smoke Test
+        id: smoke
+        # Carry on to the scans when this fails; Enforce Smoke Test fails the job at the end.
+        continue-on-error: true
+        env:
+          IMAGE: ${{ needs.build.outputs.name }}:${{ needs.build.outputs.version }}
+        run: |
+          # Start the image the way the README does and ask it for a page of movies. Scanning an
+          # image proves nothing about whether it runs, so this is the check that it actually does.
+          echo "smoke=failed" >> "$GITHUB_OUTPUT"
+          docker run --detach --name api --publish 8080:8080 --env Database__SeedSampleData=true "$IMAGE"
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail --max-time 5 http://localhost:8080/health/ready > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          RESPONSE=$(curl --silent --fail --max-time 30 "http://localhost:8080/api/movies?limit=2" || true)
+          echo "$RESPONSE"
+          if echo "$RESPONSE" | python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("items") else 1)'; then
+            echo "smoke=passed" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::The image started but didn't return any movies"
+            docker logs api
+            exit 1
+          fi
+
+      - name: Stop Container
+        id: stop
+        if: ${{ always() }}
+        run: docker rm --force api || true
+
+      - name: Scan Image
+        id: scan-image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ needs.build.outputs.name }}:${{ needs.build.outputs.version }}
+          format: sarif
+          output: trivy-image.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          trivyignores: .trivyignore
+
+      - name: Scan Config
+        id: scan-config
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          format: sarif
+          output: trivy-config.sarif
+          severity: CRITICAL,HIGH
+          trivyignores: .trivyignore
+          skip-setup-trivy: true
+
+      - name: Upload Image Scan
+        id: upload-image-scan
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-image.sarif
+          category: trivy
+
+      - name: Upload Config Scan
+        id: upload-config-scan
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-config.sarif
+          category: trivy-config
+
+      - name: Enforce Image Findings
+        id: enforce-image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ needs.build.outputs.name }}:${{ needs.build.outputs.version }}
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          trivyignores: .trivyignore
+          exit-code: 1
+          skip-setup-trivy: true
+
+      - name: Enforce Config Findings
+        id: enforce-config
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          format: table
+          severity: CRITICAL,HIGH
+          trivyignores: .trivyignore
+          exit-code: 1
+          skip-setup-trivy: true
+
+      - name: Enforce Smoke Test
+        id: enforce-smoke
+        if: ${{ !cancelled() && steps.smoke.outcome == 'failure' }}
+        run: |
+          echo "::error::The image didn't start or answer a request; see the Smoke Test step"
+          exit 1
+
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs: [build, test, analysis, dependencies, scan]
+    # Report on failures too, but not when a newer push cancelled this run: its stale result would
+    # overwrite the comment the newer run is about to write.
+    if: ${{ !cancelled() }}
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+      security-events: read
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions/pipeline-report
+            .trivyignore
+          sparse-checkout-cone-mode: false
+
+      - name: Download Results
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: test-results
+          path: results
+
+      - name: Report
+        id: report
+        uses: ./.github/actions/pipeline-report
+        with:
+          command: summary
+          results: results
+          coverage-threshold: ${{ env.COVERAGE_THRESHOLD }}
+          needs: ${{ toJSON(needs) }}
+
   release:
     name: Release Check
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'stphnwlsh/CleanWebApi' && github.ref == 'refs/heads/main' && (github.event.schedule == '0 9 1 * *' || github.event_name == 'workflow_dispatch') }}
+    needs: summary
+    # Only once the Summary has passed. Real releases come from main on the 1st or a manual run;
+    # dry runs can come from any branch. The explicit !cancelled() matters: without it GitHub skips
+    # this job whenever anything upstream was skipped, and Dependency Review always is outside PRs.
+    if: >-
+      ${{ !cancelled() && needs.summary.result == 'success' && github.repository_owner == 'LeanMeanCleanApps' && (
+        (github.ref == 'refs/heads/main' && github.event.schedule == '17 9 1 * *') ||
+        (github.event_name == 'workflow_dispatch' && inputs.run == 'release' && (inputs.dry-run || github.ref == 'refs/heads/main'))
+      ) }}
     permissions:
       contents: read
 
     outputs:
       publish: ${{ steps.check.outputs.publish }}
+      dry-run: ${{ steps.check.outputs.dry-run }}
 
     steps:
       - name: Checkout
@@ -356,18 +481,26 @@ jobs:
             PUBLISH=true
           fi
 
-          echo "publish=$PUBLISH" >> $GITHUB_OUTPUT
+          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
+          echo "dry-run=${DRY_RUN:-false}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Release Check"
+            echo "Latest release: ${LATEST:-none}. Publish: $PUBLISH. Dry run: ${DRY_RUN:-false}."
+          } >> "$GITHUB_STEP_SUMMARY"
         env:
           GH_TOKEN: ${{ github.token }}
           FORCE: ${{ inputs.force }}
+          DRY_RUN: ${{ inputs.dry-run }}
         shell: bash
 
   publish:
     name: Publish
     runs-on: ubuntu-latest
-    needs: [build, coverage, scan, analysis, release]
-    if: ${{ needs.release.outputs.publish == 'true' }}
+    needs: [build, summary, release]
+    if: ${{ !cancelled() && needs.summary.result == 'success' && needs.release.outputs.publish == 'true' }}
     permissions:
+      artifact-metadata: write
+      attestations: write
       contents: write
       id-token: write
 
@@ -385,22 +518,85 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
-      - name: NuGet Push
-        id: nuget-push
-        run: dotnet nuget push packages/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
-
-      - name: GitHub Release
-        id: github-release
+      - name: Release Notes
+        id: notes
         run: |
           if [[ "$EVENT" == 'schedule' ]]; then
             NOTES="Monthly release for $(date +'%B %Y'). The template is released on the 1st of each month with every change merged since the previous release."
           else
             NOTES="Out-of-cycle release. The template is normally released on the 1st of each month with every change merged since the previous release."
           fi
-
-          gh release create "$VERSION" packages/*.nupkg --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$VERSION" --notes "$NOTES" --generate-notes
+          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Publish${DRY_RUN:+ (dry run)}"
+            echo "Package: \`$(basename packages/*.nupkg)\`"
+            echo "Release: \`$VERSION\`"
+            echo
+            echo "$NOTES"
+          } >> "$GITHUB_STEP_SUMMARY"
         env:
-          GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
           VERSION: ${{ needs.build.outputs.version }}
+          DRY_RUN: ${{ needs.release.outputs.dry-run == 'true' && 'yes' || '' }}
+        shell: bash
+
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        id: setup
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish API
+        id: publish-api
+        run: dotnet publish ./src/Presentation/Presentation.csproj --configuration Release --output sbom-source --no-self-contained
+
+      - name: SBOM
+        id: sbom
+        # The bill of materials for what the template generates: every package the API ships with.
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          path: sbom-source
+          format: spdx-json
+          output-file: ${{ github.event.repository.name }}.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+        env:
+          SYFT_SOURCE_NAME: ${{ github.event.repository.name }}
+          SYFT_SOURCE_VERSION: ${{ needs.build.outputs.version }}
+
+      - name: SBOM Summary
+        id: sbom-summary
+        run: |
+          PACKAGES=$(python3 -c 'import json, sys; print(len(json.load(open(sys.argv[1])).get("packages", [])))' "$SBOM")
+          echo "SBOM: \`$SBOM\` lists $PACKAGES packages." | tee --append "$GITHUB_STEP_SUMMARY"
+        env:
+          SBOM: ${{ github.event.repository.name }}.spdx.json
+
+      - name: Attest
+        id: attest
+        if: ${{ needs.release.outputs.dry-run != 'true' }}
+        uses: actions/attest@v4
+        with:
+          subject-path: packages/*.nupkg
+
+      - name: NuGet Push
+        id: nuget-push
+        if: ${{ needs.release.outputs.dry-run != 'true' }}
+        run: dotnet nuget push packages/*.nupkg --source https://api.nuget.org/v3/index.json --api-key "$API_KEY" --skip-duplicate
+        env:
+          API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+
+      - name: GitHub Release
+        id: github-release
+        if: ${{ needs.release.outputs.dry-run != 'true' }}
+        run: gh release create "$VERSION" packages/*.nupkg "$SBOM" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$VERSION" --notes "$NOTES" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.build.outputs.version }}
+          NOTES: ${{ steps.notes.outputs.notes }}
+          SBOM: ${{ github.event.repository.name }}.spdx.json
         shell: bash
