@@ -20,7 +20,7 @@ Presentation ──► Application ◄── Infrastructure
 | --- | --- | --- |
 | `src/Application` | Commands, queries, handlers, validators, entities (records), repository interfaces, paging, exceptions, pipeline behaviours | EF Core, ASP.NET Core, Serilog, anything about HTTP or SQL |
 | `src/Infrastructure` | `DbContext`, database models, EF configuration, migrations, the repository, Mapperly mappers, sample data, `AddInfrastructure()` | Business rules, validation, HTTP types |
-| `src/Presentation` | Endpoints, tools or resolvers, request models, exception-to-response mapping, API documentation, authentication, health check endpoints, `Program.cs` | Database access, business rules |
+| `src/Presentation` | Endpoints, tools, resolvers or function handlers, request and response models, exception-to-response mapping, API documentation, authentication, health check endpoints, startup | Database access, business rules |
 
 Infrastructure keeps its types `internal`. The only public surface is `AddInfrastructure()`, `AddInfrastructureHealthChecks()` and `InitialiseInfrastructure()` in `src/Infrastructure/DependencyInjection.cs`.
 

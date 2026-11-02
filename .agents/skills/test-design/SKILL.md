@@ -20,7 +20,7 @@ What each kind of code needs:
 | Validator | A valid request has no errors; each allowed boundary value passes | One failing case per rule, asserting the message; each value just outside a boundary fails |
 | Handler | The happy path returns the expected result and passes the request's values and the token to the repository | Each documented failure (not found, conflict) throws the right exception, and later calls don't happen |
 | Repository | The right rows come back or change, in the right order, with paging and search applied | Unknown ids return null or false; nothing else changes |
-| Endpoint, tool or resolver | One test per documented success status | One test per documented failure status (validation problem, not found, unauthorised) with the problem body checked |
+| Endpoint, tool, resolver or function | One test per documented success status | One test per documented failure status (validation problem, not found, unauthorised) with the problem body checked |
 | Behaviour or middleware | It calls the next step and passes the result through | It stops the request when it should, and the next step isn't called |
 
 ## Steps

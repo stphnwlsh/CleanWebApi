@@ -16,7 +16,7 @@ There are two kinds of data, and they never mix.
 | Sample data | `src/Infrastructure/Databases/MovieReviews/Extensions/MovieReviewsDbContextExtensions.cs` (`AddData`) | Local runs, Docker and the presentation integration tests | 15 authors, 50 movies, 150 reviews from Bogus with a fixed seed |
 | Test data | `tests/Infrastructure.Tests.Integration/Databases/MovieReviews/Extensions/MovieReviewsCollectionData.cs` (`AddTestData`) | Repository tests | A handful of hand-written rows named "One", "Two", "Three" so assertions can find them |
 
-Sample data is only added when `Database:SeedSampleData` is `true` (on in `appsettings.local.json` and `appsettings.docker.json`, off in `appsettings.json`) and the database is empty. A deployed copy never starts with fake data.
+Sample data is only added when `Database:SeedSampleData` is `true` (on in `appsettings.local.json` and `appsettings.docker.json`, off in `appsettings.json`; Lambda turns it on only in `docker-compose.yml`) and the database is empty. A deployed copy never starts with fake data.
 
 ## Steps
 

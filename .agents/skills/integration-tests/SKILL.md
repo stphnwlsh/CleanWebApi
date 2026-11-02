@@ -14,15 +14,15 @@ Integration tests use the real database engine, built from the real migrations, 
 | Project | Fixture | Database |
 | --- | --- | --- |
 | `tests/Infrastructure.Tests.Integration` | `MovieReviewsTestDatabase` | `Data Source=:memory:` held open for one test, with the hand-written test data (`sample-data`) and a `FakeTimeProvider` fixed at 2009-12-31 23:51:01 UTC |
-| `tests/Presentation.Tests.Integration` | The presentation layer's application host (a `WebApplicationFactory<Program>` in web templates) | `Data Source=Tests-{Guid};Mode=Memory;Cache=Shared` with sample data on |
+| `tests/Presentation.Tests.Integration` | The presentation layer's application host (a `WebApplicationFactory<Program>` in web templates, the `Handler` itself in Lambda) | `Data Source=Tests-{Guid};Mode=Memory;Cache=Shared` with sample data on |
 
 ## Steps
 
 1. Repository tests: make the test class `sealed` and `IDisposable`, create `private readonly MovieReviewsTestDatabase database = new();` and dispose it. Use `this.database.Repository`, and `this.database.Context` to find known rows.
 2. Find rows by their known values, not by position.
 3. For time-dependent results, assert against `this.database.TimeProvider`.
-4. Presentation tests: create a new application host per test class instance, pass settings in through its constructor, and make real requests. Assert the status code, then the body.
-5. Override settings in memory through the host's `settings` dictionary. Never edit appsettings files for a test.
+4. Presentation tests: create a new application host per test class instance, pass settings in through its constructor, and make real requests (in Lambda, real calls to the handler). Assert the status code, then the body.
+5. Override settings in memory through the host's constructor, never by editing appsettings files or leaving environment variables set.
 6. The details of this template's application host are in `presentation-integration-tests`.
 
 ## Example

@@ -21,6 +21,8 @@ One multi-stage `Dockerfile` does everything the pipeline needs:
 
 `docker-compose.yml` runs the app with `DOTNET_ENVIRONMENT=docker`, the `movie-reviews-data` volume and a pinned Seq image for logs. Images are built by CI but not pushed anywhere; the template ships the Dockerfile so users can.
 
+The Lambda template's `run` stage is the AWS Lambda .NET base image instead. It runs as user `65534` from `/var/task`, keeps its database in `/tmp`, and has no `HEALTHCHECK` or Seq. Compose maps the runtime interface emulator to port 9000, so the function can be invoked with a `POST` to `/2015-03-31/functions/function/invocations`.
+
 ## Steps
 
 1. Keep restore before `COPY . .` so a code change doesn't redo the restore layer. A new project folder needs nothing extra; the loops pick up every `src/*/*.csproj` and `tests/*/*.csproj`.
@@ -41,5 +43,6 @@ One multi-stage `Dockerfile` does everything the pipeline needs:
 ``` bash
 docker build . --target run --tag local-check
 docker compose up -d --build && curl -fsS http://localhost:8080/health/ready
+# Lambda: curl -fsS -X POST http://localhost:9000/2015-03-31/functions/function/invocations -d '{}'
 docker compose down
 ```
