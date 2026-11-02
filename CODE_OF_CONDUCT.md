@@ -61,7 +61,7 @@ representative at an online or offline event.
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement by contacting the
 maintainer, [@stphnwlsh](https://github.com/stphnwlsh), privately through
-[private vulnerability reporting](https://github.com/stphnwlsh/CleanWebApi/security/advisories/new)
+[private vulnerability reporting](https://github.com/LeanMeanCleanApps/CleanWebApi/security/advisories/new)
 or through any contact details on the maintainer's GitHub profile.
 All complaints will be reviewed and investigated promptly and fairly.
 

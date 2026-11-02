@@ -1,0 +1,3 @@
+# Trivy findings to ignore, one ID per line, each with a comment saying why and an expiry date,
+# for example: CVE-2026-12345 exp:2026-12-31
+# Keep it empty unless a fix is genuinely out of our hands.

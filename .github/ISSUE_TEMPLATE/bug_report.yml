@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to report a bug. Every bug found here is one that doesn't end up in somebody's production. Please search the [existing issues](https://github.com/stphnwlsh/CleanWebApi/issues) first, and report security vulnerabilities through the [security policy](https://github.com/stphnwlsh/CleanWebApi/security/policy) instead.
+        Thanks for taking the time to report a bug. Every bug found here is one that doesn't end up in somebody's production. Please search the [existing issues](https://github.com/LeanMeanCleanApps/CleanWebApi/issues) first, and report security vulnerabilities through the [security policy](https://github.com/LeanMeanCleanApps/CleanWebApi/security/policy) instead.
   - type: textarea
     id: description
     attributes:
@@ -80,5 +80,5 @@ body:
       options:
         - label: I searched the existing issues and this hasn't been reported yet.
           required: true
-        - label: I agree to follow this project's [code of conduct](https://github.com/stphnwlsh/CleanWebApi/blob/main/CODE_OF_CONDUCT.md).
+        - label: I agree to follow this project's [code of conduct](https://github.com/LeanMeanCleanApps/CleanWebApi/blob/main/CODE_OF_CONDUCT.md).
           required: true
