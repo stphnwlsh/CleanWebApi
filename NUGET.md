@@ -64,15 +64,15 @@ A new version is released on the 1st of each month with every change merged sinc
 dotnet new update
 ```
 
-What changed in each version is in the [release notes](https://github.com/stphnwlsh/CleanWebApi/releases). To remove the template, run `dotnet new uninstall CleanWebApi.Template`.
+What changed in each version is in the [release notes](https://github.com/LeanMeanCleanApps/CleanWebApi/releases). To remove the template, run `dotnet new uninstall CleanWebApi.Template`.
 
 ## More help
 
 - [Docs site](https://leanmeancleanapps.github.io/webapi/) for guides, a reference and why it's built this way
-- [README on GitHub](https://github.com/stphnwlsh/CleanWebApi#readme) for the architecture, every feature and the Docker build options
-- [Running guide](https://github.com/stphnwlsh/CleanWebApi/blob/main/docs/RUN.md) for every way to run, configure and test the solution
-- [GitHub issues](https://github.com/stphnwlsh/CleanWebApi/issues) for bugs and ideas
-- [Security policy](https://github.com/stphnwlsh/CleanWebApi/security/policy) to report a vulnerability privately
+- [README on GitHub](https://github.com/LeanMeanCleanApps/CleanWebApi#readme) for the architecture, every feature and the Docker build options
+- [Running guide](https://github.com/LeanMeanCleanApps/CleanWebApi/blob/main/docs/RUN.md) for every way to run, configure and test the solution
+- [GitHub issues](https://github.com/LeanMeanCleanApps/CleanWebApi/issues) for bugs and ideas
+- [Security policy](https://github.com/LeanMeanCleanApps/CleanWebApi/security/policy) to report a vulnerability privately
 
 ## Support
 

@@ -1,0 +1,39 @@
+name: Pipeline Report
+description: Gates the test results and coverage, and writes the one Build Pipeline summary for the run and its pull request.
+
+inputs:
+  command:
+    description: "test: check the test results and coverage. summary: report every stage and update the pull request comment."
+    required: true
+  results:
+    description: The folder holding the .trx files, coverage.opencover.xml and exit-code from the test stage.
+    default: results
+  coverage-threshold:
+    description: The lowest line coverage, in percent, that passes.
+    default: "95"
+  needs:
+    description: The calling job's needs context as JSON (summary only).
+    default: "{}"
+  token:
+    description: Reads the run's jobs and code scanning alerts, and writes the pull request comment (summary only).
+    default: ${{ github.token }}
+
+outputs:
+  tests:
+    description: passed or failed, from the test command.
+    value: ${{ steps.report.outputs.tests }}
+
+runs:
+  using: composite
+  steps:
+    - name: Report
+      id: report
+      shell: bash
+      run: python3 "$GITHUB_ACTION_PATH/report.py" "$COMMAND" --results "$RESULTS"
+      env:
+        COMMAND: ${{ inputs.command }}
+        RESULTS: ${{ inputs.results }}
+        COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
+        NEEDS: ${{ inputs.needs }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
