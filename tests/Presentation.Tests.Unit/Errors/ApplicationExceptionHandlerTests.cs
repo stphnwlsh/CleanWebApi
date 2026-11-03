@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Tests.Integration.Errors;
+namespace CleanWebApi.Presentation.Tests.Unit.Errors;
 
 using System.Threading;
 using System.Threading.Tasks;

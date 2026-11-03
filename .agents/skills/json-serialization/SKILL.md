@@ -33,7 +33,7 @@ Responses are trees: lists return summaries, and an entity holds only the flat r
 ## Steps
 
 1. Change how JSON looks only in `UseApiDefaults()`. Both option sets pick it up.
-2. Add a test in `tests/Presentation.Tests.Integration/Serialization/JsonSerializerOptionsExtensionsTests.cs` for any setting you change, and an integration test if a client would see the difference.
+2. Add a test in `tests/Presentation.Tests.Unit/Serialization/JsonSerializerOptionsExtensionsTests.cs` for any setting you change, and an integration test if a client would see the difference.
 3. Never let a response type refer back to its parent. Return a flat record instead (`ReviewAuthor`, `ReviewedMovie`).
 
 ## Example
@@ -61,6 +61,6 @@ private static readonly JsonSerializerOptions Options = new JsonSerializerOption
 ## Check
 
 ``` bash
-dotnet test tests/Presentation.Tests.Integration --filter "FullyQualifiedName~Serialization"
+dotnet test tests/Presentation.Tests.Unit --filter "FullyQualifiedName~Serialization"
 dotnet test tests/Presentation.Tests.Integration
 ```

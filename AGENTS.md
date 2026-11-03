@@ -13,7 +13,8 @@ Start with [Jacques](.agents/agents/jacques.md), our sous-chef and the persona e
 | `src/Presentation` | The Web API: controllers, request models, error handling, OpenAPI with Scalar, authentication, health checks and startup. |
 | `tests/Application.Tests.Unit` | Handler and validator tests with NSubstitute. |
 | `tests/Infrastructure.Tests.Integration` | Repository tests against a private in-memory SQLite database. |
-| `tests/Presentation.Tests.Integration` | Real HTTP requests through `WebApplicationFactory`, plus direct tests of the error handler, settings, OpenAPI transformers and JSON options. |
+| `tests/Presentation.Tests.Unit` | Error handler, settings, OpenAPI transformer and JSON options tests. |
+| `tests/Presentation.Tests.Integration` | Real HTTP requests through `WebApplicationFactory`. |
 | `.agents/skills` | How we do each kind of change, one skill per folder. |
 
 Application and Infrastructure, and their tests, are identical in the five Lean Mean Clean Apps templates. Only Presentation differs.

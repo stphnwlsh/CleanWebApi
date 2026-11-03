@@ -1,6 +1,6 @@
 ---
 name: presentation-integration-tests
-description: How this Web API is tested end to end with WebApplicationFactory - the WebApiApplication host, a private database per test class, overriding settings and services, the JSON helper, asserting problem details, testing with authentication on and off, and where the presentation classes are tested directly. Use when writing or fixing a test in tests/Presentation.Tests.Integration.
+description: How this Web API is tested end to end with WebApplicationFactory - the WebApiApplication host, a private database per test class, overriding settings and services, the JSON helper, asserting problem details, and testing with authentication on and off. Use when writing or fixing a test in tests/Presentation.Tests.Integration.
 metadata:
   scope: presentation
 ---
@@ -11,9 +11,7 @@ metadata:
 
 `tests/Presentation.Tests.Integration` makes real HTTP requests to the whole application in memory. `WebApiApplication` (a `WebApplicationFactory<Program>`) starts the app with the `local` environment, its own shared-cache in-memory SQLite database and the sample data on, so tests never touch a file or each other.
 
-This template has no Presentation unit test project, so the same project also tests presentation classes directly: `ApplicationExceptionHandler`, `AuthenticationSettings`, the OpenAPI transformers and `UseApiDefaults()`.
-
-Each test class that makes requests creates one `WebApiApplication` and disposes it. The constructor takes three optional arguments:
+Each test class creates one `WebApiApplication` in its constructor and disposes it. The constructor takes three optional arguments:
 
 | Argument | Use it to |
 | --- | --- |

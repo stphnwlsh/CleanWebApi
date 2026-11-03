@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Tests.Integration.Serialization;
+namespace CleanWebApi.Presentation.Tests.Unit.Serialization;
 
 using System.Text.Json;
 using CleanWebApi.Presentation.Serialization;

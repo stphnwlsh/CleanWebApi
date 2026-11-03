@@ -24,7 +24,7 @@ Scalar is set up in `ProgramExtensions.ConfigureApplication` with the title, C# 
 
 1. A new controller needs a `CreateTag(...)` line in `DocumentInfoTransformer`, named like the controller without `Controller`, with a one-sentence description.
 2. Something every operation needs goes in an operation transformer; something about the whole API goes in a document transformer. Register it in `AddOpenApi` in `ProgramExtensions.ConfigureBuilder`.
-3. Transformers are classes implementing `IOpenApiDocumentTransformer` or `IOpenApiOperationTransformer`, `sealed`, with XML docs. Test them directly in `tests/Presentation.Tests.Integration/OpenApi/`.
+3. Transformers are classes implementing `IOpenApiDocumentTransformer` or `IOpenApiOperationTransformer`, `sealed`, with XML docs. Unit test them in `tests/Presentation.Tests.Unit/OpenApi/`.
 4. When you add an action, update the operation count in `GetOpenApiDocument_ShouldDescribe_EveryOperation`.
 5. Run the app and read the result at <http://localhost:8080/scalar>.
 

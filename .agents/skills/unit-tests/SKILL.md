@@ -14,7 +14,9 @@ xUnit for tests, Shouldly for assertions, NSubstitute for fakes. Test folders mi
 | Project | Tests |
 | --- | --- |
 | `tests/Application.Tests.Unit` | Handlers (repositories faked with NSubstitute) and validators (`FluentValidation.TestHelper`) |
-| `tests/Presentation.Tests.Unit` | Presentation classes called directly, with `ISender` faked. Only templates whose presentation layer has logic worth testing on its own have this project; the others test it through `presentation-integration-tests` |
+| `tests/Presentation.Tests.Unit` | Presentation classes we wrote, called directly, with `ISender` faked where they send requests. Every template has this project; what goes in it depends on what its presentation layer holds |
+
+Test the code we wrote, not the libraries under it. A unit test that only proves ASP.NET Core, Hot Chocolate, Mapperly or the AWS serializer does its job protects nothing of ours. Test our settings, error handlers and filters, transformers, option extensions and parsing, and leave the libraries' own behaviour to the libraries.
 
 Names read as `Method_Should<Outcome>_<Condition>`: `Handle_ShouldThrowException_ReviewDoesNotExist`, `GetReviews_ShouldReturn_Ok`, `Validator_ShouldHaveValidationErrorFor_Id`.
 
@@ -74,10 +76,11 @@ _ = result.ShouldHaveValidationErrorFor(command => command.Id);
 - Test private methods, or test through the database in a unit test.
 - Share mutable state between tests through static fields.
 - Write a test that only exists to raise coverage without asserting behaviour.
+- Re-test a library's behaviour, such as a framework's model binding or a serializer's defaults.
 
 ## Check
 
 ``` bash
 dotnet test tests/Application.Tests.Unit
-dotnet test tests/Presentation.Tests.Unit      # where the template has one
+dotnet test tests/Presentation.Tests.Unit
 ```
