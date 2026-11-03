@@ -1,8 +1,5 @@
 namespace CleanWebApi.Application.Tests.Unit.Common.Behaviours;
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Authors.Entities;
 using Application.Authors.Queries.GetAuthorById;
 using Application.Common.Behaviours;

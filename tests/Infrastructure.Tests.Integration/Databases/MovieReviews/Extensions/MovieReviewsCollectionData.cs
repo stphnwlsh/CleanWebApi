@@ -1,6 +1,5 @@
 namespace CleanWebApi.Infrastructure.Tests.Integration.Databases.MovieReviews.Extensions;
 
-using System;
 using Infrastructure.Databases.MovieReviews;
 using Infrastructure.Databases.MovieReviews.Models;
 

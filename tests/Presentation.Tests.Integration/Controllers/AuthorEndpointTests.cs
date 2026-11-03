@@ -176,8 +176,8 @@ public class AuthorEndpointTests : IDisposable
         using var client = this.application.CreateClient();
         using var authorsResponse = await client.GetAsync("/api/authors?limit=50");
         var lastName = (await authorsResponse.Content.ReadAsStringAsync())
-            .Deserialize<Page<Entities.AuthorSummary>>().Items
-            .First().LastName;
+            .Deserialize<Page<Entities.AuthorSummary>>().Items[0]
+            .LastName;
 
         // Act
         using var response = await client.GetAsync($"/api/authors?query={Uri.EscapeDataString(lastName.ToLowerInvariant())}");

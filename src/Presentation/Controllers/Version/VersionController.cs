@@ -25,9 +25,9 @@ public class VersionController(ISender sender) : ApiControllerBase(sender)
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
     [EndpointName("GetVersion")]
-    [ProducesResponseType(typeof(Entity.Version), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(Entity.VersionInfo), StatusCodes.Status200OK, "application/json")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
-    public async Task<ActionResult<Entity.Version>> Get(CancellationToken cancellationToken)
+    public async Task<ActionResult<Entity.VersionInfo>> Get(CancellationToken cancellationToken)
     {
         return this.Ok(await this.Sender.Send(new Queries.GetVersion.GetVersionQuery(), cancellationToken));
     }

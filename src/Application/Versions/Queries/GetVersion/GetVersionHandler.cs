@@ -1,23 +1,33 @@
 namespace CleanWebApi.Application.Versions.Queries.GetVersion;
 
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Entities;
 using Mediator;
 
-public class GetVersionHandler : IRequestHandler<GetVersionQuery, Version>
+public class GetVersionHandler : IRequestHandler<GetVersionQuery, VersionInfo>
 {
-    public ValueTask<Version> Handle(GetVersionQuery request, CancellationToken cancellationToken)
-    {
-        var assembly = Assembly.GetEntryAssembly();
+    private readonly Assembly? assembly;
 
-        var version = new Version
+    /// <summary>Reads the version of the app that's running.</summary>
+    public GetVersionHandler()
+        : this(Assembly.GetEntryAssembly())
+    {
+    }
+
+    /// <summary>Reads the version of the given assembly, so tests can choose one with known values.</summary>
+    internal GetVersionHandler(Assembly? assembly)
+    {
+        this.assembly = assembly;
+    }
+
+    public ValueTask<VersionInfo> Handle(GetVersionQuery request, CancellationToken cancellationToken)
+    {
+        var version = new VersionInfo
         {
             FileVersion =
-                $"{assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version}",
+                $"{this.assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version}",
             InformationalVersion =
-                $"{assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}"
+                $"{this.assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}"
         };
 
         return ValueTask.FromResult(version);

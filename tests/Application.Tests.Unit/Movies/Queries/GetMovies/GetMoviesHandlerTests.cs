@@ -1,7 +1,5 @@
 namespace CleanWebApi.Application.Tests.Unit.Movies.Queries.GetMovies;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Common.Paging;
 using Application.Movies;
 using Application.Movies.Entities;

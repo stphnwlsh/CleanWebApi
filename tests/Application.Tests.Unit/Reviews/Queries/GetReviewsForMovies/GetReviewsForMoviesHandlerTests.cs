@@ -1,7 +1,5 @@
 namespace CleanWebApi.Application.Tests.Unit.Reviews.Queries.GetReviewsForMovies;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Movies.Entities;
 using Application.Reviews;
 using Application.Reviews.Entities;

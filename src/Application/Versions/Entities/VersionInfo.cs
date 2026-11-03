@@ -3,7 +3,7 @@ namespace CleanWebApi.Application.Versions.Entities;
 /// <summary>
 /// The version details of the running application.
 /// </summary>
-public class Version
+public class VersionInfo
 {
     /// <summary>
     /// The assembly file version.

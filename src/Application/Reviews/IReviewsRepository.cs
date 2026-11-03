@@ -25,7 +25,5 @@ public interface IReviewsRepository
 
     public Task<Review?> GetReviewById(Guid id, CancellationToken cancellationToken);
 
-    public Task<bool> ReviewExists(Guid id, CancellationToken cancellationToken);
-
-    public Task<bool> UpdateReview(Guid id, int stars, CancellationToken cancellationToken);
+    public Task<Review?> UpdateReview(Guid id, int stars, CancellationToken cancellationToken);
 }

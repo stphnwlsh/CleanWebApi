@@ -1,7 +1,5 @@
 namespace CleanWebApi.Application.Reviews.Queries.GetReviewById;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Common.Enums;
 using Common.Exceptions;
 using Entities;

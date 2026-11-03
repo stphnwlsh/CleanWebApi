@@ -1,7 +1,5 @@
 namespace CleanWebApi.Application.Tests.Unit.Authors.Queries.GetAuthors;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Authors;
 using Application.Authors.Entities;
 using Application.Authors.Queries.GetAuthors;

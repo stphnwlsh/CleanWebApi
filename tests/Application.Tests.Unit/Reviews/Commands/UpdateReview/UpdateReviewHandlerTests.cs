@@ -1,10 +1,9 @@
 namespace CleanWebApi.Application.Tests.Unit.Reviews.Commands.UpdateReview;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Common.Exceptions;
 using Application.Reviews;
 using Application.Reviews.Commands.UpdateReview;
+using Application.Reviews.Entities;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -12,7 +11,7 @@ using Xunit;
 public class UpdateReviewHandlerTests
 {
     [Fact]
-    public async Task Handle_ShouldPassThrough_Command()
+    public async Task Handle_ShouldReturnUpdatedReview_ReviewExists()
     {
         // Arrange
         var command = new UpdateReviewCommand
@@ -21,10 +20,10 @@ public class UpdateReviewHandlerTests
             Stars = 1
         };
 
+        var review = new Review(command.Id, command.Stars);
         var reviewsRepository = Substitute.For<IReviewsRepository>();
 
-        _ = reviewsRepository.ReviewExists(default, default).ReturnsForAnyArgs(true);
-        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(true);
+        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(review);
 
         var handler = new UpdateReviewHandler(reviewsRepository);
         using var tokenSource = new CancellationTokenSource();
@@ -34,9 +33,8 @@ public class UpdateReviewHandlerTests
         var result = await handler.Handle(command, token);
 
         // Assert
-        result.ShouldBeTrue();
+        result.ShouldBe(review);
 
-        _ = await reviewsRepository.Received(1).ReviewExists(command.Id, token);
         _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
     }
 
@@ -52,7 +50,7 @@ public class UpdateReviewHandlerTests
 
         var reviewsRepository = Substitute.For<IReviewsRepository>();
 
-        _ = reviewsRepository.ReviewExists(default, default).ReturnsForAnyArgs(false);
+        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(Task.FromResult<Review?>(null));
 
         var handler = new UpdateReviewHandler(reviewsRepository);
         using var tokenSource = new CancellationTokenSource();
@@ -64,7 +62,6 @@ public class UpdateReviewHandlerTests
         // Assert
         exception.Message.ShouldBe("The Review with the supplied id was not found.");
 
-        _ = await reviewsRepository.Received(1).ReviewExists(command.Id, token);
-        _ = await reviewsRepository.DidNotReceiveWithAnyArgs().UpdateReview(default, default, default);
+        _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
     }
 }

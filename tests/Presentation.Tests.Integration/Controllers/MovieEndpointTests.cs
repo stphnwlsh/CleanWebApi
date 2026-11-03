@@ -200,8 +200,8 @@ public class MovieEndpointTests : IDisposable
         using var client = this.application.CreateClient();
         using var moviesResponse = await client.GetAsync("/api/movies?limit=50");
         var title = (await moviesResponse.Content.ReadAsStringAsync())
-            .Deserialize<Page<Entities.MovieSummary>>().Items
-            .First().Title;
+            .Deserialize<Page<Entities.MovieSummary>>().Items[0]
+            .Title;
 
         // Act
         using var response = await client.GetAsync($"/api/movies?query={Uri.EscapeDataString(title.ToUpperInvariant())}");
