@@ -93,7 +93,7 @@ public class OpenApiDocumentTests : IDisposable
     [InlineData("Author")]
     [InlineData("Movie")]
     [InlineData("Review")]
-    [InlineData("Version")]
+    [InlineData("VersionInfo")]
     [InlineData("AuthorSummary")]
     [InlineData("PageOfAuthorSummary")]
     [InlineData("MovieSummary")]

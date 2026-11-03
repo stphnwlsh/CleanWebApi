@@ -24,13 +24,13 @@ public class VersionEndpointTests : IDisposable
 
         // Act
         using var response = await client.GetAsync("/api/version");
-        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Entities.Version>();
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Entities.VersionInfo>();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         _ = result.ShouldNotBeNull();
-        _ = result.ShouldBeOfType<Entities.Version>();
+        _ = result.ShouldBeOfType<Entities.VersionInfo>();
 
         _ = result.FileVersion.ShouldBeOfType<string>();
         result.FileVersion.ShouldNotBeNullOrWhiteSpace();

@@ -54,7 +54,7 @@ public async Task Handle_ShouldThrowException_ReviewDoesNotExist()
     // Arrange
     var command = new UpdateReviewCommand { Id = Guid.NewGuid(), Stars = 5 };
     var reviewsRepository = Substitute.For<IReviewsRepository>();
-    _ = reviewsRepository.ReviewExists(default, default).ReturnsForAnyArgs(false);
+    _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs((Review?)null);
     var handler = new UpdateReviewHandler(reviewsRepository);
     using var tokenSource = new CancellationTokenSource();
     var token = tokenSource.Token;
@@ -64,8 +64,7 @@ public async Task Handle_ShouldThrowException_ReviewDoesNotExist()
 
     // Assert
     exception.Message.ShouldBe("The Review with the supplied id was not found.");
-    _ = await reviewsRepository.Received(1).ReviewExists(command.Id, token);
-    _ = await reviewsRepository.DidNotReceiveWithAnyArgs().UpdateReview(default, default, default);
+    _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
 }
 ```
 

@@ -34,7 +34,7 @@ Names read as `Method_Should<Outcome>_<Condition>`: `Handle_ShouldThrowException
 ```csharp
 // tests/Application.Tests.Unit/Reviews/Commands/UpdateReview/UpdateReviewHandlerTests.cs
 [Fact]
-public async Task Handle_ShouldPassThrough_Command()
+public async Task Handle_ShouldReturnUpdatedReview_ReviewExists()
 {
     // Arrange
     var command = new UpdateReviewCommand
@@ -43,10 +43,10 @@ public async Task Handle_ShouldPassThrough_Command()
         Stars = 1
     };
 
+    var review = new Review(command.Id, command.Stars);
     var reviewsRepository = Substitute.For<IReviewsRepository>();
 
-    _ = reviewsRepository.ReviewExists(default, default).ReturnsForAnyArgs(true);
-    _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(true);
+    _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(review);
 
     var handler = new UpdateReviewHandler(reviewsRepository);
     using var tokenSource = new CancellationTokenSource();
@@ -56,9 +56,8 @@ public async Task Handle_ShouldPassThrough_Command()
     var result = await handler.Handle(command, token);
 
     // Assert
-    result.ShouldBeTrue();
+    result.ShouldBe(review);
 
-    _ = await reviewsRepository.Received(1).ReviewExists(command.Id, token);
     _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
 }
 ```

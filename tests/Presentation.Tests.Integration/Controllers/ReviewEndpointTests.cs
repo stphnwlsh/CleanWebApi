@@ -376,7 +376,7 @@ public class ReviewEndpointTests : IDisposable
         using var client = this.application.CreateClient();
         using var reviewsResponse = await client.GetAsync("/api/reviews");
         var reviews = (await reviewsResponse.Content.ReadAsStringAsync()).Deserialize<Page<Entities.Review>>().Items;
-        var movieId = reviews.First().ReviewedMovie!.Id;
+        var movieId = reviews[0].ReviewedMovie!.Id;
 
         // Act
         using var response = await client.GetAsync($"/api/reviews?movieId={movieId}&limit=50");
@@ -399,7 +399,7 @@ public class ReviewEndpointTests : IDisposable
         using var client = this.application.CreateClient();
         using var reviewsResponse = await client.GetAsync("/api/reviews");
         var reviews = (await reviewsResponse.Content.ReadAsStringAsync()).Deserialize<Page<Entities.Review>>().Items;
-        var authorId = reviews.First().ReviewAuthor!.Id;
+        var authorId = reviews[0].ReviewAuthor!.Id;
 
         // Act
         using var response = await client.GetAsync($"/api/reviews?authorId={authorId}&limit=50");

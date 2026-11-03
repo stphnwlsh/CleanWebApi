@@ -24,14 +24,24 @@ The presentation layer maps each exception to its own shape in one place (in a w
 ## Steps
 
 1. For a missing entity, use the helpers rather than `throw new`:
-   - `NotFoundException.ThrowIfNull(result, EntityType.Movie);` after a fetch.
-   - `NotFoundException.Throw(EntityType.Author);` after an existence check.
+   - `NotFoundException.ThrowIfNull(result, EntityType.Movie);` after a fetch, or after an update that returns the changed entity, or `null` when no row matched.
+   - `NotFoundException.Throw(EntityType.Review);` when a delete changed no rows.
+   - `NotFoundException.Throw(EntityType.Author);` after an existence check. Only check first when the write itself can't tell you which thing is missing, such as a new review's author and movie.
 2. A new kind of entity needs a value in `EntityType` (`src/Application/Common/Enums/EntityType.cs`).
 3. Test the not-found path in the handler tests with `Should.ThrowAsync<NotFoundException>`.
 4. If you add a new exception type, map it in the presentation layer's error handler in the same change, and test the mapping. If the caller should see it as an answer rather than a fault, log it in `LoggingBehaviour` too.
 5. Test that the handler logs an unexpected exception once, as `Error`, and logs nothing for the ones it maps (`unit-tests`).
 
 ## Example
+
+```csharp
+// src/Application/Reviews/Commands/UpdateReview/UpdateReviewHandler.cs
+var review = await reviewsRepository.UpdateReview(request.Id, request.Stars, cancellationToken);
+
+NotFoundException.ThrowIfNull(review, EntityType.Review);
+
+return review;
+```
 
 ```csharp
 // src/Application/Reviews/Commands/CreateReview/CreateReviewHandler.cs
@@ -48,6 +58,7 @@ if (!await authorsRepository.AuthorExists(request.AuthorId, cancellationToken))
 - Return `null`, `false` or an empty result to mean "not found" from a handler.
 - Catch exceptions in a handler to turn them into something else.
 - Introduce a `Result<T>` type. We use exceptions on purpose.
+- Check that a row exists and then update or delete it. That's two trips and a race; let the write tell you.
 - Put a stack trace, SQL or exception type name in a message.
 
 ## Check

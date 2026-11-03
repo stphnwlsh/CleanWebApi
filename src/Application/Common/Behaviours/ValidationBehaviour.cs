@@ -1,9 +1,5 @@
 namespace CleanWebApi.Application.Common.Behaviours;
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentValidation;
 using Mediator;
 

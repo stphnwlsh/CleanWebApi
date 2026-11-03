@@ -1,6 +1,5 @@
 namespace CleanWebApi.Infrastructure;
 
-using System;
 using Application.Authors;
 using Application.Movies;
 using Application.Reviews;
@@ -19,10 +18,15 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string? connectionString = null)
     {
-        var database = new MovieReviewsDatabase(string.IsNullOrWhiteSpace(connectionString) ? DefaultConnectionString : connectionString);
+        var databaseConnectionString = string.IsNullOrWhiteSpace(connectionString) ? DefaultConnectionString : connectionString;
 
-        _ = services.AddSingleton(database);
-        _ = services.AddDbContext<MovieReviewsDbContext>(options => options.UseSqlite(database.ConnectionString));
+        // Registered through a factory, so the container owns it and closes its connection when the app stops.
+        _ = services.AddSingleton(_ => new MovieReviewsDatabase(databaseConnectionString));
+
+        // Nothing reads an entity to change it, so queries don't track by default.
+        _ = services.AddDbContext<MovieReviewsDbContext>(options => options
+            .UseSqlite(databaseConnectionString)
+            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
         _ = services.AddSingleton<MovieReviewsMapper>();
         _ = services.AddScoped<EntityFrameworkMovieReviewsRepository>();

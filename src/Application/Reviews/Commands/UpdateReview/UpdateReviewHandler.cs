@@ -2,17 +2,17 @@ namespace CleanWebApi.Application.Reviews.Commands.UpdateReview;
 
 using Common.Enums;
 using Common.Exceptions;
+using Entities;
 using Mediator;
 
-public class UpdateReviewHandler(IReviewsRepository reviewsRepository) : IRequestHandler<UpdateReviewCommand, bool>
+public class UpdateReviewHandler(IReviewsRepository reviewsRepository) : IRequestHandler<UpdateReviewCommand, Review>
 {
-    public async ValueTask<bool> Handle(UpdateReviewCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Review> Handle(UpdateReviewCommand request, CancellationToken cancellationToken)
     {
-        if (!await reviewsRepository.ReviewExists(request.Id, cancellationToken))
-        {
-            NotFoundException.Throw(EntityType.Review);
-        }
+        var review = await reviewsRepository.UpdateReview(request.Id, request.Stars, cancellationToken);
 
-        return await reviewsRepository.UpdateReview(request.Id, request.Stars, cancellationToken);
+        NotFoundException.ThrowIfNull(review, EntityType.Review);
+
+        return review;
     }
 }

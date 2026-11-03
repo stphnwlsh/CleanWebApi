@@ -1,7 +1,5 @@
 namespace CleanWebApi.Application.Tests.Unit.Movies.Queries.GetMovieById;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Application.Common.Exceptions;
 using Application.Movies;
 using Application.Movies.Entities;

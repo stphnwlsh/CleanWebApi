@@ -10,7 +10,7 @@ internal abstract class EntityConfiguration<T> : IEntityTypeConfiguration<T>
     public virtual void Configure(EntityTypeBuilder<T> builder)
     {
         _ = builder.HasKey(e => e.Id);
-        _ = builder.Property(m => m.Id).ValueGeneratedOnAdd().IsRequired();
+        _ = builder.Property(m => m.Id).ValueGeneratedOnAdd().HasValueGenerator<Version7GuidValueGenerator>().IsRequired();
         _ = builder.Property(m => m.DateCreated).IsRequired();
         _ = builder.Property(m => m.DateModified).IsRequired();
     }

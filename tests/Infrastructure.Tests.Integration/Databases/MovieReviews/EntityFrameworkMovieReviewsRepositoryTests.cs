@@ -2,6 +2,7 @@ namespace CleanWebApi.Infrastructure.Tests.Integration.Databases.MovieReviews;
 
 using Application.Reviews.Commands.CreateReview;
 using Application.Reviews.Commands.UpdateReview;
+using Infrastructure.Databases.MovieReviews.Models;
 using Shouldly;
 using Xunit;
 
@@ -230,6 +231,24 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task GetMovies_ShouldSort_TitlesIgnoringCase()
+    {
+        // Arrange
+        this.database.Context.Add(new Movie { Title = "aardvark" });
+        _ = await this.database.Context.SaveChangesAsync();
+
+        var repository = this.database.Repository;
+        using var tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+
+        // Act
+        var (items, _) = await repository.GetMovies(null, 0, 10, token);
+
+        // Assert
+        items[0].Title.ShouldBe("aardvark");
+    }
+
+    [Fact]
     public async Task GetMovies_ShouldReturn_ReviewCountAndAverageStars()
     {
         // Arrange
@@ -304,7 +323,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
 
         // Assert
         _ = result.ShouldNotBeNull();
-        result.Id.ShouldNotBe(Guid.Empty);
+        result.Id.Version.ShouldBe(7);
         result.ReviewAuthor.ShouldNotBeNull().Id.ShouldBe(review.AuthorId);
         result.ReviewedMovie.ShouldNotBeNull().Id.ShouldBe(review.MovieId);
         result.Stars.ShouldBe(review.Stars);
@@ -382,38 +401,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task ReviewExists_ShouldReturn_True()
-    {
-        // Arrange
-        var repository = this.database.Repository;
-        using var tokenSource = new CancellationTokenSource();
-        var token = tokenSource.Token;
-        var review = this.database.Context.Reviews.First(m => m.Stars == 5);
-
-        // Act
-        var result = await repository.ReviewExists(review.Id, token);
-
-        // Assert
-        result.ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task ReviewExists_ShouldReturn_False()
-    {
-        // Arrange
-        var repository = this.database.Repository;
-        using var tokenSource = new CancellationTokenSource();
-        var token = tokenSource.Token;
-
-        // Act
-        var result = await repository.ReviewExists(Guid.Empty, token);
-
-        // Assert
-        result.ShouldBeFalse();
-    }
-
-    [Fact]
-    public async Task UpdateReview_ShouldReturn_True()
+    public async Task UpdateReview_ShouldReturn_UpdatedReview()
     {
         // Arrange
         var original = this.database.Context.Reviews.First(a => a.Stars == 2);
@@ -429,7 +417,11 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var result = await this.database.Repository.UpdateReview(review.Id, review.Stars, token);
 
         // Assert
-        result.ShouldBeTrue();
+        _ = result.ShouldNotBeNull();
+        result.Id.ShouldBe(review.Id);
+        result.Stars.ShouldBe(review.Stars);
+        _ = result.ReviewAuthor.ShouldNotBeNull();
+        _ = result.ReviewedMovie.ShouldNotBeNull();
 
         var updatedReview = this.database.Context.Reviews.First(a => a.Id == review.Id);
 
@@ -441,7 +433,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task UpdateReview_ShouldReturn_False()
+    public async Task UpdateReview_ShouldReturn_Null()
     {
         // Arrange
         var review = new UpdateReviewCommand
@@ -456,7 +448,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var result = await this.database.Repository.UpdateReview(review.Id, review.Stars, token);
 
         // Assert
-        result.ShouldBeFalse();
+        result.ShouldBeNull();
     }
 
     [Fact]

@@ -8,4 +8,4 @@ namespace CleanWebApi.Application.Common.Paging;
 /// <param name="Offset">The number of results skipped before this page.</param>
 /// <param name="Limit">The largest number of results this page could hold.</param>
 /// <param name="TotalCount">The number of results across every page.</param>
-public record Page<T>(List<T> Items, int Offset, int Limit, int TotalCount);
+public record Page<T>(IReadOnlyList<T> Items, int Offset, int Limit, int TotalCount);

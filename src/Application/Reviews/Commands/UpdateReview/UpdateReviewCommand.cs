@@ -1,11 +1,12 @@
 namespace CleanWebApi.Application.Reviews.Commands.UpdateReview;
 
+using Entities;
 using Mediator;
 
 /// <summary>
 /// Changes the star rating of a review. The author and the movie of a review can't change.
 /// </summary>
-public class UpdateReviewCommand : IRequest<bool>
+public class UpdateReviewCommand : IRequest<Review>
 {
     /// <summary>The unique identifier of the review.</summary>
     public Guid Id { get; init; }

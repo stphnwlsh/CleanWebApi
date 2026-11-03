@@ -17,7 +17,7 @@ Lists return summaries (`MovieSummary`, `AuthorSummary`) worked out in SQL, not 
 
 1. Give the query `Offset` (default 0) and `Limit` (default `Paging.DefaultLimit`) properties, plus an optional `Query` search term if the list can be searched.
 2. Validate them with `ValidOffset()`, `ValidLimit()` and `ValidSearchTerm()` (`validation`).
-3. Have the repository return `(List<T> Items, int TotalCount)`. Count before you skip and take.
+3. Have the repository return `(List<T> Items, int TotalCount)`; `Page<T>` exposes the items as an `IReadOnlyList<T>`. Count before you skip and take.
 4. Order by something that makes a stable order, ending with the id, so a row never shows up on two pages.
 5. Build the page in the handler: `new Page<T>(items, request.Offset, request.Limit, totalCount)`.
 

@@ -1,7 +1,5 @@
 namespace CleanWebApi.Application.Reviews.Commands.CreateReview;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Authors;
 using Common.Enums;
 using Common.Exceptions;

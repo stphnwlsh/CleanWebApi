@@ -4,6 +4,7 @@ using Application.Authors;
 using Application.Movies;
 using Application.Reviews;
 using Infrastructure.Databases.MovieReviews;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -26,6 +27,46 @@ public class DependencyInjectionTests
         services.Single(s => s.ServiceType == typeof(IAuthorsRepository)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(s => s.ServiceType == typeof(IMoviesRepository)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(s => s.ServiceType == typeof(IReviewsRepository)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void AddInfrastructure_ShouldNotTrack_Queries()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        _ = services.AddInfrastructure(InMemoryConnectionString());
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+
+        // Act
+        var context = scope.ServiceProvider.GetRequiredService<MovieReviewsDbContext>();
+
+        // Assert
+        context.ChangeTracker.QueryTrackingBehavior.ShouldBe(QueryTrackingBehavior.NoTracking);
+    }
+
+    [Fact]
+    public void AddInfrastructure_ShouldClose_InMemoryDatabaseWithTheContainer()
+    {
+        // Arrange
+        var connectionString = InMemoryConnectionString();
+        var services = new ServiceCollection();
+        _ = services.AddInfrastructure(connectionString);
+
+        var provider = services.BuildServiceProvider();
+        _ = provider.InitialiseInfrastructure(false);
+
+        // Act
+        provider.Dispose();
+
+        // Assert
+        using var connection = new SqliteConnection(connectionString);
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'";
+
+        command.ExecuteScalar().ShouldBe(0L);
     }
 
     [Fact]

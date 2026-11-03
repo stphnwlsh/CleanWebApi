@@ -1,8 +1,6 @@
 namespace CleanWebApi.Application.Tests.Unit.Version.Queries.GetVersion;
 
-using System.Threading;
-using System.Threading.Tasks;
-using Application.Versions.Entities;
+using System.Reflection;
 using Application.Versions.Queries.GetVersion;
 using Shouldly;
 using Xunit;
@@ -10,25 +8,47 @@ using Xunit;
 public class GetVersionHandlerTests
 {
     [Fact]
-    public async Task Handle_ShouldPassThrough_Query()
+    public async Task Handle_ShouldReturnVersions_AssemblyHasVersionAttributes()
     {
         // Arrange
-        var query = new GetVersionQuery();
-
-        var handler = new GetVersionHandler();
+        var assembly = typeof(GetVersionHandlerTests).Assembly;
+        var handler = new GetVersionHandler(assembly);
         using var tokenSource = new CancellationTokenSource();
-        var token = tokenSource.Token;
 
         // Act
-        var result = await handler.Handle(query, token);
+        var result = await handler.Handle(new GetVersionQuery(), tokenSource.Token);
 
         // Assert
-        _ = result.ShouldNotBeNull();
-        _ = result.ShouldBeOfType<Version>();
+        result.FileVersion.ShouldBe(assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()!.Version);
+        result.InformationalVersion.ShouldBe(assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion);
+    }
 
-        _ = result.FileVersion.ShouldBeOfType<string>();
+    [Fact]
+    public async Task Handle_ShouldReturnEmptyVersions_NoAssembly()
+    {
+        // Arrange
+        var handler = new GetVersionHandler(null);
+        using var tokenSource = new CancellationTokenSource();
+
+        // Act
+        var result = await handler.Handle(new GetVersionQuery(), tokenSource.Token);
+
+        // Assert
+        result.FileVersion.ShouldBeEmpty();
+        result.InformationalVersion.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReadEntryAssembly_DefaultConstructor()
+    {
+        // Arrange
+        var handler = new GetVersionHandler();
+        using var tokenSource = new CancellationTokenSource();
+
+        // Act
+        var result = await handler.Handle(new GetVersionQuery(), tokenSource.Token);
+
+        // Assert
         result.FileVersion.ShouldNotBeNullOrWhiteSpace();
-        _ = result.InformationalVersion.ShouldBeOfType<string>();
-        result.InformationalVersion.ShouldNotBeNullOrWhiteSpace();
     }
 }
