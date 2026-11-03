@@ -54,11 +54,11 @@ public class DependencyInjectionTests
         var services = new ServiceCollection();
         _ = services.AddInfrastructure(connectionString);
 
-        var provider = services.BuildServiceProvider();
-        _ = provider.InitialiseInfrastructure(false);
-
-        // Act
-        provider.Dispose();
+        // Act: leaving the block disposes the container, even if setting up the database throws
+        using (var provider = services.BuildServiceProvider())
+        {
+            _ = provider.InitialiseInfrastructure(false);
+        }
 
         // Assert
         using var connection = new SqliteConnection(connectionString);

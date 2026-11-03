@@ -50,7 +50,7 @@ public class UpdateReviewHandlerTests
 
         var reviewsRepository = Substitute.For<IReviewsRepository>();
 
-        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs((Review?)null);
+        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(Task.FromResult<Review?>(null));
 
         var handler = new UpdateReviewHandler(reviewsRepository);
         using var tokenSource = new CancellationTokenSource();
