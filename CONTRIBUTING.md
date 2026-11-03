@@ -58,7 +58,7 @@ dotnet new uninstall ./
 
 ## Working with an AI agent
 
-Agents are welcome here, as long as a person stays in charge. [AGENTS.md](AGENTS.md) is the agent's map of the repository, [Sous](.agents/agents/sous.md) is the persona they work as, and [.agents/skills](.agents/skills) holds one skill per kind of change, in the open Agent Skills format that most coding agents understand. If you change how something is done, update its skill in the same pull request. Out-of-date recipes are how kitchens catch fire.
+Agents are welcome here, as long as a person stays in charge. [AGENTS.md](AGENTS.md) is the agent's map of the repository, [Jacques](.agents/agents/jacques.md), our sous-chef, is the persona they work as, and [.agents/skills](.agents/skills) holds one skill per kind of change, in the open Agent Skills format that most coding agents understand. If you change how something is done, update its skill in the same pull request. Out-of-date recipes are how kitchens catch fire.
 
 ## Pull requests
 

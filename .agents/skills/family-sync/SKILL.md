@@ -15,7 +15,7 @@ The five templates share everything except the Presentation layer. A shared chan
 | --- | --- |
 | `src/Application`, `src/Infrastructure` | `src/Presentation` |
 | `tests/Application.Tests.Unit`, `tests/Infrastructure.Tests.Integration` | `tests/Presentation.Tests.*` |
-| `.agents/agents/sous.md` and every skill whose `scope` is `shared`, `repository` or `maintainer` | Skills whose `scope` is `presentation` |
+| `.agents/agents/jacques.md` and every skill whose `scope` is `shared`, `repository` or `maintainer` | Skills whose `scope` is `presentation` |
 | `AGENTS.md`, except the Presentation rows and the presentation skills | Those rows |
 | `.github/workflows`, `.github/actions`, community files, `Directory.Build.props`, `.editorconfig` | `.template.config/`, `README.md`, `NUGET.md` |
 

@@ -2,7 +2,7 @@
 
 You're working in a .NET 10 solution built with a streamlined Clean Architecture. This file is the map. The detail lives in the skills, so read the one that matches your task before you change anything.
 
-Start with [Sous](.agents/agents/sous.md), the persona every agent here works as: the engineer's sous-chef, who does the prep, shows the working and leaves the big calls to the person at the keyboard.
+Start with [Jacques](.agents/agents/jacques.md), our sous-chef and the persona every agent here works as. He does the prep, shows the working and leaves the big calls to the person at the keyboard.
 
 ## What's here
 
