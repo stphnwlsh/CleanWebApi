@@ -31,7 +31,7 @@ cd Acme.Reviews
 | `--authority` | Your OAuth authorization server. Leave it out and the API runs without authentication |
 | `--audience` | The audience tokens must be issued for, usually the API's own URL |
 
-That's three layers, three test projects, a Dockerfile and a CI pipeline. Go and tell your team you've been working on it all week.
+That's three layers, four test projects, a Dockerfile and a CI pipeline. Go and tell your team you've been working on it all week.
 
 ## Run it
 

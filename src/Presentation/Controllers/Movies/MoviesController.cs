@@ -2,12 +2,13 @@ namespace CleanWebApi.Presentation.Controllers.Movies;
 
 using Application.Common.Paging;
 using Common;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Entities = Application.Movies.Entities;
 using Queries = Application.Movies.Queries;
 
 [Route("api/movies")]
-public class MoviesController : ApiControllerBase
+public class MoviesController(ISender sender) : ApiControllerBase(sender)
 {
     /// <summary>
     /// List Movies

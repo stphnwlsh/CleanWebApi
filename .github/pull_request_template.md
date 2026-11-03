@@ -25,4 +25,5 @@
 - [ ] `dotnet build` and `dotnet test` pass locally with no warnings.
 - [ ] I added or updated tests, and line coverage stays at or above 95%.
 - [ ] I updated the README or docs where behaviour changed.
+- [ ] If this changes how we do something, I updated the matching skill in `.agents/skills`.
 - [ ] I checked the template still installs and creates a working solution (see CONTRIBUTING.md).

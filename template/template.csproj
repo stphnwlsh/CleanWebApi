@@ -24,6 +24,8 @@
 
   <PropertyGroup>
     <TemplateExcludes>../**/bin/**;../**/obj/**;../**/TestResults/**;../**/*.user;../**/.DS_Store</TemplateExcludes>
+    <!-- Skills about the template repository itself (its pipeline, releases and the five-template family) stay out of generated solutions. -->
+    <RepositorySkills>../.agents/skills/branches-and-pull-requests/**;../.agents/skills/ci-pipeline/**;../.agents/skills/security-findings/**;../.agents/skills/docs-and-voice/**;../.agents/skills/template-authoring/**;../.agents/skills/family-sync/**;../.agents/skills/releases/**</RepositorySkills>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +33,8 @@
     <None Include="../src/**/*" Exclude="$(TemplateExcludes)" Pack="true" PackagePath="content/src/" />
     <None Include="../tests/**/*" Exclude="$(TemplateExcludes)" Pack="true" PackagePath="content/tests/" />
     <None Include="../docs/RUN.md" Pack="true" PackagePath="content/docs/" />
+    <None Include="../.agents/**/*" Exclude="$(TemplateExcludes);$(RepositorySkills)" Pack="true" PackagePath="content/.agents/" />
+    <None Include="../AGENTS.md;../CLAUDE.md" Pack="true" PackagePath="content/" />
     <None Include="../*.sln;../Directory.Build.props;../Directory.Packages.props;../global.json;../NuGet.config;../Dockerfile;../docker-compose.yml;../icon.png;../.*ignore;../.editorconfig;../.gitattributes" Pack="true" PackagePath="content/" />
     <None Include="../icon.png" Pack="true" PackagePath="images/" />
     <None Include="../LICENSE.md" Pack="true" PackagePath="docs/" />

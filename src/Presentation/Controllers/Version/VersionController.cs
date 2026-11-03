@@ -1,6 +1,7 @@
 namespace CleanWebApi.Presentation.Controllers.Version;
 
 using Common;
+using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Entity = Application.Versions.Entities;
@@ -8,7 +9,7 @@ using Queries = Application.Versions.Queries;
 
 [AllowAnonymous]
 [Route("api/version")]
-public class VersionController : ApiControllerBase
+public class VersionController(ISender sender) : ApiControllerBase(sender)
 {
     /// <summary>
     /// Look up the application version details
@@ -28,6 +29,6 @@ public class VersionController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError, "application/problem+json")]
     public async Task<ActionResult<Entity.Version>> Get(CancellationToken cancellationToken)
     {
-        return await this.Sender.Send(new Queries.GetVersion.GetVersionQuery(), cancellationToken);
+        return this.Ok(await this.Sender.Send(new Queries.GetVersion.GetVersionQuery(), cancellationToken));
     }
 }

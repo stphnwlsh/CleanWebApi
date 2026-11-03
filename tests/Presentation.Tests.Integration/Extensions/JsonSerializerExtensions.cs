@@ -1,21 +1,12 @@
 namespace CleanWebApi.Presentation.Tests.Integration.Extensions;
 
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using CleanWebApi.Presentation.Serialization;
 
 public static class JsonSerializerExtensions
 {
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters =
-        {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-        }
-    };
+    // The same settings as the API, so a test reads a response exactly the way a client would.
+    private static readonly JsonSerializerOptions Options = new JsonSerializerOptions().UseApiDefaults();
 
     public static string Serialize(this object input)
     {

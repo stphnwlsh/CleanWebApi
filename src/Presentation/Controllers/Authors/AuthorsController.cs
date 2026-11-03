@@ -2,12 +2,13 @@ namespace CleanWebApi.Presentation.Controllers.Authors;
 
 using Application.Common.Paging;
 using Common;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Entities = Application.Authors.Entities;
 using Queries = Application.Authors.Queries;
 
 [Route("api/authors")]
-public class AuthorsController : ApiControllerBase
+public class AuthorsController(ISender sender) : ApiControllerBase(sender)
 {
     /// <summary>
     /// List Authors

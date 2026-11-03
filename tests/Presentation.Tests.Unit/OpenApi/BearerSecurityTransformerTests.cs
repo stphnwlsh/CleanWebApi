@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Tests.Integration.OpenApi;
+namespace CleanWebApi.Presentation.Tests.Unit.OpenApi;
 
 using CleanWebApi.Presentation.OpenApi;
 using Microsoft.AspNetCore.Authorization;

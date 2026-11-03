@@ -1,4 +1,4 @@
-namespace CleanWebApi.Presentation.Tests.Integration.Authentication;
+namespace CleanWebApi.Presentation.Tests.Unit.Authentication;
 
 using CleanWebApi.Presentation.Authentication;
 using Microsoft.Extensions.Configuration;
