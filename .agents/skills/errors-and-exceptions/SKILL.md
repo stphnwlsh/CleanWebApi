@@ -19,6 +19,8 @@ Application signals failure by throwing; it never returns error codes or result 
 
 The presentation layer maps each exception to its own shape in one place (in a web API, an `IExceptionHandler` writing RFC 9457 problem details). Messages are written for the caller and never include stack traces or internal details.
 
+`LoggingBehaviour` logs validation failures and not found as `Information`, because the caller got an answer. The presentation layer's handler logs anything unexpected as `Error`, with the exception, in the same place it reports it (`serilog`).
+
 ## Steps
 
 1. For a missing entity, use the helpers rather than `throw new`:
@@ -26,7 +28,8 @@ The presentation layer maps each exception to its own shape in one place (in a w
    - `NotFoundException.Throw(EntityType.Author);` after an existence check.
 2. A new kind of entity needs a value in `EntityType` (`src/Application/Common/Enums/EntityType.cs`).
 3. Test the not-found path in the handler tests with `Should.ThrowAsync<NotFoundException>`.
-4. If you add a new exception type, map it in the presentation layer's error handler in the same change, and test the mapping.
+4. If you add a new exception type, map it in the presentation layer's error handler in the same change, and test the mapping. If the caller should see it as an answer rather than a fault, log it in `LoggingBehaviour` too.
+5. Test that the handler logs an unexpected exception once, as `Error`, and logs nothing for the ones it maps (`unit-tests`).
 
 ## Example
 

@@ -7,6 +7,8 @@ using CleanWebApi.Presentation.Errors;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Shouldly;
 using Xunit;
 
@@ -23,7 +25,7 @@ public class ApplicationExceptionHandlerTests
         ]);
 
         // Act
-        var (handled, httpContext, context) = await Handle(exception);
+        var (handled, httpContext, context, logger) = await Handle(exception);
 
         // Assert
         handled.ShouldBeTrue();
@@ -36,6 +38,7 @@ public class ApplicationExceptionHandlerTests
         problemDetails.Errors["Id"].ShouldBe(["A Review Id was not supplied."]);
         problemDetails.Errors["Stars"].ShouldBe(["A star rating must be between 1 and 5."]);
         context.Exception.ShouldBe(exception);
+        logger.Collector.Count.ShouldBe(0);
     }
 
     [Fact]
@@ -45,13 +48,14 @@ public class ApplicationExceptionHandlerTests
         var exception = new NotFoundException("Expected Exception");
 
         // Act
-        var (handled, httpContext, context) = await Handle(exception);
+        var (handled, httpContext, context, logger) = await Handle(exception);
 
         // Assert
         handled.ShouldBeTrue();
         httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status404NotFound);
         context.ProblemDetails.Status.ShouldBe(StatusCodes.Status404NotFound);
         context.ProblemDetails.Detail.ShouldBe("Expected Exception");
+        logger.Collector.Count.ShouldBe(0);
     }
 
     [Fact]
@@ -61,13 +65,14 @@ public class ApplicationExceptionHandlerTests
         var exception = new BadHttpRequestException("Expected Exception");
 
         // Act
-        var (handled, httpContext, context) = await Handle(exception);
+        var (handled, httpContext, context, logger) = await Handle(exception);
 
         // Assert
         handled.ShouldBeTrue();
         httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
         context.ProblemDetails.Status.ShouldBe(StatusCodes.Status400BadRequest);
         context.ProblemDetails.Detail.ShouldBe("Expected Exception");
+        logger.Collector.Count.ShouldBe(0);
     }
 
     [Fact]
@@ -77,25 +82,36 @@ public class ApplicationExceptionHandlerTests
         var exception = new ArgumentException("Expected Exception");
 
         // Act
-        var (handled, httpContext, context) = await Handle(exception);
+        var (handled, httpContext, context, logger) = await Handle(exception);
 
         // Assert
         handled.ShouldBeTrue();
         httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status500InternalServerError);
         context.ProblemDetails.Status.ShouldBe(StatusCodes.Status500InternalServerError);
         context.ProblemDetails.Detail.ShouldBeNull();
+
+        var record = logger.Collector.LatestRecord;
+
+        logger.Collector.Count.ShouldBe(1);
+        record.Level.ShouldBe(LogLevel.Error);
+        record.Exception.ShouldBe(exception);
+        record.Message.ShouldBe("An unexpected exception stopped GET /api/movies");
     }
 
-    private static async Task<(bool Handled, HttpContext HttpContext, ProblemDetailsContext Context)> Handle(Exception exception)
+    private static async Task<(bool Handled, HttpContext HttpContext, ProblemDetailsContext Context, FakeLogger<ApplicationExceptionHandler> Logger)> Handle(Exception exception)
     {
         var problemDetailsService = new CapturingProblemDetailsService();
+        var logger = new FakeLogger<ApplicationExceptionHandler>();
 
-        var handler = new ApplicationExceptionHandler(problemDetailsService);
+        var handler = new ApplicationExceptionHandler(problemDetailsService, logger);
         var httpContext = new DefaultHttpContext();
+
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Request.Path = "/api/movies";
 
         var handled = await handler.TryHandleAsync(httpContext, exception, CancellationToken.None);
 
-        return (handled, httpContext, problemDetailsService.Context.ShouldNotBeNull());
+        return (handled, httpContext, problemDetailsService.Context.ShouldNotBeNull(), logger);
     }
 
     private sealed class CapturingProblemDetailsService : IProblemDetailsService

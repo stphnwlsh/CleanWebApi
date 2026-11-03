@@ -9,6 +9,7 @@ using Databases.MovieReviews.Extensions;
 using Databases.MovieReviews.Mapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 public static class DependencyInjection
@@ -33,7 +34,7 @@ public static class DependencyInjection
         _ = services.AddScoped<IReviewsRepository>(x =>
             x.GetRequiredService<EntityFrameworkMovieReviewsRepository>());
 
-        _ = services.AddSingleton(TimeProvider.System);
+        services.TryAddSingleton(TimeProvider.System);
 
         return services;
     }

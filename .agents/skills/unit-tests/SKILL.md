@@ -27,6 +27,7 @@ Names read as `Method_Should<Outcome>_<Condition>`: `Handle_ShouldThrowException
 3. Assert the result, then assert the calls: `Received(1)` with the exact arguments and token, and `DidNotReceiveWithAnyArgs()` for calls that mustn't happen.
 4. Validators: a static validator instance, one valid case with `ShouldNotHaveAnyValidationErrors()`, and a `[Theory]` per rule with `ShouldHaveValidationErrorFor(...)`.
 5. Use a real `CancellationTokenSource` so you can prove the token was passed on (`cancellation`).
+6. To check a log message, pass a `FakeLogger<T>` (`Microsoft.Extensions.Diagnostics.Testing`) and assert on `logger.Collector`: the count, then the level, message and exception of `LatestRecord`.
 
 ## Example
 
