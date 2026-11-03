@@ -9,16 +9,16 @@ metadata:
 
 ## The rule
 
-Nothing reads the clock directly. Code that needs the time takes `TimeProvider` through its constructor and calls `GetUtcNow()`. Production gets `TimeProvider.System`, registered once in `src/Infrastructure/DependencyInjection.cs`. Tests pass a `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Testing`) set to a fixed moment, so every date is known in advance.
+Nothing reads the clock directly. Code that needs the time takes `TimeProvider` through its constructor and calls `GetUtcNow()`. Production gets `TimeProvider.System`, registered with `TryAddSingleton` in both `AddApplication` and `AddInfrastructure`, so either layer works on its own and the clock is only registered once. Tests pass a `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Testing`) set to a fixed moment, so every date is known in advance.
 
-Times are stored and compared in UTC. Only the Infrastructure layer reads the time today: the repository stamps `DateCreated` and `DateModified` on writes.
+Times are stored and compared in UTC. Two things read the clock today. The repository stamps `DateCreated` and `DateModified` on writes, and `LoggingBehaviour` times each request with `GetTimestamp()` and `GetElapsedTime()`.
 
 ## Steps
 
 1. Take `TimeProvider timeProvider` in the constructor, check it with `ArgumentNullException.ThrowIfNull`, and keep it in a `private readonly` field.
 2. Read the time once per operation into a local (`var now = this.timeProvider.GetUtcNow().UtcDateTime;`) and use that value everywhere in the operation, so created and modified dates match.
 3. In repository tests, use the clock from `MovieReviewsTestDatabase` (fixed at 2009-12-31 23:51:01 UTC) and assert against it.
-4. To test something that depends on time passing, call `Advance(TimeSpan)` on the fake.
+4. To test something that depends on time passing, call `Advance(TimeSpan)` on the fake. `LoggingBehaviourTests` advance it inside the fake `next` delegate, so the logged time is exact.
 
 ## Example
 

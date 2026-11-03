@@ -5,11 +5,15 @@ using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// Maps exceptions raised by the Application layer to RFC 9457 problem details responses.
+/// Maps exceptions raised by the Application layer to RFC 9457 problem details responses. Anything it doesn't
+/// expect becomes a 500 and is logged here as an error, because handling the exception stops ASP.NET Core logging it.
 /// </summary>
-public class ApplicationExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+/// <param name="problemDetailsService">Writes the problem details response.</param>
+/// <param name="logger">Where unexpected exceptions are logged.</param>
+public partial class ApplicationExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<ApplicationExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
@@ -32,10 +36,7 @@ public class ApplicationExceptionHandler(IProblemDetailsService problemDetailsSe
                 Status = badHttpRequestException.StatusCode,
                 Detail = badHttpRequestException.Message
             },
-            _ => new ProblemDetails
-            {
-                Status = StatusCodes.Status500InternalServerError
-            }
+            _ => this.Unexpected(httpContext, exception)
         };
 
         httpContext.Response.StatusCode = problemDetails.Status!.Value;
@@ -47,4 +48,17 @@ public class ApplicationExceptionHandler(IProblemDetailsService problemDetailsSe
             Exception = exception
         });
     }
+
+    private ProblemDetails Unexpected(HttpContext httpContext, Exception exception)
+    {
+        LogUnexpected(logger, exception, httpContext.Request.Method, httpContext.Request.Path);
+
+        return new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError
+        };
+    }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "An unexpected exception stopped {RequestMethod} {RequestPath}")]
+    private static partial void LogUnexpected(ILogger logger, Exception exception, string requestMethod, string requestPath);
 }

@@ -133,18 +133,19 @@ public static class ProgramExtensions
 
         #endregion Security
 
+        #region Logging
+
+        // Before the exception handler, so each request is logged once with the status code the client gets.
+        _ = app.UseSerilogRequestLogging();
+
+        #endregion Logging
+
         #region Errors
 
         _ = app.UseExceptionHandler();
         _ = app.UseStatusCodePages();
 
         #endregion Errors
-
-        #region Logging
-
-        _ = app.UseSerilogRequestLogging();
-
-        #endregion Logging
 
         #region Authentication
 
