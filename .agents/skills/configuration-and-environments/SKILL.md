@@ -11,7 +11,7 @@ metadata:
 
 Settings come from `appsettings.json`, then `appsettings.<environment>.json`, then environment variables (`Section__Key`). The base file holds safe defaults for anywhere; the environment files hold what's only true for that environment.
 
-The Lambda template has no appsettings files or environments. Its handler builds configuration from environment variables alone, so the same keys are set as `ConnectionStrings__MovieReviews` and `Database__SeedSampleData`, and the defaults live in the handler.
+The Lambda template has no appsettings files or environments. Its startup builds configuration from environment variables alone, so the same keys are set as `ConnectionStrings__MovieReviews` and `Database__SeedSampleData`, and the defaults live in `Startup`.
 
 | Environment | Set by | Used for |
 | --- | --- | --- |
