@@ -69,6 +69,7 @@ Each skill is a folder in `.agents/skills` with a `SKILL.md`. If your tool doesn
 | `time-provider` | Need the current date or time |
 | `configuration-and-environments` | Add a setting or work with environments |
 | `serilog` | Log something or change log settings |
+| `telemetry` | Add a span or metric, or change where traces, metrics and logs go |
 | `health-checks` | Change what liveness or readiness checks |
 | `optional-token-auth` | Protect an endpoint or change authentication |
 | `xml-docs-and-openapi` | Document a public type, endpoint or model |

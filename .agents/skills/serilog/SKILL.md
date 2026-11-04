@@ -1,6 +1,6 @@
 ---
 name: serilog
-description: How logging works with Serilog - registration with AddSerilog, configuration from appsettings, sinks per environment, the enrichers and properties on every event, the request log, the LoggingBehaviour, who logs an unexpected exception, levels, and source-generated log messages. Use when adding a log line, changing log configuration or levels, adding a property, or looking for where logs go.
+description: How logging works with Serilog - registration with AddSerilog, configuration from appsettings, sinks per environment, logs over OTLP, the enrichers and properties on every event, the request log, the LoggingBehaviour, who logs an unexpected exception, levels, and source-generated log messages. Use when adding a log line, changing log configuration or levels, adding a property, or looking for where logs go.
 metadata:
   scope: shared
 ---
@@ -14,8 +14,11 @@ Serilog is the logger. Application and Infrastructure code log through `Microsof
 | Environment | Sink | Where to look |
 | --- | --- | --- |
 | `local` | Console, with the output template in `appsettings.local.json` | The terminal |
-| `docker` | Seq at `http://seq:5341` | <http://localhost:5341> |
-| Lambda, anywhere | Console, as compact JSON | CloudWatch Logs, or `docker compose logs` for the emulator |
+| `docker` | Console, and OTLP through the collector to the Aspire dashboard | <http://localhost:18888>, or `docker compose logs` |
+| Lambda, anywhere | Console, as compact JSON, and OTLP when the endpoint is set | CloudWatch Logs, or `docker compose logs` for the emulator, and the Aspire dashboard in Docker Compose |
+| Any, when `OTEL_EXPORTER_OTLP_ENDPOINT` is set | Also OTLP, through `Serilog.Sinks.OpenTelemetry` | Whatever receives the OTLP (`telemetry`) |
+
+The OTLP sink is added in code, not in the appsettings files, because it follows the standard `OTEL_*` settings like the trace and metric exporters do. It sends the same `service.name`, `service.version` and `deployment.environment.name` as the traces, and each event carries the trace and span IDs of whatever was running when it was written, so a log line links to its trace.
 
 Every event carries these properties:
 
@@ -26,7 +29,7 @@ Every event carries these properties:
 | `AssemblyVersion`, `AssemblyInformationalVersion` | Added in code at startup |
 | Anything pushed with `LogContext` | `FromLogContext` |
 
-Levels are set in configuration, never in code: `Information` by default and `Debug` in `local`, with `Information` for `Microsoft`, `Warning` for `Microsoft.AspNetCore` and `Error` for `System`. The built-in `Logging` section is set to `None` so nothing is written twice.
+Levels are set in configuration, never in code: `Information` by default and `Debug` in `local`, with `Information` for `Microsoft`, `Warning` for `Microsoft.AspNetCore` and `Microsoft.EntityFrameworkCore.Database.Command` (a line per SQL statement buries everything else, and EF Core's meter already counts them), and `Error` for `System`. The built-in `Logging` section is set to `None` so nothing is written twice.
 
 Three things log a request, and each says something the others don't:
 
@@ -45,9 +48,9 @@ The Lambda template has no appsettings files. Its startup sets the same levels a
 1. Take `ILogger<T>` through the constructor where you need it. Never reference Serilog types outside the presentation layer.
 2. Write each message as a `[LoggerMessage]` method on a `partial` class, with named holes in the template. The source generator writes the code, so nothing is formatted when the level is off. Put the methods in a `#region Log Messages` at the bottom of the class.
 3. Pick the level for the reader at 3am: `Information` for something that happened, `Warning` for something odd that was handled, `Error` for a failed request, `Debug` for detail you'd only want while developing.
-4. Name new properties in PascalCase with no spaces, so they can be used in templates and queried in Seq without quoting.
+4. Name new properties in PascalCase with no spaces, so they can be used in templates and queried in any backend without quoting.
 5. Add a sink or change a level in the appsettings files. A new sink package goes in `Directory.Packages.props` (`packages-and-dependencies`).
-6. In Seq, filter with property expressions: `ApplicationName = 'CleanWebApi-Docker' and @Level = 'Error'`.
+6. In the Aspire dashboard's structured logs, filter on any property, or open a log's trace from its trace ID.
 
 ## Example
 
@@ -61,19 +64,30 @@ private static partial void LogHandled(ILogger logger, string requestName, doubl
 // src/Presentation/Extensions, where startup registers services
 _ = builder.Services.AddSerilog((services, loggerConfiguration) =>
 {
-    var assembly = Assembly.GetEntryAssembly();
+    var configuration = services.GetRequiredService<IConfiguration>();
 
-    _ = loggerConfiguration.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>())
+    _ = loggerConfiguration.ReadFrom.Configuration(configuration)
         .Enrich.WithProperty(
             "AssemblyVersion",
-            assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version);
+            assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version);
+
+    if (telemetry.Enabled)
+    {
+        _ = loggerConfiguration.WriteTo.OpenTelemetry(
+            options =>
+            {
+                options.ResourceAttributes = telemetry.ResourceAttributes;
+                options.OnBeginSuppressInstrumentation = SuppressInstrumentationScope.Begin;
+            },
+            key => configuration[key]);
+    }
 });
 ```
 
 ```json
 // src/Presentation/appsettings.docker.json
 "Serilog": {
-  "WriteTo": [ { "Name": "Seq", "Args": { "serverUrl": "http://seq:5341" } } ],
+  "WriteTo": [ { "Name": "Console", "Args": { "outputTemplate": "..." } } ],
   "Properties": { "ApplicationName": "CleanWebApi-Docker" }
 }
 ```
@@ -94,6 +108,6 @@ _ = builder.Services.AddSerilog((services, loggerConfiguration) =>
 
 ``` bash
 dotnet run --project ./src/Presentation   # watch the console, then make a request
-docker compose up -d --build              # then open http://localhost:5341
+docker compose up -d --build              # then open http://localhost:18888
 dotnet test tests/Application.Tests.Unit  # LoggingBehaviourTests check the messages with FakeLogger
 ```
