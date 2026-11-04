@@ -21,7 +21,7 @@ Three files in `.template.config` make up the template, and every symbol appears
 
 | File | Used by | Holds |
 | --- | --- | --- |
-| `template.json` | Every host | Identity, `tags.type` of `solution`, the standard classifications, `defaultName`, an SDK `constraints` entry matching `global.json`, `primaryOutputs` (the `.slnx`), the symbols with a `displayName` and a `description`, and the restore post action |
+| `template.json` | Every host | Identity, `groupIdentity`, `precedence` and `generatorVersions`, `tags.type` of `solution`, the standard classifications, `defaultName`, an SDK `constraints` entry matching `global.json`, the symbols with a `displayName` and a `description`, a `HostIdentifier` bind, `primaryOutputs` (the `.slnx`, and `docs/RUN.md` for IDEs only) and three post actions: restore, open `docs/RUN.md` in the IDE, and a next-steps line in the terminal |
 | `dotnetcli.host.json` | `dotnet new` | Each symbol's `longName` and short flag, and `usageExamples` (kept for hosts that show them; the .NET 10 `--help` doesn't) |
 | `ide.host.json` | Visual Studio, Rider | The icon (`.template.config/icon.png`, a copy of the root `icon.png`) and the label, description and visibility of each symbol in the new project dialog |
 
@@ -31,7 +31,7 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 
 ## Steps
 
-1. Change `template.json` or `template.csproj`. A new option also goes in `dotnetcli.host.json` with a short flag that doesn't clash with `dotnet new`'s own (`-n`, `-o`, `-lang`, `-h`), and in `ide.host.json` with `isVisible` set, or Visual Studio hides it.
+1. Change `template.json` or `template.csproj`. `template.csproj` references `Microsoft.TemplateEngine.Authoring.Tasks`, Microsoft's template validator, which checks `.template.config` on every build and pack; keep its output free of messages, not just errors. A new option also goes in `dotnetcli.host.json` with a short flag that doesn't clash with `dotnet new`'s own (`-n`, `-o`, `-lang`, `-h`), and in `ide.host.json` with `isVisible` set, or Visual Studio hides it.
 2. Keep the `sourceName` out of identifiers. A class called `CleanMinimalApiApplication` becomes invalid when the name is replaced with something like `My.Api`.
 3. Test the install from the repository root:
 
@@ -57,6 +57,7 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 ## Don't
 
 - Change `identity` or `shortName`; existing installs and docs depend on them.
+- Make a primary output that isn't a project visible to the CLI. The restore post action restores every primary output it can see, so `docs/RUN.md` carries the same `HostIdentifier` condition as the action that opens it.
 - Add a `.sln`. The solution is `.slnx` only, and `primaryOutputs`, the Dockerfile and the package all point at it.
 - Reuse a short flag across options, or give one to `--no-restore`; the `dotnet new` templates from Microsoft leave it long, and so do we.
 - Pack with a wildcard over the whole repository; it pulls in build output and pipeline files.

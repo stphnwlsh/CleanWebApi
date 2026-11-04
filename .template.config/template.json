@@ -9,6 +9,9 @@
     "Clean Architecture"
   ],
   "identity": "CleanWebApi.Template",
+  "groupIdentity": "CleanWebApi",
+  "generatorVersions": "[1.0.0.0-*)",
+  "precedence": "100",
   "name": "Clean Web API Template",
   "description": "An ASP.NET Core Web API with controllers on .NET 10, built with Clean Architecture minus the ceremony.",
   "shortName": "cleanwebapi",
@@ -28,6 +31,10 @@
   "primaryOutputs": [
     {
       "path": "CleanWebApi.slnx"
+    },
+    {
+      "path": "docs/RUN.md",
+      "condition": "(HostIdentifier != \"dotnetcli\" && HostIdentifier != \"dotnetcli-preview\")"
     }
   ],
   "symbols": {
@@ -101,6 +108,10 @@
           }
         ]
       }
+    },
+    "HostIdentifier": {
+      "type": "bind",
+      "binding": "host:HostIdentifier"
     }
   },
   "postActions": [
@@ -114,6 +125,33 @@
         }
       ],
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    },
+    {
+      "id": "open-run-guide",
+      "condition": "(HostIdentifier != \"dotnetcli\" && HostIdentifier != \"dotnetcli-preview\")",
+      "description": "Open the guide to running the solution.",
+      "manualInstructions": [
+        {
+          "text": "Open docs/RUN.md for how to run the solution."
+        }
+      ],
+      "actionId": "84C0DA21-51C8-4541-9940-6CA19AF04EE6",
+      "args": {
+        "files": "1"
+      },
+      "continueOnError": true
+    },
+    {
+      "id": "next-steps",
+      "condition": "(HostIdentifier == \"dotnetcli\" || HostIdentifier == \"dotnetcli-preview\")",
+      "description": "What to do next.",
+      "manualInstructions": [
+        {
+          "text": "All set. Change into the new folder and run 'dotnet run --project ./src/Presentation'. docs/RUN.md covers the rest, and AGENTS.md briefs your coding agents."
+        }
+      ],
+      "actionId": "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C",
       "continueOnError": true
     }
   ]

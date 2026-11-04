@@ -15,6 +15,9 @@
     <File Path="NuGet.config" />
     <File Path="otel-collector.yaml" />
   </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/RUN.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Application/Application.csproj" />
     <Project Path="src/Infrastructure/Infrastructure.csproj" />
