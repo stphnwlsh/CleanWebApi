@@ -1,5 +1,6 @@
 namespace CleanWebApi.Application.Reviews;
 
+using Common.Paging;
 using Entities;
 
 public interface IReviewsRepository
@@ -12,11 +13,10 @@ public interface IReviewsRepository
 
     public Task<bool> DeleteReview(Guid id, CancellationToken cancellationToken);
 
-    public Task<(List<Review> Items, int TotalCount)> GetReviews(
+    public Task<Page<Review>> GetReviews(
         Guid? movieId,
         Guid? authorId,
-        int offset,
-        int limit,
+        PageRequest page,
         CancellationToken cancellationToken);
 
     public Task<List<Review>> GetReviewsForMovies(IReadOnlyCollection<Guid> movieIds, CancellationToken cancellationToken);

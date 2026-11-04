@@ -13,8 +13,6 @@ using InfraReview = Models.Review;
 [Mapper]
 internal partial class MovieReviewsMapper
 {
-    // Infrastructure → Domain
-
     [MapperIgnoreSource(nameof(InfraAuthor.DateCreated))]
     [MapperIgnoreSource(nameof(InfraAuthor.DateModified))]
     public partial AppAuthor ToDomain(InfraAuthor author);
@@ -38,30 +36,4 @@ internal partial class MovieReviewsMapper
     [MapperIgnoreSource(nameof(InfraReview.DateCreated))]
     [MapperIgnoreSource(nameof(InfraReview.DateModified))]
     public partial AppReview ToDomain(InfraReview review);
-
-    // Domain → Infrastructure
-
-    [MapperIgnoreTarget(nameof(InfraAuthor.DateCreated))]
-    [MapperIgnoreTarget(nameof(InfraAuthor.DateModified))]
-    public partial InfraAuthor ToInfrastructure(AppAuthor author);
-
-    [MapperIgnoreTarget(nameof(InfraAuthor.Reviews))]
-    [MapperIgnoreTarget(nameof(InfraAuthor.DateCreated))]
-    [MapperIgnoreTarget(nameof(InfraAuthor.DateModified))]
-    public partial InfraAuthor ToInfrastructure(AppReviewAuthor author);
-
-    [MapperIgnoreTarget(nameof(InfraMovie.DateCreated))]
-    [MapperIgnoreTarget(nameof(InfraMovie.DateModified))]
-    public partial InfraMovie ToInfrastructure(AppMovie movie);
-
-    [MapperIgnoreTarget(nameof(InfraMovie.Reviews))]
-    [MapperIgnoreTarget(nameof(InfraMovie.DateCreated))]
-    [MapperIgnoreTarget(nameof(InfraMovie.DateModified))]
-    public partial InfraMovie ToInfrastructure(AppReviewedMovie movie);
-
-    [MapperIgnoreTarget(nameof(InfraReview.ReviewAuthorId))]
-    [MapperIgnoreTarget(nameof(InfraReview.ReviewedMovieId))]
-    [MapperIgnoreTarget(nameof(InfraReview.DateCreated))]
-    [MapperIgnoreTarget(nameof(InfraReview.DateModified))]
-    public partial InfraReview ToInfrastructure(AppReview review);
 }

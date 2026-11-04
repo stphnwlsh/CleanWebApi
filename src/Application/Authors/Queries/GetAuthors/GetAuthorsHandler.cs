@@ -8,8 +8,6 @@ public class GetAuthorsHandler(IAuthorsRepository repository) : IRequestHandler<
 {
     public async ValueTask<Page<AuthorSummary>> Handle(GetAuthorsQuery request, CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await repository.GetAuthors(request.Query, request.Offset, request.Limit, cancellationToken);
-
-        return new Page<AuthorSummary>(items, request.Offset, request.Limit, totalCount);
+        return await repository.GetAuthors(request.Query, new PageRequest(request.Offset, request.Limit), cancellationToken);
     }
 }

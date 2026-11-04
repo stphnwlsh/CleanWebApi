@@ -14,9 +14,9 @@ One repository, `EntityFrameworkMovieReviewsRepository` in `src/Infrastructure/D
 ## Steps
 
 1. Add the method to the Application interface first (`IMoviesRepository` and friends), taking a `CancellationToken` last.
-2. Implement it in the matching `#region` of the repository, as `public virtual async Task<...>` like every other method.
+2. Implement it in the matching `#region` of the repository, as `public async Task<...>` like every other method.
 3. Reads: start from `this.context.<Set>`, filter, then either
-   - **a list**: count, order (ending with the id), skip, take, and `Select` the summary fields so SQL does the counting and averaging (`paging`), or
+   - **a list**: take a `PageRequest page`, count, order (ending with the id), `Skip(page.Offset)`, `Take(page.Limit)`, `Select` the summary fields so SQL does the counting and averaging, and return `new Page<T>(items, page.Offset, page.Limit, totalCount)` (`paging`), or
    - **one entity**: `Include` what the entity needs, `FirstOrDefaultAsync`, then map with `this.mapper.ToDomain(...)` (`mapping-with-mapperly`).
 4. Writes:
    - **create**: build the model, set `DateCreated` and `DateModified` from `this.timeProvider.GetUtcNow().UtcDateTime`, `Add`, `SaveChangesAsync`, then read it back with its includes.
@@ -31,7 +31,7 @@ One repository, `EntityFrameworkMovieReviewsRepository` in `src/Infrastructure/D
 
 ```csharp
 // src/Infrastructure/Databases/MovieReviews/EntityFrameworkMovieReviewsRepository.cs
-public virtual async Task<ApplicationReview?> UpdateReview(Guid id, int stars, CancellationToken cancellationToken)
+public async Task<ApplicationReview?> UpdateReview(Guid id, int stars, CancellationToken cancellationToken)
 {
     var now = this.timeProvider.GetUtcNow().UtcDateTime;
 

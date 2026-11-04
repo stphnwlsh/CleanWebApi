@@ -1,6 +1,7 @@
 namespace CleanWebApi.Infrastructure.Tests.Integration;
 
 using Application.Authors;
+using Application.Common.Paging;
 using Application.Movies;
 using Application.Reviews;
 using Infrastructure.Databases.MovieReviews;
@@ -176,7 +177,7 @@ public class DependencyInjectionTests
             using var scope = provider.CreateScope();
             var repository = scope.ServiceProvider.GetRequiredService<IMoviesRepository>();
 
-            return await repository.GetMovies(null, 0, 50, CancellationToken.None);
+            return await repository.GetMovies(null, new PageRequest(0, 50), CancellationToken.None);
         });
 
         var results = await Task.WhenAll(requests);
@@ -193,9 +194,9 @@ public class DependencyInjectionTests
         using var provider = services.BuildServiceProvider();
         _ = provider.InitialiseInfrastructure(true);
 
-        var (items, _) = await provider.GetRequiredService<IServiceScopeFactory>().CreateScope()
+        var (items, _, _, _) = await provider.GetRequiredService<IServiceScopeFactory>().CreateScope()
             .ServiceProvider.GetRequiredService<IMoviesRepository>()
-            .GetMovies(null, 0, 50, CancellationToken.None);
+            .GetMovies(null, new PageRequest(0, 50), CancellationToken.None);
 
         return [.. items.Select(m => m.Title)];
     }

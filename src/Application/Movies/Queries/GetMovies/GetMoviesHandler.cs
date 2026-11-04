@@ -8,8 +8,6 @@ public class GetMoviesHandler(IMoviesRepository repository) : IRequestHandler<Ge
 {
     public async ValueTask<Page<MovieSummary>> Handle(GetMoviesQuery request, CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await repository.GetMovies(request.Query, request.Offset, request.Limit, cancellationToken);
-
-        return new Page<MovieSummary>(items, request.Offset, request.Limit, totalCount);
+        return await repository.GetMovies(request.Query, new PageRequest(request.Offset, request.Limit), cancellationToken);
     }
 }

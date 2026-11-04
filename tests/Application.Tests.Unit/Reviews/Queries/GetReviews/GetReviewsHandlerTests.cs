@@ -24,13 +24,13 @@ public class GetReviewsHandlerTests
         using var tokenSource = new CancellationTokenSource();
         var token = tokenSource.Token;
 
-        _ = repository.GetReviews(MovieId, AuthorId, 20, 5, token).Returns(([new Review(Guid.Empty, 5)], 21));
+        _ = repository.GetReviews(MovieId, AuthorId, new PageRequest(20, 5), token).Returns(new Page<Review>([new Review(Guid.Empty, 5)], 20, 5, 21));
 
         // Act
         var result = await handler.Handle(query, token);
 
         // Assert
-        _ = await repository.Received(1).GetReviews(MovieId, AuthorId, 20, 5, token);
+        _ = await repository.Received(1).GetReviews(MovieId, AuthorId, new PageRequest(20, 5), token);
 
         _ = result.ShouldNotBeNull();
         result.Items.Count.ShouldBe(1);
@@ -51,13 +51,13 @@ public class GetReviewsHandlerTests
         using var tokenSource = new CancellationTokenSource();
         var token = tokenSource.Token;
 
-        _ = repository.GetReviews(null, null, 0, Paging.DefaultLimit, token).Returns(([new Review(Guid.Empty, 5)], 1));
+        _ = repository.GetReviews(null, null, new PageRequest(0, Paging.DefaultLimit), token).Returns(new Page<Review>([new Review(Guid.Empty, 5)], 0, Paging.DefaultLimit, 1));
 
         // Act
         var result = await handler.Handle(query, token);
 
         // Assert
-        _ = await repository.Received(1).GetReviews(null, null, 0, Paging.DefaultLimit, token);
+        _ = await repository.Received(1).GetReviews(null, null, new PageRequest(0, Paging.DefaultLimit), token);
 
         result.Offset.ShouldBe(0);
         result.Limit.ShouldBe(Paging.DefaultLimit);

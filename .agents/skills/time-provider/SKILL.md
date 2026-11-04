@@ -9,7 +9,7 @@ metadata:
 
 ## The rule
 
-Nothing reads the clock directly. Code that needs the time takes `TimeProvider` through its constructor and calls `GetUtcNow()`. Production gets `TimeProvider.System`, registered with `TryAddSingleton` in both `AddApplication` and `AddInfrastructure`, so either layer works on its own and the clock is only registered once. Tests pass a `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Testing`) set to a fixed moment, so every date is known in advance.
+Nothing reads the clock directly. Code that needs the time takes `TimeProvider` through its constructor and calls `GetUtcNow()`. Production gets `TimeProvider.System`, registered with `TryAddSingleton` in `AddInfrastructure` only. The system clock is an outside dependency, and Infrastructure owns those; Application only uses the abstract `TimeProvider`, which is part of .NET and needs no package. Every host calls `AddInfrastructure`, and `TryAdd` lets a host or test register its own clock first. Tests pass a `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Testing`) set to a fixed moment, so every date is known in advance.
 
 Times are stored and compared in UTC. Two things read the clock today. The repository stamps `DateCreated` and `DateModified` on writes, and `LoggingBehaviour` times each request with `GetTimestamp()` and `GetElapsedTime()`.
 
