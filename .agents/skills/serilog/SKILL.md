@@ -29,7 +29,7 @@ Every event carries these properties:
 | `AssemblyVersion`, `AssemblyInformationalVersion` | Added in code at startup |
 | Anything pushed with `LogContext` | `FromLogContext` |
 
-Levels are set in configuration, never in code: `Information` by default and `Debug` in `local`, with `Information` for `Microsoft`, `Warning` for `Microsoft.AspNetCore` and `Microsoft.EntityFrameworkCore.Database.Command` (each SQL command already has a span), and `Error` for `System`. The built-in `Logging` section is set to `None` so nothing is written twice.
+Levels are set in configuration, never in code: `Information` by default and `Debug` in `local`, with `Information` for `Microsoft`, `Warning` for `Microsoft.AspNetCore` and `Microsoft.EntityFrameworkCore.Database.Command` (a line per SQL statement buries everything else, and EF Core's meter already counts them), and `Error` for `System`. The built-in `Logging` section is set to `None` so nothing is written twice.
 
 Three things log a request, and each says something the others don't:
 

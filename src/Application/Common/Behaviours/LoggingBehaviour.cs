@@ -1,14 +1,16 @@
 namespace CleanWebApi.Application.Common.Behaviours;
 
+using System.Diagnostics;
 using Exceptions;
 using FluentValidation;
 using Mediator;
 using Microsoft.Extensions.Logging;
+using Telemetry;
 
 /// <summary>
-/// Logs how every request ended and how long it took. Validation failures and missing entities are logged as
-/// information, because the caller gets an answer. Anything else is left to the presentation layer, which turns it
-/// into a response and logs it once as an error.
+/// Logs how every request ended and how long it took, and gives it a span named after the request. Validation failures
+/// and missing entities are logged as information, because the caller gets an answer. Anything else marks the span as
+/// an error and is left to the presentation layer, which turns it into a response and logs it once as an error.
 /// </summary>
 /// <typeparam name="TMessage">The request being sent.</typeparam>
 /// <typeparam name="TResponse">The response the handler returns.</typeparam>
@@ -21,6 +23,9 @@ public partial class LoggingBehaviour<TMessage, TResponse>(ILogger<LoggingBehavi
 
     public async ValueTask<TResponse> Handle(TMessage message, MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken cancellationToken)
     {
+        using var activity = ApplicationTelemetry.ActivitySource.StartActivity(RequestName);
+        _ = activity?.SetTag(ApplicationTelemetry.RequestNameTag, RequestName);
+
         var started = timeProvider.GetTimestamp();
 
         try
@@ -29,6 +34,7 @@ public partial class LoggingBehaviour<TMessage, TResponse>(ILogger<LoggingBehavi
             var elapsed = timeProvider.GetElapsedTime(started).TotalMilliseconds;
 
             LogHandled(logger, RequestName, elapsed);
+            _ = activity?.SetTag(ApplicationTelemetry.RequestOutcomeTag, "handled");
 
             return response;
         }
@@ -38,6 +44,7 @@ public partial class LoggingBehaviour<TMessage, TResponse>(ILogger<LoggingBehavi
             var properties = string.Join(", ", exception.Errors.Select(e => e.PropertyName).Distinct());
 
             LogInvalid(logger, RequestName, elapsed, properties);
+            _ = activity?.SetTag(ApplicationTelemetry.RequestOutcomeTag, "invalid");
 
             throw;
         }
@@ -46,6 +53,21 @@ public partial class LoggingBehaviour<TMessage, TResponse>(ILogger<LoggingBehavi
             var elapsed = timeProvider.GetElapsedTime(started).TotalMilliseconds;
 
             LogNotFound(logger, RequestName, elapsed, exception.Message);
+            _ = activity?.SetTag(ApplicationTelemetry.RequestOutcomeTag, "not_found");
+
+            throw;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _ = activity?.SetTag(ApplicationTelemetry.RequestOutcomeTag, "cancelled");
+
+            throw;
+        }
+        catch (Exception exception)
+        {
+            _ = activity?.SetTag(ApplicationTelemetry.RequestOutcomeTag, "error")
+                .SetStatus(ActivityStatusCode.Error, exception.Message)
+                .AddException(exception);
 
             throw;
         }

@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Mediator.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 

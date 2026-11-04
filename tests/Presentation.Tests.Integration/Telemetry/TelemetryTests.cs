@@ -3,7 +3,6 @@ namespace CleanWebApi.Presentation.Tests.Integration.Telemetry;
 using System.Diagnostics;
 using System.Net;
 using Application.Common.Telemetry;
-using Infrastructure.Telemetry;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -22,7 +21,7 @@ public sealed class TelemetryTests : IDisposable
         // Other tests send requests at the same time, so only spans from this test's own trace are kept.
         this.listener = new ActivityListener
         {
-            ShouldListenTo = source => source.Name is AspNetCoreSourceName or ApplicationTelemetry.Name or InfrastructureTelemetry.Name,
+            ShouldListenTo = source => source.Name is AspNetCoreSourceName or ApplicationTelemetry.Name,
             Sample = (ref _) => ActivitySamplingResult.AllDataAndRecorded,
             ActivityStopped = activity =>
             {
@@ -37,7 +36,7 @@ public sealed class TelemetryTests : IDisposable
     }
 
     [Fact]
-    public async Task Request_ShouldTrace_FromHttpThroughUseCaseToDatabase()
+    public async Task Request_ShouldTrace_FromHttpThroughUseCase()
     {
         // Arrange
         using var application = new WebApiApplication();
@@ -46,7 +45,6 @@ public sealed class TelemetryTests : IDisposable
         var traceId = ActivityTraceId.CreateRandom();
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/movies?limit=5");
         request.Headers.Add("traceparent", $"00-{traceId}-{ActivitySpanId.CreateRandom()}-01");
-        request.Headers.Add("baggage", "tenant.id=acme");
 
         // Act
         using var response = await client.SendAsync(request);
@@ -57,14 +55,11 @@ public sealed class TelemetryTests : IDisposable
         var trace = await this.ServerTraceIn(traceId);
         var server = trace.Single(s => s.Source.Name == AspNetCoreSourceName);
         var useCase = trace.Single(s => s.Source.Name == ApplicationTelemetry.Name);
-        var commands = trace.Where(s => s.Source.Name == InfrastructureTelemetry.Name).ToList();
 
         server.Kind.ShouldBe(ActivityKind.Server);
         useCase.DisplayName.ShouldBe("GetMoviesQuery");
         useCase.ParentSpanId.ShouldBe(server.SpanId);
-        useCase.GetTagItem("tenant.id").ShouldBe("acme");
-        commands.ShouldNotBeEmpty();
-        commands.ShouldAllBe(c => c.ParentSpanId == useCase.SpanId);
+        useCase.GetTagItem(ApplicationTelemetry.RequestOutcomeTag).ShouldBe("handled");
     }
 
     [Fact]
