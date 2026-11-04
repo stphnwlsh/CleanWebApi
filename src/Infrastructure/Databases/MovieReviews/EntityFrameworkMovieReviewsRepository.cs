@@ -34,7 +34,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
 
     #region Authors
 
-    public virtual async Task<(List<ApplicationAuthorSummary> Items, int TotalCount)> GetAuthors(
+    public async Task<(List<ApplicationAuthorSummary> Items, int TotalCount)> GetAuthors(
         string? query,
         int offset,
         int limit,
@@ -71,7 +71,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return ([.. result.Select(a => new ApplicationAuthorSummary(a.Id, a.FirstName, a.LastName, a.ReviewCount, RoundStars(a.AverageStars)))], totalCount);
     }
 
-    public virtual async Task<ApplicationAuthor?> GetAuthorById(Guid id, CancellationToken cancellationToken)
+    public async Task<ApplicationAuthor?> GetAuthorById(Guid id, CancellationToken cancellationToken)
     {
         var author = await this.context.Authors
             .Where(r => r.Id == id).Include(a => a.Reviews)
@@ -81,7 +81,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return author is null ? null : this.mapper.ToDomain(author);
     }
 
-    public virtual async Task<bool> AuthorExists(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> AuthorExists(Guid id, CancellationToken cancellationToken)
     {
         return await this.context.Authors.AnyAsync(a => a.Id == id, cancellationToken);
     }
@@ -90,7 +90,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
 
     #region Movies
 
-    public virtual async Task<(List<ApplicationMovieSummary> Items, int TotalCount)> GetMovies(
+    public async Task<(List<ApplicationMovieSummary> Items, int TotalCount)> GetMovies(
         string? query,
         int offset,
         int limit,
@@ -125,7 +125,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return ([.. result.Select(m => new ApplicationMovieSummary(m.Id, m.Title, m.ReviewCount, RoundStars(m.AverageStars)))], totalCount);
     }
 
-    public virtual async Task<ApplicationMovie?> GetMovieById(Guid id, CancellationToken cancellationToken)
+    public async Task<ApplicationMovie?> GetMovieById(Guid id, CancellationToken cancellationToken)
     {
         var result = await this.context.Movies
             .Where(r => r.Id == id)
@@ -136,7 +136,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return result is null ? null : this.mapper.ToDomain(result);
     }
 
-    public virtual async Task<bool> MovieExists(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> MovieExists(Guid id, CancellationToken cancellationToken)
     {
         return await this.context.Movies.AnyAsync(m => m.Id == id, cancellationToken);
     }
@@ -145,7 +145,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
 
     #region Reviews
 
-    public virtual async Task<ApplicationReview> CreateReview(
+    public async Task<ApplicationReview> CreateReview(
         Guid authorId,
         Guid movieId,
         int stars,
@@ -175,7 +175,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return this.mapper.ToDomain(result);
     }
 
-    public virtual async Task<bool> DeleteReview(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteReview(Guid id, CancellationToken cancellationToken)
     {
         var deleted = await this.context.Reviews
             .Where(r => r.Id == id)
@@ -184,7 +184,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return deleted > 0;
     }
 
-    public virtual async Task<(List<ApplicationReview> Items, int TotalCount)> GetReviews(
+    public async Task<(List<ApplicationReview> Items, int TotalCount)> GetReviews(
         Guid? movieId,
         Guid? authorId,
         int offset,
@@ -218,7 +218,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return ([.. result.Select(this.mapper.ToDomain)], totalCount);
     }
 
-    public virtual async Task<List<ApplicationReview>> GetReviewsForMovies(IReadOnlyCollection<Guid> movieIds, CancellationToken cancellationToken)
+    public async Task<List<ApplicationReview>> GetReviewsForMovies(IReadOnlyCollection<Guid> movieIds, CancellationToken cancellationToken)
     {
         var result = await this.context.Reviews
             .Where(r => movieIds.Contains(r.ReviewedMovieId))
@@ -232,7 +232,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return [.. result.Select(this.mapper.ToDomain)];
     }
 
-    public virtual async Task<List<ApplicationReview>> GetReviewsForAuthors(IReadOnlyCollection<Guid> authorIds, CancellationToken cancellationToken)
+    public async Task<List<ApplicationReview>> GetReviewsForAuthors(IReadOnlyCollection<Guid> authorIds, CancellationToken cancellationToken)
     {
         var result = await this.context.Reviews
             .Where(r => authorIds.Contains(r.ReviewAuthorId))
@@ -245,7 +245,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return [.. result.Select(this.mapper.ToDomain)];
     }
 
-    public virtual async Task<ApplicationReview?> GetReviewById(Guid id, CancellationToken cancellationToken)
+    public async Task<ApplicationReview?> GetReviewById(Guid id, CancellationToken cancellationToken)
     {
         var result = await this.context.Reviews
             .Where(r => r.Id == id)
@@ -256,7 +256,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return result is null ? null : this.mapper.ToDomain(result);
     }
 
-    public virtual async Task<ApplicationReview?> UpdateReview(Guid id, int stars, CancellationToken cancellationToken)
+    public async Task<ApplicationReview?> UpdateReview(Guid id, int stars, CancellationToken cancellationToken)
     {
         var now = this.timeProvider.GetUtcNow().UtcDateTime;
 

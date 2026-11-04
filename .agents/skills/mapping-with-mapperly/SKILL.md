@@ -9,7 +9,7 @@ metadata:
 
 ## The rule
 
-Mapping code is generated at compile time by Mapperly (`Riok.Mapperly`), never written by hand and never done by reflection. Infrastructure's `MovieReviewsMapper` (`src/Infrastructure/Databases/MovieReviews/Mapping/MovieReviewsMapper.cs`) maps database models to Application entities and back. Presentation layers that need their own response models have their own mapper beside them.
+Mapping code is generated at compile time by Mapperly (`Riok.Mapperly`), never written by hand and never done by reflection. Infrastructure's `MovieReviewsMapper` (`src/Infrastructure/Databases/MovieReviews/Mapping/MovieReviewsMapper.cs`) maps database models to Application entities. It only maps that way, because writes build the database model directly (`data-access-ef-core`). Add a mapping in the other direction only when something calls it. Presentation layers that need their own response models have their own mapper beside them.
 
 Mapperly reports unmapped members as `RMG` warnings, and warnings fail the build, so every member is either mapped or explicitly ignored.
 
