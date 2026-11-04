@@ -2,12 +2,10 @@ namespace CleanWebApi.Presentation.Controllers.Version;
 
 using Common;
 using Mediator;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Entity = Application.Versions.Entities;
 using Queries = Application.Versions.Queries;
 
-[AllowAnonymous]
 [Route("api/version")]
 public class VersionController(ISender sender) : ApiControllerBase(sender)
 {

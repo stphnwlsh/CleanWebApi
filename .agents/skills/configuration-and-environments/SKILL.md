@@ -16,7 +16,7 @@ The Lambda template has no appsettings files or environments. Its startup builds
 | Environment | Set by | Used for |
 | --- | --- | --- |
 | `local` | `launchSettings.json` (`DOTNET_ENVIRONMENT=local`) | `dotnet run` on a developer machine: console logs, sample data on |
-| `docker` | `docker-compose.yml` and the Dockerfile | `docker compose up`: logs to Seq, database in `/app/data`, sample data on |
+| `docker` | `docker-compose.yml` and the Dockerfile | `docker compose up`: telemetry over OTLP through the collector to the Aspire dashboard, database in `/app/data`, sample data on |
 | anything else | the host | Real deployments: base settings only, sample data off, HSTS on |
 
 Settings that exist today:

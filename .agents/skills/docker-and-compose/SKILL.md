@@ -19,9 +19,9 @@ One multi-stage `Dockerfile` does everything the pipeline needs:
 | `publish` | Publishes the Presentation project |
 | `run` | The runtime image: non-root `$APP_UID`, `WORKDIR /app`, data in `/app/data`, a `HEALTHCHECK` on `/health/live` |
 
-`docker-compose.yml` runs the app with `DOTNET_ENVIRONMENT=docker`, the `movie-reviews-data` volume and a pinned Seq image for logs. Images are built by CI but not pushed anywhere; the template ships the Dockerfile so users can.
+`docker-compose.yml` runs the app with `DOTNET_ENVIRONMENT=docker`, the `movie-reviews-data` volume a pinned OpenTelemetry Collector that receives the app's OTLP logs, traces and metrics, configured by `otel-collector.yaml`, and a pinned Aspire dashboard the collector forwards them to (`telemetry`). The dashboard UI is at <http://localhost:18888>, and the collector's OTLP ports are published on 4317 and 4318 so a `dotnet run` can send to it too. Images are built by CI but not pushed anywhere; the template ships the Dockerfile so users can.
 
-The Lambda template's `run` stage is the AWS Lambda .NET base image instead. It runs as user `65534` from `/var/task`, keeps its database in `/tmp`, and has no `HEALTHCHECK` or Seq. Compose maps the runtime interface emulator to port 9000, so the function can be invoked with a `POST` to `/2015-03-31/functions/function/invocations`.
+The Lambda template's `run` stage is the AWS Lambda .NET base image instead. It runs as user `65534` from `/var/task`, keeps its database in `/tmp`, and has no `HEALTHCHECK`. Its compose file runs the collector and the Aspire dashboard as well. Compose maps the runtime interface emulator to port 9000, so the function can be invoked with a `POST` to `/2015-03-31/functions/function/invocations`.
 
 ## Steps
 

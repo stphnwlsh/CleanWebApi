@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Telemetry;
 
 public static class DependencyInjection
 {
@@ -23,10 +24,12 @@ public static class DependencyInjection
         // Registered through a factory, so the container owns it and closes its connection when the app stops.
         _ = services.AddSingleton(_ => new MovieReviewsDatabase(databaseConnectionString));
 
-        // Nothing reads an entity to change it, so queries don't track by default.
+        // Nothing reads an entity to change it, so queries don't track by default. The interceptor gives each command a
+        // span when something is listening.
         _ = services.AddDbContext<MovieReviewsDbContext>(options => options
             .UseSqlite(databaseConnectionString)
-            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+            .AddInterceptors(DatabaseCommandInterceptor.Instance));
 
         _ = services.AddSingleton<MovieReviewsMapper>();
         _ = services.AddScoped<EntityFrameworkMovieReviewsRepository>();

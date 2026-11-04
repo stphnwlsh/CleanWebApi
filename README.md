@@ -36,7 +36,7 @@ That's three layers, four test projects, a Dockerfile and a CI pipeline. Go and 
 ## Run it
 
 ```bash
-# Build the image and start it with sample data, plus Seq for the logs
+# Build the image and start it with sample data, plus a collector and the Aspire dashboard for its telemetry
 docker compose up -d --build
 
 # Ask it for a page of movies
@@ -69,11 +69,11 @@ Yes, the sample movies are named by a corporate buzzword generator, and the crit
 
 Every list endpoint returns one page at a time, with its `offset`, `limit` and a `totalCount`, so you always know how much more there is. Movies and authors come with their review count and average stars, worked out by the database rather than in a loop somewhere. Ask for one by id and its reviews come along for the ride.
 
-Open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8080/scalar> to browse and try every endpoint. Each one is documented with XML comments that the .NET 10 OpenAPI generator reads at build time, so the document at `/openapi/v1.json` can't drift from the code. The logs land in Seq at <http://localhost:5341>.
+Open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8080/scalar> to browse and try every endpoint. Each one is documented with XML comments that the .NET 10 OpenAPI generator reads at build time, so the document at `/openapi/v1.json` can't drift from the code. Its logs, traces and metrics land in the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone) at <http://localhost:18888>.
 
 No Docker? `dotnet run --project src/Presentation` works too. Every other way to run it, from plain `docker run` to stamping a version into the image, is in [docs/RUN.md](docs/RUN.md).
 
-The API is open until you give it an authorization server. Pass `--authority` and `--audience` when you create the solution, or set `Authentication:Authority` later, and the movie, author and review endpoints start asking for a JWT bearer token. The version endpoint, the OpenAPI document and Scalar stay open, and Scalar has a spot to paste your token. [Securing the API](https://leanmeancleanapps.github.io/webapi/guides/secure-the-api/) has the details.
+The API is open until you give it an authorization server. Pass `--authority` and `--audience` when you create the solution, or set `Authentication:Authority` later, and the movie, author and review endpoints start asking for a JWT bearer token. The version endpoint asks for one too. Health checks, the OpenAPI document and Scalar stay open, and Scalar has a spot to paste your token. [Securing the API](https://leanmeancleanapps.github.io/webapi/guides/secure-the-api/) has the details.
 
 ## What's inside
 
@@ -89,7 +89,7 @@ And around the edges:
 
 - **Tests** use [xUnit](https://xunit.net), [Shouldly](https://github.com/shouldly/shouldly) and [NSubstitute](https://github.com/nsubstitute/NSubstitute), with coverage from [Coverlet](https://github.com/coverlet-coverage/coverlet). Each test gets its own throwaway in-memory database, so no test can spoil another one's data.
 - **Sample data** comes from [Bogus](https://github.com/bchavez/Bogus), and only when `Database:SeedSampleData` is on. A real deployment never starts with fake reviews.
-- **Logs** go through [Serilog](https://github.com/serilog/serilog), to the console and to [Seq](https://datalust.co/seq) when you run it with Docker Compose. Health checks answer at `/health/live` and `/health/ready`.
+- **Telemetry** is [OpenTelemetry](https://opentelemetry.io) all the way: a span for every request, use case and SQL command, metrics from ASP.NET Core, EF Core and each use case, and [Serilog](https://github.com/serilog/serilog) logs that know which trace they belong to. It all leaves over OTLP when `OTEL_EXPORTER_OTLP_ENDPOINT` is set, so point it at whatever backend you like. Docker Compose runs an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) that forwards it to the Aspire dashboard, the same shape you'd run in production. Health checks answer at `/health/live` and `/health/ready`.
 - **Build rules** live in `Directory.Build.props`. Code style and the recommended analyzers run on every build, warnings fail it, and package versions sit in one place with [Central Package Management](https://learn.microsoft.com/nuget/consume-packages/central-package-management).
 - **The container** runs as a non-root user and has its own health check.
 - **The pipeline** builds, checks formatting, tests with a 95% coverage bar, makes sure the packed template still works, runs [CodeQL](https://codeql.github.com), reviews new dependencies and their licences, starts the image to check it actually answers, and scans the container and Dockerfile with [Trivy](https://trivy.dev). Then it sums the lot up in one comment on your pull request, so you know exactly who to blame. It needs no accounts, tokens or secrets, so your copy works the moment you push it. Trust is earned.

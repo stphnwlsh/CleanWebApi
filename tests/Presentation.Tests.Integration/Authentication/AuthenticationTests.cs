@@ -37,6 +37,7 @@ public class AuthenticationTests : IDisposable
     [InlineData("/api/movies")]
     [InlineData("/api/authors")]
     [InlineData("/api/reviews")]
+    [InlineData("/api/version")]
     public async Task Get_WithoutToken_ShouldReturn_Unauthorized(string path)
     {
         // Arrange
@@ -68,6 +69,7 @@ public class AuthenticationTests : IDisposable
     [InlineData("/api/movies")]
     [InlineData("/api/authors")]
     [InlineData("/api/reviews")]
+    [InlineData("/api/version")]
     public async Task Get_WithToken_ShouldReturn_Ok(string path)
     {
         // Arrange
@@ -81,14 +83,16 @@ public class AuthenticationTests : IDisposable
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
-    [Fact]
-    public async Task GetVersion_WithoutToken_ShouldReturn_Ok()
+    [Theory]
+    [InlineData("/health/live")]
+    [InlineData("/health/ready")]
+    public async Task GetHealth_WithoutToken_ShouldReturn_Ok(string path)
     {
         // Arrange
         using var client = this.application.CreateClient();
 
         // Act
-        using var response = await client.GetAsync("/api/version");
+        using var response = await client.GetAsync(path);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -113,8 +117,8 @@ public class AuthenticationTests : IDisposable
         getMovies.GetProperty("responses").TryGetProperty("401", out _).ShouldBeTrue();
 
         var getVersion = document.RootElement.GetProperty("paths").GetProperty("/api/version").GetProperty("get");
-        getVersion.TryGetProperty("security", out _).ShouldBeFalse();
-        getVersion.GetProperty("responses").TryGetProperty("401", out _).ShouldBeFalse();
+        getVersion.GetProperty("security")[0].TryGetProperty("Bearer", out _).ShouldBeTrue();
+        getVersion.GetProperty("responses").TryGetProperty("401", out _).ShouldBeTrue();
     }
 
     [Fact]
