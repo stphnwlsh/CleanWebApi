@@ -8,7 +8,7 @@
         "text": "Author name"
       },
       "description": {
-        "text": "Your name, for the Authors and Copyright lines. Better know an author."
+        "text": "Your name, for the Authors and Copyright lines. Is that enough detail for Richard to send you a .NET Rocks mug?"
       },
       "isVisible": true
     },
@@ -28,7 +28,7 @@
         "text": "Token audience (optional)"
       },
       "description": {
-        "text": "Who the tokens are for, usually the API's own URL. Not the listeners at home."
+        "text": "Who the tokens are for, usually the API's own URL."
       },
       "isVisible": true
     }

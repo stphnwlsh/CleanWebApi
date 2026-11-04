@@ -50,14 +50,14 @@
       "type": "parameter",
       "datatype": "string",
       "displayName": "Token audience (optional)",
-      "description": "The audience access tokens must be issued for, usually the API's own URL. Not the people listening at home, though do say hi to Carl and Richard for us.",
+      "description": "The audience access tokens must be issued for, usually the API's own URL. Not the people in the room, who are lovely but don't carry tokens.",
       "defaultValue": ""
     },
     "skipRestore": {
       "type": "parameter",
       "datatype": "bool",
       "displayName": "Skip restore",
-      "description": "Don't restore packages after the solution is created. Handy on a plane, offline, or halfway through recording a podcast.",
+      "description": "Don't restore packages after the solution is created. Handy on a plane, offline, or when you like to do things yourself.",
       "defaultValue": "false"
     },
     "authorityValue": {
@@ -110,7 +110,7 @@
       "description": "Restore the NuGet packages the solution needs, so the first build has less to do.",
       "manualInstructions": [
         {
-          "text": "Run 'dotnet restore'. It takes less time than a Better Know a Framework segment."
+          "text": "Run 'dotnet restore'. It takes less time than reading this sentence twice."
         }
       ],
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
