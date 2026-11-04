@@ -15,7 +15,7 @@ Serilog is the logger. Application and Infrastructure code log through `Microsof
 | --- | --- | --- |
 | `local` | Console, with the output template in `appsettings.local.json` | The terminal |
 | `docker` | Console, and OTLP through the collector to the Aspire dashboard | <http://localhost:18888>, or `docker compose logs` |
-| Lambda, anywhere | Console, as compact JSON | CloudWatch Logs, or `docker compose logs` for the emulator |
+| Lambda, anywhere | Console, as compact JSON, and OTLP when the endpoint is set | CloudWatch Logs, or `docker compose logs` for the emulator, and the Aspire dashboard in Docker Compose |
 | Any, when `OTEL_EXPORTER_OTLP_ENDPOINT` is set | Also OTLP, through `Serilog.Sinks.OpenTelemetry` | Whatever receives the OTLP (`telemetry`) |
 
 The OTLP sink is added in code, not in the appsettings files, because it follows the standard `OTEL_*` settings like the trace and metric exporters do. It sends the same `service.name`, `service.version` and `deployment.environment.name` as the traces, and each event carries the trace and span IDs of whatever was running when it was written, so a log line links to its trace.

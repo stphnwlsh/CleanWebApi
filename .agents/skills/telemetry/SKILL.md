@@ -35,7 +35,9 @@ What each presentation layer adds:
 | Minimal API, Web API | ASP.NET Core and HttpClient traces and metrics, runtime metrics, the authentication and authorization meters. Health endpoints aren't traced |
 | GraphQL | The same, plus Hot Chocolate's resolver and operation spans from `HotChocolate.Diagnostics` |
 | MCP | The same, plus the MCP SDK's own `Experimental.ModelContextProtocol` spans and `mcp.*.operation.duration` metrics |
-| Lambda | A span per invocation from `OpenTelemetry.Instrumentation.AWSLambda`, flushed before the function returns |
+| Lambda | A span per invocation from `OpenTelemetry.Instrumentation.AWSLambda`, and runtime metrics. Traces and metrics are flushed before the function returns, because Lambda can freeze the environment as soon as it does |
+
+The Lambda template builds its tracer and meter providers once in `Startup` with `Sdk.CreateTracerProviderBuilder()` and `Sdk.CreateMeterProviderBuilder()` rather than `AddOpenTelemetry()`, because the classes Lambda Annotations generates build two service providers from the same services, and each would otherwise export everything again. X-Ray context extraction is off, so a "not sampled" header from Lambda can't switch tracing off; the collector can still send to X-Ray. Lambda container images can't use layers, so in AWS the collector is either built into the image (the ADOT collector extension) or runs as a gateway.
 
 The app sends to an OpenTelemetry Collector, never straight to a backend, because that's how it should run in production: the collector owns batching, retries, sampling, scrubbing and the choice of backend, so none of that lives in the app. `otel-collector.yaml` holds its configuration: an OTLP receiver on 4317 (gRPC) and 4318 (HTTP), the `memory_limiter` and `batch` processors, and one exporter per backend.
 
