@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host",
+  "icon": "icon.png",
+  "symbolInfo": [
+    {
+      "id": "authorName",
+      "name": {
+        "text": "Author name"
+      },
+      "description": {
+        "text": "Your name, for the Authors and Copyright lines. Better know an author."
+      },
+      "isVisible": true
+    },
+    {
+      "id": "authority",
+      "name": {
+        "text": "Token authority (optional)"
+      },
+      "description": {
+        "text": "The OAuth server that issues access tokens. Leave it empty to run without authentication on your machine."
+      },
+      "isVisible": true
+    },
+    {
+      "id": "audience",
+      "name": {
+        "text": "Token audience (optional)"
+      },
+      "description": {
+        "text": "Who the tokens are for, usually the API's own URL. Not the listeners at home."
+      },
+      "isVisible": true
+    }
+  ]
+}

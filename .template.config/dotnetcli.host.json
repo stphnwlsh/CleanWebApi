@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/dotnetcli.host",
+  "symbolInfo": {
+    "authorName": {
+      "longName": "authorName",
+      "shortName": "an"
+    },
+    "authority": {
+      "longName": "authority",
+      "shortName": "iss"
+    },
+    "audience": {
+      "longName": "audience",
+      "shortName": "aud"
+    },
+    "skipRestore": {
+      "longName": "no-restore",
+      "shortName": ""
+    }
+  },
+  "usageExamples": [
+    "--name Acme.Movies --authorName \"Carl Franklin\"",
+    "--name Acme.Movies --authority https://login.example.com --audience https://api.example.com",
+    "--name Acme.Movies --authorName \"Richard Campbell\" --no-restore"
+  ]
+}

@@ -62,7 +62,7 @@
 *.vbproj text=auto
 *.fsproj text=auto
 *.dbproj text=auto
-*.sln text=auto eol=crlf
+*.slnx text=auto
 
 Dockerfile  text
 *.Dockerfile  text

@@ -2,41 +2,63 @@
   "$schema": "https://json.schemastore.org/template",
   "author": "Stephen Walsh",
   "classifications": [
-    "Clean Architecture",
     "Web",
+    "WebAPI",
     "API",
-    "Web API",
-    "Dotnet",
-    "Docker"
+    "Service",
+    "Clean Architecture"
   ],
   "identity": "CleanWebApi.Template",
   "name": "Clean Web API Template",
-  "description": "A dotnet new template for an ASP.NET Core Web API with controllers, built with a streamlined Clean Architecture on .NET 10.",
+  "description": "An ASP.NET Core Web API with controllers on .NET 10, built with Clean Architecture minus the ceremony.",
   "shortName": "cleanwebapi",
   "tags": {
     "language": "C#",
-    "type": "project"
+    "type": "solution"
   },
   "sourceName": "CleanWebApi",
+  "defaultName": "Acme.Movies",
   "preferNameDirectory": true,
+  "constraints": {
+    "sdk": {
+      "type": "sdk-version",
+      "args": "[10.0.100,)"
+    }
+  },
+  "primaryOutputs": [
+    {
+      "path": "CleanWebApi.slnx"
+    }
+  ],
   "symbols": {
     "authorName": {
       "type": "parameter",
-      "displayName": "The name of the author of the solution.",
+      "datatype": "string",
+      "displayName": "Author name",
+      "description": "Who gets the credit in the Authors and Copyright of the Presentation project. Leave it and Stephen Walsh gets the credit, which he'd enjoy more than you would.",
       "defaultValue": "Stephen Walsh",
       "replaces": "Stephen Walsh"
     },
     "authority": {
       "type": "parameter",
       "datatype": "string",
-      "displayName": "The OAuth authorization server that issues access tokens. Leave empty to run the API without authentication.",
+      "displayName": "Token authority (optional)",
+      "description": "The OAuth authorization server that issues access tokens. Leave it empty to run without authentication, which is fine on your machine and brave anywhere else.",
       "defaultValue": ""
     },
     "audience": {
       "type": "parameter",
       "datatype": "string",
-      "displayName": "The audience access tokens must be issued for, usually the API's own URL.",
+      "displayName": "Token audience (optional)",
+      "description": "The audience access tokens must be issued for, usually the API's own URL. Not the people listening at home, though do say hi to Carl and Richard for us.",
       "defaultValue": ""
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "displayName": "Skip restore",
+      "description": "Don't restore packages after the solution is created. Handy on a plane, offline, or halfway through recording a podcast.",
+      "defaultValue": "false"
     },
     "authorityValue": {
       "type": "generated",
@@ -80,5 +102,19 @@
         ]
       }
     }
-  }
+  },
+  "postActions": [
+    {
+      "id": "restore",
+      "condition": "(!skipRestore)",
+      "description": "Restore the NuGet packages the solution needs, so the first build has less to do.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'. It takes less time than a Better Know a Framework segment."
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
 }

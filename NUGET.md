@@ -19,10 +19,13 @@ cd Acme.Reviews
 
 | Option | What it does |
 | --- | --- |
-| `--name` | Names the solution and its root namespace |
-| `--authorName` | Puts your name on the assembly instead of ours |
-| `--authority` | Your OAuth authorization server. Leave it out and the API runs without authentication |
-| `--audience` | The audience tokens must be issued for, usually the API's own URL |
+| `--name`, `-n` | Names the solution and its root namespace |
+| `--authorName`, `-an` | Puts your name on the assembly instead of ours |
+| `--authority`, `-iss` | Your OAuth authorization server. Leave it out and the API runs without authentication |
+| `--audience`, `-aud` | The audience tokens must be issued for, usually the API's own URL |
+| `--no-restore` | Skips the package restore that normally runs once the solution is created |
+
+Rather click than type? Visual Studio and Rider show the same options in their new project dialogs, and `dotnet new cleanwebapi --help` lists them in the terminal.
 
 ## Run it
 

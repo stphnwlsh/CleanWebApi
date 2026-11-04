@@ -13,7 +13,7 @@ One multi-stage `Dockerfile` does everything the pipeline needs:
 
 | Stage | Does |
 | --- | --- |
-| `build` | Restores (project files copied first for layer caching), then builds in Release with the version passed in |
+| `build` | Restores (the `.slnx`, the root build files and every project file copied first for layer caching), then builds in Release with the version passed in |
 | `test` | Runs every test project with coverage and saves the results and exit code |
 | `results` | Exports the test results so the pipeline can report them |
 | `publish` | Publishes the Presentation project |

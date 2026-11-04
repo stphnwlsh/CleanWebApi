@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path=".trivyignore" />
+    <File Path="AGENTS.md" />
+    <File Path="CLAUDE.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="docker-compose.yml" />
+    <File Path="Dockerfile" />
+    <File Path="global.json" />
+    <File Path="NuGet.config" />
+    <File Path="otel-collector.yaml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Application/Application.csproj" />
+    <Project Path="src/Infrastructure/Infrastructure.csproj" />
+    <Project Path="src/Presentation/Presentation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Application.Tests.Unit/Application.Tests.Unit.csproj" />
+    <Project Path="tests/Infrastructure.Tests.Integration/Infrastructure.Tests.Integration.csproj" />
+    <Project Path="tests/Presentation.Tests.Integration/Presentation.Tests.Integration.csproj" />
+    <Project Path="tests/Presentation.Tests.Unit/Presentation.Tests.Unit.csproj" />
+  </Folder>
+</Solution>
