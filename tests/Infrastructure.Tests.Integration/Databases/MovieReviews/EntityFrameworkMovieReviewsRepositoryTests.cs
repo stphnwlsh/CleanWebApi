@@ -1,5 +1,6 @@
 namespace CleanWebApi.Infrastructure.Tests.Integration.Databases.MovieReviews;
 
+using Application.Common.Paging;
 using Application.Reviews.Commands.CreateReview;
 using Application.Reviews.Commands.UpdateReview;
 using Infrastructure.Databases.MovieReviews.Models;
@@ -98,7 +99,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, totalCount) = await repository.GetAuthors(query, 0, 10, token);
+        var (items, _, _, totalCount) = await repository.GetAuthors(query, new PageRequest(0, 10), token);
 
         // Assert
         items.Count.ShouldBe(expected);
@@ -114,7 +115,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, _) = await repository.GetAuthors("one", 0, 10, token);
+        var (items, _, _, _) = await repository.GetAuthors("one", new PageRequest(0, 10), token);
 
         // Assert
         var author = items.ShouldHaveSingleItem();
@@ -131,7 +132,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, totalCount) = await repository.GetAuthors(null, 1, 1, token);
+        var (items, _, _, totalCount) = await repository.GetAuthors(null, new PageRequest(1, 1), token);
 
         // Assert
         items.Count.ShouldBe(1);
@@ -223,7 +224,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, totalCount) = await repository.GetMovies(query, 0, 10, token);
+        var (items, _, _, totalCount) = await repository.GetMovies(query, new PageRequest(0, 10), token);
 
         // Assert
         items.Count.ShouldBe(expected);
@@ -242,7 +243,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, _) = await repository.GetMovies(null, 0, 10, token);
+        var (items, _, _, _) = await repository.GetMovies(null, new PageRequest(0, 10), token);
 
         // Assert
         items[0].Title.ShouldBe("aardvark");
@@ -257,7 +258,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, _) = await repository.GetMovies("one", 0, 10, token);
+        var (items, _, _, _) = await repository.GetMovies("one", new PageRequest(0, 10), token);
 
         // Assert
         var movie = items.ShouldHaveSingleItem();
@@ -276,7 +277,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         _ = await this.database.Context.SaveChangesAsync(token);
 
         // Act
-        var (items, _) = await repository.GetMovies(null, 0, 10, token);
+        var (items, _, _, _) = await repository.GetMovies(null, new PageRequest(0, 10), token);
 
         // Assert
         items.ShouldAllBe(m => m.ReviewCount == 0 && m.AverageStars == null);
@@ -291,8 +292,8 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (first, firstTotal) = await repository.GetMovies(null, 0, 2, token);
-        var (second, secondTotal) = await repository.GetMovies(null, 2, 2, token);
+        var (first, _, _, firstTotal) = await repository.GetMovies(null, new PageRequest(0, 2), token);
+        var (second, _, _, secondTotal) = await repository.GetMovies(null, new PageRequest(2, 2), token);
 
         // Assert
         first.Select(m => m.Title).ShouldBe(["One", "Three"]);
@@ -461,7 +462,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var movieId = this.database.Context.Movies.First(m => m.Title == "Two").Id;
 
         // Act
-        var (items, totalCount) = await repository.GetReviews(movieId, null, 0, 50, token);
+        var (items, _, _, totalCount) = await repository.GetReviews(movieId, null, new PageRequest(0, 50), token);
 
         // Assert
         items.ShouldNotBeEmpty();
@@ -481,7 +482,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var authorId = this.database.Context.Authors.First(a => a.FirstName == "Two").Id;
 
         // Act
-        var (items, _) = await repository.GetReviews(movieId, authorId, 0, 50, token);
+        var (items, _, _, _) = await repository.GetReviews(movieId, authorId, new PageRequest(0, 50), token);
 
         // Assert
         items.ShouldAllBe(r => r.ReviewedMovie!.Id == movieId && r.ReviewAuthor!.Id == authorId);
@@ -496,7 +497,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, totalCount) = await repository.GetReviews(null, null, 0, 2, token);
+        var (items, _, _, totalCount) = await repository.GetReviews(null, null, new PageRequest(0, 2), token);
 
         // Assert
         items.Count.ShouldBe(2);

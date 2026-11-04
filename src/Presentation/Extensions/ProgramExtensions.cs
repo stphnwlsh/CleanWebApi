@@ -3,6 +3,7 @@ namespace CleanWebApi.Presentation.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Application;
+using Application.Versions.Entities;
 using Authentication;
 using Errors;
 using Infrastructure;
@@ -106,6 +107,7 @@ public static class ProgramExtensions
         _ = builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
         _ = builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("MovieReviews"));
         _ = builder.Services.AddApplication();
+        _ = builder.Services.AddSingleton(VersionInfo.FromAssembly(typeof(ProgramExtensions).Assembly));
         _ = builder.Services.AddHealthChecks().AddInfrastructureHealthChecks("ready");
 
         #endregion Project Dependencies

@@ -1,6 +1,7 @@
 namespace CleanWebApi.Infrastructure.Databases.MovieReviews;
 
 using Application.Authors;
+using Application.Common.Paging;
 using Application.Movies;
 using Application.Reviews;
 using Mapping;
@@ -34,10 +35,9 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
 
     #region Authors
 
-    public async Task<(List<ApplicationAuthorSummary> Items, int TotalCount)> GetAuthors(
+    public async Task<Page<ApplicationAuthorSummary>> GetAuthors(
         string? query,
-        int offset,
-        int limit,
+        PageRequest page,
         CancellationToken cancellationToken)
     {
         var authors = this.context.Authors.AsQueryable();
@@ -56,8 +56,8 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
             .OrderBy(a => a.LastName)
             .ThenBy(a => a.FirstName)
             .ThenBy(a => a.Id)
-            .Skip(offset)
-            .Take(limit)
+            .Skip(page.Offset)
+            .Take(page.Limit)
             .Select(a => new
             {
                 a.Id,
@@ -68,7 +68,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
             })
             .ToListAsync(cancellationToken);
 
-        return ([.. result.Select(a => new ApplicationAuthorSummary(a.Id, a.FirstName, a.LastName, a.ReviewCount, RoundStars(a.AverageStars)))], totalCount);
+        return new([.. result.Select(a => new ApplicationAuthorSummary(a.Id, a.FirstName, a.LastName, a.ReviewCount, RoundStars(a.AverageStars)))], page.Offset, page.Limit, totalCount);
     }
 
     public async Task<ApplicationAuthor?> GetAuthorById(Guid id, CancellationToken cancellationToken)
@@ -90,10 +90,9 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
 
     #region Movies
 
-    public async Task<(List<ApplicationMovieSummary> Items, int TotalCount)> GetMovies(
+    public async Task<Page<ApplicationMovieSummary>> GetMovies(
         string? query,
-        int offset,
-        int limit,
+        PageRequest page,
         CancellationToken cancellationToken)
     {
         var movies = this.context.Movies.AsQueryable();
@@ -111,8 +110,8 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         var result = await movies
             .OrderBy(m => m.Title)
             .ThenBy(m => m.Id)
-            .Skip(offset)
-            .Take(limit)
+            .Skip(page.Offset)
+            .Take(page.Limit)
             .Select(m => new
             {
                 m.Id,
@@ -122,7 +121,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
             })
             .ToListAsync(cancellationToken);
 
-        return ([.. result.Select(m => new ApplicationMovieSummary(m.Id, m.Title, m.ReviewCount, RoundStars(m.AverageStars)))], totalCount);
+        return new([.. result.Select(m => new ApplicationMovieSummary(m.Id, m.Title, m.ReviewCount, RoundStars(m.AverageStars)))], page.Offset, page.Limit, totalCount);
     }
 
     public async Task<ApplicationMovie?> GetMovieById(Guid id, CancellationToken cancellationToken)
@@ -184,11 +183,10 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return deleted > 0;
     }
 
-    public async Task<(List<ApplicationReview> Items, int TotalCount)> GetReviews(
+    public async Task<Page<ApplicationReview>> GetReviews(
         Guid? movieId,
         Guid? authorId,
-        int offset,
-        int limit,
+        PageRequest page,
         CancellationToken cancellationToken)
     {
         var reviews = this.context.Reviews.AsQueryable();
@@ -211,11 +209,11 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
             .OrderBy(r => r.ReviewedMovie.Title)
             .ThenBy(r => r.ReviewAuthor.LastName)
             .ThenBy(r => r.Id)
-            .Skip(offset)
-            .Take(limit)
+            .Skip(page.Offset)
+            .Take(page.Limit)
             .ToListAsync(cancellationToken);
 
-        return ([.. result.Select(this.mapper.ToDomain)], totalCount);
+        return new([.. result.Select(this.mapper.ToDomain)], page.Offset, page.Limit, totalCount);
     }
 
     public async Task<List<ApplicationReview>> GetReviewsForMovies(IReadOnlyCollection<Guid> movieIds, CancellationToken cancellationToken)

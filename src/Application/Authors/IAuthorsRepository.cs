@@ -1,13 +1,13 @@
 namespace CleanWebApi.Application.Authors;
 
+using Common.Paging;
 using Entities;
 
 public interface IAuthorsRepository
 {
-    public Task<(List<AuthorSummary> Items, int TotalCount)> GetAuthors(
+    public Task<Page<AuthorSummary>> GetAuthors(
         string? query,
-        int offset,
-        int limit,
+        PageRequest page,
         CancellationToken cancellationToken);
 
     public Task<Author?> GetAuthorById(Guid id, CancellationToken cancellationToken);

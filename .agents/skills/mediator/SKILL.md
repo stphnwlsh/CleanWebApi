@@ -36,7 +36,6 @@ Behaviours run in the order they're registered. The first one registered is the 
 ```csharp
 // src/Application/DependencyInjection.cs
 _ = services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient);
-services.TryAddSingleton(TimeProvider.System);
 
 _ = services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
 _ = services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
