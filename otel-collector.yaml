@@ -1,0 +1,44 @@
+# The OpenTelemetry Collector sits between the app and wherever its telemetry is stored. The app only ever talks
+# OTLP to the collector, so batching, retries, sampling, scrubbing and the choice of backend all live here.
+# Locally it forwards everything to the Aspire dashboard. In production, run a collector beside the app (a sidecar
+# or agent) or as a shared gateway, and swap or add exporters for your backend.
+# Reference: https://opentelemetry.io/docs/collector/configuration/
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  # Refuses data before the collector runs out of memory, so it fails gracefully instead of crashing.
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+  # Sends in batches rather than one call per span, metric or log.
+  batch: {}
+
+exporters:
+  # Add your backend here (another otlp_grpc or otlp_http exporter, for example) and list it in the pipelines below.
+  otlp_grpc/aspire:
+    endpoint: aspire-dashboard:18889
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_grpc/aspire]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_grpc/aspire]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_grpc/aspire]

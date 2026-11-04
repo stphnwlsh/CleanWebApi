@@ -21,7 +21,7 @@ Requests travel from the presentation layer to Application through Mediator (`Me
 
 Every request uses `IRequest<TResponse>`. Mediator also offers `ICommand` and `IQuery` markers; we don't use them, because nothing yet needs a behaviour that applies to only one kind.
 
-Behaviours run in the order they're registered. The first one registered is the outermost, so it runs first on the way in and last on the way out. `LoggingBehaviour` is registered first, so it times and logs everything inside it, validation failures included (`serilog`). `ValidationBehaviour` comes next, so invalid requests never reach a handler.
+Behaviours run in the order they're registered. The first one registered is the outermost, so it runs first on the way in and last on the way out. `LoggingBehaviour` is registered first, so it times and logs everything inside it, validation failures included (`serilog`), and its span wraps the use case (`telemetry`). `ValidationBehaviour` comes next, so invalid requests never reach a handler.
 
 ## Steps
 

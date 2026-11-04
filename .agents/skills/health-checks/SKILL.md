@@ -16,7 +16,7 @@ Two questions, two endpoints, in every template that runs a web host.
 | `/health/live` | Is the process up? | No checks. It only fails when the app can't answer at all. |
 | `/health/ready` | Can it do its job? | Every check tagged `ready`, which today is the database. |
 
-Both are anonymous. The Docker image's `HEALTHCHECK` calls `/health/live`. Infrastructure owns the checks for what it talks to (`AddInfrastructureHealthChecks` in `src/Infrastructure/DependencyInjection.cs`); Presentation maps the endpoints. The Lambda template has no health endpoints, because Lambda manages its own lifecycle.
+Both are anonymous and answer with plain text, because Docker, load balancers and orchestrators call them without a token. Neither is traced (`telemetry`). The Docker image's `HEALTHCHECK` calls `/health/live`. Infrastructure owns the checks for what it talks to (`AddInfrastructureHealthChecks` in `src/Infrastructure/DependencyInjection.cs`); Presentation maps the endpoints. The Lambda template has no health endpoints, because Lambda manages its own lifecycle.
 
 ## Steps
 
@@ -38,7 +38,7 @@ public static IHealthChecksBuilder AddInfrastructureHealthChecks(this IHealthChe
 
 - Put a dependency check on `/health/live`.
 - Require authentication on either endpoint.
-- Return version or configuration details from a health endpoint.
+- Return version or configuration details from a health endpoint. Anyone can call it; the version is on every span, metric and log as `service.version`, and behind auth at the version endpoint.
 
 ## Check
 

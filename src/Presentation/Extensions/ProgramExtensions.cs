@@ -3,6 +3,7 @@ namespace CleanWebApi.Presentation.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Application;
+using Application.Common.Telemetry;
 using Authentication;
 using Errors;
 using Infrastructure;
@@ -15,9 +16,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenApi;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using Serialization;
 using Serilog;
+using Telemetry;
 
 [ExcludeFromCodeCoverage]
 public static class ProgramExtensions
@@ -30,19 +36,65 @@ public static class ProgramExtensions
 
         #endregion Controllers
 
+        #region Telemetry
+
+        var assembly = typeof(ProgramExtensions).Assembly;
+        var telemetry = TelemetrySettings.FromConfiguration(builder.Configuration, builder.Environment.EnvironmentName, assembly);
+
+        var openTelemetry = builder.Services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddAttributes(telemetry.ResourceAttributes))
+            .WithTracing(tracing => tracing
+                .AddSource(ApplicationTelemetry.Name)
+                .AddAspNetCoreInstrumentation(options =>
+                {
+                    // Probes call the health endpoints every few seconds, so tracing them would bury everything else.
+                    options.Filter = context => !context.Request.Path.StartsWithSegments("/health");
+                    options.RecordException = true;
+                })
+                .AddHttpClientInstrumentation(options => options.RecordException = true))
+            .WithMetrics(metrics => metrics
+                .AddMeter(
+                    "Microsoft.EntityFrameworkCore",
+                    "Microsoft.AspNetCore.Authentication",
+                    "Microsoft.AspNetCore.Authorization")
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation()
+                .SetExemplarFilter(ExemplarFilterType.TraceBased));
+
+        // The exporters read OTEL_EXPORTER_OTLP_ENDPOINT and the other OTEL_* settings themselves.
+        if (telemetry.Enabled)
+        {
+            _ = openTelemetry.UseOtlpExporter();
+        }
+
+        #endregion Telemetry
+
         #region Logging
 
         _ = builder.Services.AddSerilog((services, loggerConfiguration) =>
         {
-            var assembly = Assembly.GetEntryAssembly();
+            var configuration = services.GetRequiredService<IConfiguration>();
 
-            _ = loggerConfiguration.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>())
+            _ = loggerConfiguration.ReadFrom.Configuration(configuration)
                 .Enrich.WithProperty(
                     "AssemblyVersion",
-                    assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version)
+                    assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version)
                 .Enrich.WithProperty(
                     "AssemblyInformationalVersion",
-                    assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+                    assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+
+            // Logs leave over OTLP too, carrying the trace and span IDs of whatever was running when they were written.
+            if (telemetry.Enabled)
+            {
+                _ = loggerConfiguration.WriteTo.OpenTelemetry(
+                    options =>
+                    {
+                        options.ResourceAttributes = telemetry.ResourceAttributes;
+                        options.OnBeginSuppressInstrumentation = SuppressInstrumentationScope.Begin;
+                    },
+                    key => configuration[key]);
+            }
         });
 
         #endregion Logging
