@@ -1,9 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/ide.host",
   "icon": "icon.png",
-  "description": {
-    "text": "An ASP.NET Core Web API with controllers on .NET 10, built with Clean Architecture minus the ceremony. Mug not included."
-  },
   "tags": [
     {
       "type": "platform",
