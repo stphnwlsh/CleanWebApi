@@ -20,7 +20,7 @@
     "type": "solution"
   },
   "sourceName": "CleanWebApi",
-  "defaultName": "Acme.Movies",
+  "defaultName": "WorksOnMyMachine.Movies",
   "preferNameDirectory": true,
   "constraints": {
     "sdk": {
