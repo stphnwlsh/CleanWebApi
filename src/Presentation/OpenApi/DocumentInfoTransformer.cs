@@ -10,7 +10,9 @@ using Microsoft.OpenApi;
 /// </summary>
 public sealed class DocumentInfoTransformer(IHostEnvironment environment) : IOpenApiDocumentTransformer
 {
-    private static readonly Uri RepositoryUrl = new("https://github.com/LeanMeanCleanApps/cleanwebapi");
+    // The docs site, not the repository: dotnet new renames the template's name wherever it appears,
+    // so a repository link would point at a repository that doesn't exist in a new solution.
+    private static readonly Uri DocumentationUrl = new("https://leanmeancleanapps.github.io/webapi/");
 
     public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
     {
@@ -24,7 +26,7 @@ public sealed class DocumentInfoTransformer(IHostEnvironment environment) : IOpe
             Contact = new OpenApiContact
             {
                 Name = "CleanWebApi API",
-                Url = RepositoryUrl
+                Url = DocumentationUrl
             },
             License = new OpenApiLicense
             {
@@ -35,8 +37,8 @@ public sealed class DocumentInfoTransformer(IHostEnvironment environment) : IOpe
 
         document.ExternalDocs = new OpenApiExternalDocs
         {
-            Description = "Source code and documentation",
-            Url = RepositoryUrl
+            Description = "Documentation",
+            Url = DocumentationUrl
         };
 
         document.Tags = new HashSet<OpenApiTag>
@@ -56,7 +58,7 @@ public sealed class DocumentInfoTransformer(IHostEnvironment environment) : IOpe
         {
             Name = name,
             Description = description,
-            ExternalDocs = new OpenApiExternalDocs { Url = RepositoryUrl }
+            ExternalDocs = new OpenApiExternalDocs { Url = DocumentationUrl }
         };
     }
 }
