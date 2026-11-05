@@ -22,6 +22,8 @@ One workflow, `.github/workflows/build-pipeline.yml`, runs on every pull request
 
 After those, Release Check and Publish only run on the monthly release (`releases`).
 
+A copy made with GitHub's "Use this template" gets this workflow and runs it as is, with no secrets or setup. Release Check and Publish only run when the repository owner is LeanMeanCleanApps, so a copy builds, tests and scans but never publishes. A solution made with `dotnet new` gets no workflow at all; `ci-for-your-solution` covers building one.
+
 ## Steps
 
 1. Read the Summary comment first; it names the unhappy check and links to its details.

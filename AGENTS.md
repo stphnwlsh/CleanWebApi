@@ -80,6 +80,7 @@ Each skill is a folder in `.agents/skills` with a `SKILL.md`. If your tool doesn
 | `unit-tests` | Test a handler, validator or endpoint |
 | `integration-tests` | Test the repository or a real HTTP request |
 | `coverage` | Check or fix line coverage |
+| `ci-for-your-solution` | Set up or change the CI pipeline for this solution |
 | `writing-a-skill` | Add or change a skill, or build a feature with a new pattern |
 
 These are for this Web API's presentation layer. The other templates have their own, with the same names where the job is the same:
