@@ -4,6 +4,14 @@ A `dotnet new` template for an HTTP API using [ASP.NET Core controllers](https:/
 
 It's one of five [Lean Mean Clean Apps](https://leanmeancleanapps.github.io/) templates, for Minimal APIs, Model Context Protocol, GraphQL, Web API controllers and AWS Lambda. They share the same Application and Infrastructure layers and differ only in how they face the world. The full docs live at [leanmeancleanapps.github.io/webapi](https://leanmeancleanapps.github.io/webapi/).
 
+| Template | Presentation | Package | Docs |
+| --- | --- | --- | --- |
+| Clean Minimal API | ASP.NET Core Minimal APIs | [CleanMinimalApi.Template](https://www.nuget.org/packages/CleanMinimalApi.Template) | [Docs](https://leanmeancleanapps.github.io/minimalapi/) |
+| Clean Model Context Protocol | Model Context Protocol server | [CleanModelContextProtocol.Template](https://www.nuget.org/packages/CleanModelContextProtocol.Template) | [Docs](https://leanmeancleanapps.github.io/mcp/) |
+| Clean GraphQL API | GraphQL with Hot Chocolate | [CleanGraphQLApi.Template](https://www.nuget.org/packages/CleanGraphQLApi.Template) | [Docs](https://leanmeancleanapps.github.io/graphql/) |
+| **Clean Web API** | ASP.NET Core controllers, you are here | [CleanWebApi.Template](https://www.nuget.org/packages/CleanWebApi.Template) | [Docs](https://leanmeancleanapps.github.io/webapi/) |
+| Clean Lambda Function | AWS Lambda | [CleanLambdaFunction.Template](https://www.nuget.org/packages/CleanLambdaFunction.Template) | [Docs](https://leanmeancleanapps.github.io/lambda/) |
+
 ## Get started
 
 You need the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). [Docker](https://www.docker.com/products/docker-desktop) is optional, but it's the quickest way to see it running.
@@ -26,7 +34,7 @@ cd WorksOnMyMachine.Movies
 | `--audience`, `-aud` | Empty | The audience tokens must be issued for, usually the API's own URL. Only used with `--include-auth` |
 | `--no-restore` | Off | Skips the package restore that normally runs once the solution is created |
 
-Rather click than type? Visual Studio and Rider show the same options in their new project dialogs, and `dotnet new cleanwebapi --help` lists them in the terminal.
+Rather click than type? Visual Studio and Rider show the same options in their new project dialogs. They always show the authority and audience fields, but only use them when **Include authentication** is ticked. In the terminal, `dotnet new cleanwebapi --help` lists them all.
 
 ## Run it
 

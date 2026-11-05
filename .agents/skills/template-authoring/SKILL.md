@@ -74,7 +74,7 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 
 ## Don't
 
-- Change `identity` or `shortName`; existing installs and docs depend on them.
+- Change `identity` or the first `shortName`; existing installs and docs depend on them. Adding a shorter alias after it is fine.
 - Make a primary output that isn't a project visible to the CLI. The restore post action restores every primary output it can see, so `docs/RUN.md` carries the same `HostIdentifier` condition as the action that opens it.
 - Add a `.sln`. The solution is `.slnx` only, and `primaryOutputs`, the Dockerfile and the package all point at it.
 - Reuse a short flag across options, or give one to `--no-restore`; the `dotnet new` templates from Microsoft leave it long, and so do we.

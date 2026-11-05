@@ -23,7 +23,7 @@ dotnet run --project ./src/Presentation
 
 ## Docker Compose
 
-`docker-compose.yml` starts the app, and the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone), which shows its logs, traces and metrics. The app sends everything to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), and the collector forwards it to the dashboard, the same shape as a production setup. The dashboard is only a container that receives OTLP; nothing in the solution depends on Aspire.
+`docker-compose.yml` starts the app, and the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone), which shows its logs, traces and metrics. The app sends everything to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), and the collector forwards it to the dashboard, the same shape as a production setup. The dashboard is only a container that receives OTLP; nothing in the solution depends on Aspire. The dashboard has no login and the collector accepts OTLP from anyone on ports 4317 and 4318. That's on purpose for a developer's machine, so don't run this compose file anywhere other people can reach.
 
 ``` bash
 docker compose up -d --build
