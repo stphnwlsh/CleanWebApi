@@ -43,7 +43,7 @@ The repository itself stays all on. The Presentation project and the presentatio
 
 A toggle's inputs, such as `authority` and `audience`, are separate symbols, enabled with `isEnabled` and made required with `isRequired` only when the toggle is on. A toggle that needs another one says so in its conditions, such as `(includeTests && includeArchitectureTests)`. Verify Template checks the defaults, everything on, everything off, and each toggle flipped on its own.
 
-The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It leaves out `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
+The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It also packs `template/ci.yml` as the generated solution's `.github/workflows/ci.yml`, a small pipeline with no template name in it. It leaves out the rest of `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
 
 ## Steps
 

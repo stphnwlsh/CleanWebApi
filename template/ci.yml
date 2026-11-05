@@ -1,0 +1,61 @@
+# The checks from AGENTS.md, run on every pull request and every push to main.
+# It needs no secrets or paid features. The ci-for-your-solution skill shows how to add
+# security scans or a container check, or how to move this to another CI system.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  COVERAGE_THRESHOLD: 95
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Format
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # One process at a time, so every test project adds its coverage to the same merged report.
+      - name: Test
+        run: >-
+          dotnet test --configuration Release --no-build -m:1
+          -p:CollectCoverage=true -p:CoverletOutput=../results/ -p:MergeWith="../results/coverage.json"
+          -p:CoverletOutputFormat=opencover%2cjson
+          -p:ExcludeByFile="**/Program.cs%2c**/Migrations/*.cs%2c**/obj/**/*.cs"
+          -p:ExcludeByAttribute="GeneratedCodeAttribute"
+
+      # The merged report's total, not each project's own, is what has to stay at or above the gate.
+      - name: Coverage
+        run: |
+          coverage=$(grep -o -m1 'sequenceCoverage="[0-9.]*"' tests/results/coverage.opencover.xml | grep -o '[0-9.]*')
+          echo "Line coverage is $coverage%, and it needs $COVERAGE_THRESHOLD%"
+          echo "Line coverage: **$coverage%** (needs $COVERAGE_THRESHOLD%)" >> "$GITHUB_STEP_SUMMARY"
+          awk -v c="$coverage" -v t="$COVERAGE_THRESHOLD" 'BEGIN { exit (c < t) }'

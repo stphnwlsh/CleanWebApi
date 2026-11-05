@@ -18,6 +18,8 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+# The releases skill is a skill, not build output
+!.agents/skills/releases/
 x64/
 x86/
 [Aa][Rr][Mm]/
