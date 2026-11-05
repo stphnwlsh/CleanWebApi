@@ -6,6 +6,7 @@
     "WebAPI",
     "API",
     "Service",
+    "Controllers",
     "Clean Architecture"
   ],
   "identity": "CleanWebApi.Template",
