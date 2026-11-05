@@ -1,6 +1,6 @@
 namespace CleanWebApi.Presentation.Errors;
 
-using CleanWebApi.Application.Common.Exceptions;
+using Application.Common.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;

@@ -255,6 +255,41 @@ class CommandTests(unittest.TestCase):
         self.assertIn("**Blocked by Test** (and 4 more): 1 test failed.", body)
         self.assertIn("| [Build](https://example.com/build) | 🟢 Passed |", body)
 
+    def test_summary_command_passes_in_a_copy_with_only_build_and_test(self):
+        needs = {key: {"result": "success", "outputs": {}} for key in ("build", "test")}
+        needs.update({key: {"result": "skipped", "outputs": {}} for key in ("analysis", "dependencies", "scan")})
+        posted = []
+
+        class FakeGitHub(report.GitHub):
+            def jobs(self, run_id):
+                return {}
+
+            def alerts(self, tool, ref):
+                raise AssertionError("no alerts are read when the scans didn't run")
+
+            def upsert_comment(self, number, body):
+                posted.append(body)
+
+        with tempfile.TemporaryDirectory() as directory:
+            write_results(directory, exit_code="0", coverage=COVERAGE.replace('sequenceCoverage="75"', 'sequenceCoverage="100"'))
+            environment = {
+                "NEEDS": json.dumps(needs),
+                "FULL": "false",
+                "GITHUB_EVENT_NAME": "pull_request",
+                "PR_NUMBER": "3",
+                "GITHUB_REPOSITORY": "someone/copy",
+                "GITHUB_RUN_ID": "1",
+                "GITHUB_STEP_SUMMARY": os.path.join(directory, "summary.md"),
+            }
+            with mock.patch.dict(os.environ, environment), mock.patch.object(report, "GitHub", FakeGitHub):
+                self.assertEqual(report.command_summary(directory), 0)
+
+        body = posted[0]
+        self.assertIn("Ready to merge", body)
+        self.assertIn("| Container Scan | ⚪ Not run |", body)
+        self.assertIn("⚪ Not run | Runs in the LeanMeanCleanApps repositories only", body)
+        self.assertNotIn("template installs", body)
+
     def test_summary_command_passes_on_main_without_dependency_review(self):
         needs = {key: {"result": "success", "outputs": {}} for key in ("build", "test", "analysis", "scan")}
         needs["dependencies"] = {"result": "skipped", "outputs": {}}

@@ -32,6 +32,10 @@ dotnet run --project ./src/Presentation        # the API at http://localhost:808
 
 The `coverage` skill has the command that checks the 95% line coverage gate locally.
 
+## Where we track work
+
+Not set. Replace this line with where your team plans work, such as a GitHub project, a Jira board or Azure Boards, so agents put their plans and handoffs there.
+
 ## Rules that fail a change
 
 - The build has zero warnings. `TreatWarningsAsErrors`, `latest-recommended` analysers and `.editorconfig` style are all enforced by the build.
@@ -80,6 +84,7 @@ Each skill is a folder in `.agents/skills` with a `SKILL.md`. If your tool doesn
 | `unit-tests` | Test a handler, validator or endpoint |
 | `integration-tests` | Test the repository or a real HTTP request |
 | `coverage` | Check or fix line coverage |
+| `ci-for-your-solution` | Add a check to CI, or move it to another CI system |
 | `writing-a-skill` | Add or change a skill, or build a feature with a new pattern |
 
 These are for this Web API's presentation layer. The other templates have their own, with the same names where the job is the same:

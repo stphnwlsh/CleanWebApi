@@ -14,6 +14,9 @@ inputs:
   needs:
     description: The calling job's needs context as JSON (summary only).
     default: "{}"
+  full:
+    description: "true runs every stage. false for a copy outside our organisation: only build and test run, and the rest show as not run (summary only)."
+    default: "true"
   token:
     description: Reads the run's jobs and code scanning alerts, and writes the pull request comment (summary only).
     default: ${{ github.token }}
@@ -35,5 +38,6 @@ runs:
         RESULTS: ${{ inputs.results }}
         COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
         NEEDS: ${{ inputs.needs }}
+        FULL: ${{ inputs.full }}
         GITHUB_TOKEN: ${{ inputs.token }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
