@@ -1,6 +1,6 @@
 ---
 name: template-authoring
-description: How the dotnet new template is defined and packaged - .template.config/template.json and its two host files, sourceName replacement, symbols such as authorName and the auth flag, code that's left out when an option is off, short flags, the restore post action, what template/template.csproj packs, and how to test an install. Use when changing template options, the package contents or anything that affects generated solutions.
+description: How the dotnet new template is defined and packaged - .template.config/template.json and its two host files, sourceName replacement, symbols such as authorName and the include toggles, code that's left out when a toggle is off, short flags, the restore post action, what template/template.csproj packs, and how to test an install. Use when changing template options, the package contents or anything that affects generated solutions.
 metadata:
   scope: maintainer
 ---
@@ -14,8 +14,8 @@ The repository is both a working solution and a `dotnet new` template. `.templat
 | Symbol | Option | Replaces |
 | --- | --- | --- |
 | `authorName` | `--authorName`, `-an` | `Stephen Walsh` (`--author` is reserved by `dotnet new`) |
-| `auth` | `--auth` | Nothing. A bool, off by default. Off, every line of authentication code is left out; on, `authority` and `audience` switch on through `isEnabled` and `authority` becomes required through `isRequired` (web templates) |
-| `authority`, `audience` | `--authority`, `-iss`, `--audience`, `-aud` | The empty `Authentication` settings in `appsettings.json`, only with `--auth`. Passed without it, they're ignored without a word (web templates) |
+| `includeAuth` | `--include-auth` | Nothing. A toggle, off by default. Off, every line of authentication code is left out; on, `authority` and `audience` switch on through `isEnabled` and `authority` becomes required through `isRequired` (web templates) |
+| `authority`, `audience` | `--authority`, `-iss`, `--audience`, `-aud` | The empty `Authentication` settings in `appsettings.json`, only with `--include-auth`. Passed without it, they're ignored without a word (web templates) |
 | `skipRestore` | `--no-restore` | Nothing; it turns the restore post action off |
 
 Three files in `.template.config` make up the template, and every symbol appears in each one that applies:
@@ -28,7 +28,20 @@ Three files in `.template.config` make up the template, and every symbol appears
 
 The words in those files are the first thing people read, in a terminal or a dialog. Write them in our voice (`docs-and-voice`): plain first, then one dry line if it earns its place. The `--help` text keeps to plain humour. The one nod to a certain long-running .NET podcast lives at the end of the `description` override in `ide.host.json` ("Mug not included."), with its twin on the docs site's getting started pages. Keep it to those two, and never explain the joke. The `defaultName` is `WorksOnMyMachine.Movies` (`WorksOnMyMachine.Reviews` in the Lambda function). Visual Studio and Rider suggest it as the project name, and `dotnet new` uses the folder name instead, so the joke only reaches people who take the IDE's suggestion.
 
-Code that only exists for an option is wrapped so `dotnet new` can leave it out. In C#, `#if auth` and `#endif` start at the beginning of the line, with no brackets (the build fails IDE0047 and IDE0055 otherwise). In project files it's `<!--#if (auth) -->` and `<!--#endif -->`, and in `appsettings.json` it's `//#if (auth)` and `//#endif`. A file type the template engine doesn't know, such as the GraphQL schema snapshot, gets `#if (auth)` and `#endif` lines through `SpecialCustomOperations` in `template.json`. Files that only exist for authentication go in the `(!auth)` exclude list under `sources` in `template.json`. The repository itself builds with authentication in: the Presentation project and the presentation integration tests define an `auth` constant inside `<!--#if (false) -->`, which `dotnet new` always removes. The template's skills and `AGENTS.md` ship either way.
+## Feature toggles
+
+Every optional feature is a toggle, and every toggle has the same shape, so people learn it once:
+
+- A `bool` symbol named `include<Feature>` in `template.json`, such as `includeAuth`, with a `displayName` of "Include <feature>" and a description that ends with its default, such as "Default: off."
+- A `longName` of `include-<feature>` in `dotnetcli.host.json`, so it's `--include-auth` on the command line. No short flag.
+- A checkbox labelled "Include <feature>" in `ide.host.json`, whose description also ends with its default.
+- One row in the options table of the README, `NUGET.md` and the docs site's template options page, which list every toggle with a Default column.
+
+Off means absent, not switched off. Files that only exist for a toggle go in a `(!include<Feature>)` exclude list under `sources` in `template.json`, and code inside shared files is wrapped so `dotnet new` can leave it out. In C#, `#if includeAuth` and `#endif` start at the beginning of the line, with no brackets (the build fails IDE0047 and IDE0055 otherwise). In project files it's `<!--#if (includeAuth) -->` and `<!--#endif -->`, and in `appsettings.json` it's `//#if (includeAuth)` and `//#endif`. A file type the template engine doesn't know, such as the GraphQL schema snapshot, gets `#if (includeAuth)` and `#endif` lines through `SpecialCustomOperations` in `template.json`.
+
+The repository itself stays all on. The Presentation project and the presentation integration tests define each toggle's constant, such as `includeAuth`, inside `<!--#if (false) -->`, which `dotnet new` always removes. The template's skills and `AGENTS.md` ship either way.
+
+A toggle's inputs, such as `authority` and `audience`, are separate symbols, enabled with `isEnabled` and made required with `isRequired` only when the toggle is on. A toggle that needs another one says so in its conditions, such as `(includeTests && includeArchitectureTests)`. Verify Template checks the defaults, everything on, everything off, and each toggle flipped on its own.
 
 The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It leaves out `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
 
@@ -46,7 +59,7 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
    dotnet new uninstall ./
    ```
 
-   With `--auth`, also create one with `--auth --authority https://login.example.com --output ../Secured` and test that. Leave the authority out and `dotnet new` should stop with exit code 102.
+   With `--include-auth`, also create one with `--include-auth --authority https://login.example.com --output ../Secured` and test that. Leave the authority out and `dotnet new` should stop with exit code 102.
 
    `--help` shows the short flags and descriptions. Creating the solution should end with `Restoring .../Sample.slnx` and `Restore succeeded`, which is the post action at work; `--no-restore` should skip it.
 
@@ -70,4 +83,4 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 
 ## Check
 
-The Test job's Verify Template step installs the packed template, generates a solution and runs its tests, and does it again with `--auth` where the template has it.
+The Test job's Verify Template step installs the packed template, generates a solution and runs its tests, and does it again with `--include-auth` where the template has it.

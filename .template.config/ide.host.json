@@ -35,12 +35,12 @@
       "persistenceScopeName": "LeanMeanCleanApps"
     },
     {
-      "id": "auth",
+      "id": "includeAuth",
       "name": {
-        "text": "Authentication"
+        "text": "Include authentication"
       },
       "description": {
-        "text": "Add JWT bearer token authentication. Leave it unticked for an API with no auth code at all."
+        "text": "Add JWT bearer token authentication. Leave it unticked for an API with no auth code at all. Default: off."
       },
       "isVisible": true
     },

@@ -5,12 +5,12 @@ using System.Reflection;
 using Application;
 using Application.Common.Telemetry;
 using Application.Versions.Entities;
-#if auth
+#if includeAuth
 using Authentication;
 #endif
 using Errors;
 using Infrastructure;
-#if auth
+#if includeAuth
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 #endif
@@ -58,7 +58,7 @@ public static class ProgramExtensions
                 })
                 .AddHttpClientInstrumentation(options => options.RecordException = true))
             .WithMetrics(metrics => metrics
-#if auth
+#if includeAuth
                 .AddMeter(
                     "Microsoft.EntityFrameworkCore",
                     "Microsoft.AspNetCore.Authentication",
@@ -117,7 +117,7 @@ public static class ProgramExtensions
 
         #region OpenApi
 
-#if auth
+#if includeAuth
         var authentication = AuthenticationSettings.FromConfiguration(builder.Configuration);
 
         _ = builder.Services.AddOpenApi(options =>
@@ -136,7 +136,7 @@ public static class ProgramExtensions
 
         #endregion OpenApi
 
-#if auth
+#if includeAuth
         #region Authentication
 
         if (authentication.Enabled)
@@ -215,7 +215,7 @@ public static class ProgramExtensions
 
         #endregion Errors
 
-#if auth
+#if includeAuth
         #region Authentication
 
         if (AuthenticationSettings.FromConfiguration(app.Configuration).Enabled)
@@ -231,7 +231,7 @@ public static class ProgramExtensions
         #region Health
 
         // Liveness runs no checks, so it only fails when the process can't answer. Readiness checks the database.
-#if auth
+#if includeAuth
         _ = app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false }).AllowAnonymous();
         _ = app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") }).AllowAnonymous();
 #else

@@ -218,9 +218,9 @@ jobs:
           VARIANTS="the generated solution builds and passes its tests"
 
           # Templates with an auth option are verified a second time with it on.
-          if jq -e '.symbols.auth' .template.config/template.json > /dev/null; then
-            verify Template.Authentication --auth --authority https://login.example.com --audience https://api.example.com
-            VARIANTS="the generated solution builds and passes its tests with and without --auth"
+          if jq -e '.symbols.includeAuth' .template.config/template.json > /dev/null; then
+            verify Template.Authentication --include-auth --authority https://login.example.com --audience https://api.example.com
+            VARIANTS="the generated solution builds and passes its tests with and without --include-auth"
           fi
 
           echo "### Template" >> "$GITHUB_STEP_SUMMARY"

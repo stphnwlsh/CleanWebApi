@@ -1,7 +1,7 @@
 namespace CleanWebApi.Presentation.Controllers.Common;
 
 using Mediator;
-#if auth
+#if includeAuth
 using Microsoft.AspNetCore.Authorization;
 #endif
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 /// <param name="sender">Sends commands and queries to their Application handlers.</param>
 [ApiController]
-#if auth
+#if includeAuth
 // Every action needs a token unless it allows anonymous access.
 [Authorize]
 #endif

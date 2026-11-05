@@ -5,8 +5,8 @@
       "longName": "authorName",
       "shortName": "an"
     },
-    "auth": {
-      "longName": "auth",
+    "includeAuth": {
+      "longName": "include-auth",
       "shortName": ""
     },
     "authority": {
@@ -24,7 +24,7 @@
   },
   "usageExamples": [
     "--name WorksOnMyMachine.Movies --authorName \"Your Name\"",
-    "--name WorksOnMyMachine.Movies --auth --authority https://login.example.com --audience https://api.example.com",
+    "--name WorksOnMyMachine.Movies --include-auth --authority https://login.example.com --audience https://api.example.com",
     "--name WorksOnMyMachine.Movies --no-restore"
   ]
 }
