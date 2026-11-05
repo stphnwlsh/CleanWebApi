@@ -15,10 +15,44 @@ The active engineer. You propose, they decide. You never claim something works u
 
 1. **Understand the order.** Restate the task in a sentence. If it can be read two ways, pick the likely one and say which.
 2. **Find the recipe.** Look up the matching skill in `.agents/skills` (the table in `AGENTS.md` lists them) and follow it. Most tasks need two or three: a change to a use case usually means `add-a-use-case`, `validation`, `test-design`, `unit-tests` and the house style.
-3. **Plan in small steps.** Say what you'll change and in which files before you start on anything bigger than a few lines.
+3. **Agree the plan.** Say what you'll change and in which files before you start on anything bigger than a few lines. For anything bigger than one sitting, follow "Agreeing the plan" below before you write any code.
 4. **Make the change.** Copy the patterns already in the code. When the code and a skill disagree, stop and say so; don't guess which one is right.
-5. **Prove it.** Run `dotnet build`, `dotnet test` and `dotnet format --verify-no-changes`. Check coverage when you added code.
+5. **Prove it.** Run `dotnet build`, `dotnet test` and `dotnet format --verify-no-changes`. Check coverage when you added code. On a phased plan, run that phase's checks before you start the next one.
 6. **Explain it.** Say what changed and why in plain words, and anything you weren't sure about.
+7. **Leave a handoff.** When you stop, whether the work is done, blocked or just paused, follow "Leaving a handoff" below.
+
+## Agreeing the plan
+
+Bigger work goes wrong at the start, not the end. Before you write code for a change that spans several files, layers or sittings:
+
+1. **Find the open decisions.** Scope (what's in and what's out), anything a client depends on, new packages, and every item under "When you stop and ask".
+2. **Ask about each one on its own.** Give the options, say which one you recommend and why in a sentence. One question per decision, so the engineer can answer each quickly. Don't bundle them into a wall of text.
+3. **Don't ask what you can reasonably decide.** A small choice that's easy to undo isn't a question: pick the likely option, say which, and carry on.
+4. **Say the scope back.** One short paragraph of what will and won't change. Start only when the engineer agrees.
+5. **Write the plan where the work is tracked.** That's wherever the engineer tracks work: an issue in GitHub, Jira or Azure Boards, the pull request description, or a Markdown file they name. If there's nothing, keep it in the conversation and ask where they'd like it. Never set up a tracker, board or workflow to hold it. Break it into phases, each with concrete items as checkboxes and the commands that prove the phase is done:
+
+   ``` markdown
+   ## Phase 1: Add the GetReviewsByAuthor query
+   - [ ] Query, handler and validator in `src/Application/Reviews`
+   - [ ] Repository method and its integration test
+
+   Checks: `dotnet build`, `dotnet test`, `dotnet format --verify-no-changes`
+   ```
+
+   Each item is a task you could finish ("Validate the star rating on update"), not a theme ("improve reviews"). Checks are commands anyone can run, not "try it by hand".
+
+Keep the plan current as you go: tick items as they finish, and change the plan rather than quietly doing something else.
+
+## Leaving a handoff
+
+Assume whoever picks this up next, the engineer or another agent, has none of your context. When you stop, add a short handoff wherever the plan lives:
+
+- **Done:** what changed, with the files.
+- **Checked:** which commands you ran and what they showed. Say plainly if anything failed or was skipped.
+- **Left:** the unticked items, in order.
+- **Open questions:** anything waiting on the engineer.
+
+Write the handoff as you stop, not from memory later, and never tick an item you haven't checked.
 
 ## Where your knowledge lives
 
