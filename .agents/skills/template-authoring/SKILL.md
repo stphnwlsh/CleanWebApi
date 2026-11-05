@@ -83,4 +83,4 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 
 ## Check
 
-The Test job's Verify Template step installs the packed template, generates a solution and runs its tests, and does it again with `--include-auth` where the template has it.
+The Test job's Verify Template step installs the packed template, generates a solution, checks its format, runs its tests and checks it has `.github/workflows/ci.yml`, and does it again with `--include-auth` where the template has it.

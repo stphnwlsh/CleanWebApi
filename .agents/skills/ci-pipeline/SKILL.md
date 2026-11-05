@@ -14,7 +14,7 @@ One workflow, `.github/workflows/build-pipeline.yml`, runs on every pull request
 | Check | What it does | Fails when |
 | --- | --- | --- |
 | Build | `dotnet format --verify-no-changes`, `docker build` of the runtime image, `dotnet pack` of the template, the report action's own tests | Style, a warning, a build error, or a template package over 1 MB |
-| Test | Runs every test project inside the Dockerfile's `test` stage, reports results and coverage, then installs the packed template, generates a solution (its restore post action restores the `.slnx`) and tests it, then does the same with `--include-auth` where the template has it | A failing test, coverage under 95%, or a template that doesn't generate and pass |
+| Test | Runs every test project inside the Dockerfile's `test` stage, reports results and coverage, then installs the packed template, generates a solution (its restore post action restores the `.slnx`), checks its format, tests it and checks it has `.github/workflows/ci.yml`, then does the same with `--include-auth` where the template has it | A failing test, coverage under 95%, or a template that doesn't generate, format and pass |
 | Static Analysis (actions, csharp) | CodeQL `security-and-quality` on the workflows and the C# | A finding of medium severity or higher |
 | Dependency Review | New or updated packages on a pull request | A high or critical vulnerability, or a licence other than MIT, Apache-2.0 or BSD |
 | Container Scan | Starts the image and calls it, then Trivy scans the image and the Dockerfile and compose config | The smoke test fails, or a fixable high or critical finding |
