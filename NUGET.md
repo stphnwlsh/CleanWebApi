@@ -13,16 +13,20 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). [
 dotnet new install CleanWebApi.Template
 
 # Create a solution
-dotnet new cleanwebapi --name Acme.Reviews --authorName "Your Name"
-cd Acme.Reviews
+dotnet new cleanwebapi --name WorksOnMyMachine.Movies --authorName "Your Name"
+cd WorksOnMyMachine.Movies
 ```
 
-| Option | What it does |
-| --- | --- |
-| `--name` | Names the solution and its root namespace |
-| `--authorName` | Puts your name on the assembly instead of ours |
-| `--authority` | Your OAuth authorization server. Leave it out and the API runs without authentication |
-| `--audience` | The audience tokens must be issued for, usually the API's own URL |
+| Option | Default | What it does |
+| --- | --- | --- |
+| `--name`, `-n` | The folder's name | Names the solution and its root namespace |
+| `--authorName`, `-an` | `Stephen Walsh` | Puts your name on the assembly instead of ours |
+| `--include-auth` | Off | Adds JWT bearer token authentication. Leave it out and the API has no auth code at all |
+| `--authority`, `-iss` | Empty | Your OAuth authorization server. Required with `--include-auth` |
+| `--audience`, `-aud` | Empty | The audience tokens must be issued for, usually the API's own URL. Only used with `--include-auth` |
+| `--no-restore` | Off | Skips the package restore that normally runs once the solution is created |
+
+Rather click than type? Visual Studio and Rider show the same options in their new project dialogs, and `dotnet new cleanwebapi --help` lists them in the terminal.
 
 ## Run it
 
@@ -39,7 +43,7 @@ dotnet test
 
 Then open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8080/scalar> to browse and try every endpoint.
 
-The API is open until you pass `--authority` and `--audience`, and then it asks for a JWT bearer token.
+The API is open unless you create it with `--include-auth --authority` (and usually `--audience`), and then it asks for a JWT bearer token. Leave `--include-auth` out and there's no auth code at all.
 
 ## What's inside
 

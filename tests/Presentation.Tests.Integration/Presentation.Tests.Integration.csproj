@@ -3,6 +3,10 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <!--#if (false) -->
+    <!-- The template repository keeps the authentication code in, so the #if includeAuth blocks compile here. dotnet new removes this. -->
+    <DefineConstants>$(DefineConstants);includeAuth</DefineConstants>
+    <!--#endif -->
   </PropertyGroup>
 
   <ItemGroup>

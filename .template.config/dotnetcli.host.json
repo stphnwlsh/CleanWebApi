@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/dotnetcli.host",
+  "symbolInfo": {
+    "authorName": {
+      "longName": "authorName",
+      "shortName": "an"
+    },
+    "includeAuth": {
+      "longName": "include-auth",
+      "shortName": ""
+    },
+    "authority": {
+      "longName": "authority",
+      "shortName": "iss"
+    },
+    "audience": {
+      "longName": "audience",
+      "shortName": "aud"
+    },
+    "skipRestore": {
+      "longName": "no-restore",
+      "shortName": ""
+    }
+  },
+  "usageExamples": [
+    "--name WorksOnMyMachine.Movies --authorName \"Your Name\"",
+    "--name WorksOnMyMachine.Movies --include-auth --authority https://login.example.com --audience https://api.example.com",
+    "--name WorksOnMyMachine.Movies --no-restore"
+  ]
+}

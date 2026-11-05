@@ -10,6 +10,10 @@
     <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <NoWarn>$(NoWarn);1573</NoWarn>
+    <!--#if (false) -->
+    <!-- The template repository keeps the authentication code in, so the #if includeAuth blocks compile here. dotnet new removes this. -->
+    <DefineConstants>$(DefineConstants);includeAuth</DefineConstants>
+    <!--#endif -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +21,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!--#if (includeAuth) -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <!--#endif -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />

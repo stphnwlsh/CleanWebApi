@@ -20,6 +20,8 @@
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <IsTestProject>false</IsTestProject>
     <IsPublishable>false</IsPublishable>
+    <!-- Microsoft's template validator checks .template.config on every build and pack. -->
+    <ValidateTemplatesPath>$(MSBuildThisFileDirectory)..</ValidateTemplatesPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -27,6 +29,10 @@
     <!-- Skills about the template repository itself (its pipeline, releases and the five-template family) stay out of generated solutions. -->
     <RepositorySkills>../.agents/skills/branches-and-pull-requests/**;../.agents/skills/ci-pipeline/**;../.agents/skills/security-findings/**;../.agents/skills/docs-and-voice/**;../.agents/skills/template-authoring/**;../.agents/skills/family-sync/**;../.agents/skills/releases/**</RepositorySkills>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TemplateEngine.Authoring.Tasks" PrivateAssets="all" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="../.template.config/**/*" Pack="true" PackagePath="content/.template.config/" />
@@ -37,7 +43,7 @@
     <None Include="../AGENTS.md;../CLAUDE.md" Pack="true" PackagePath="content/" />
     <!-- The small pipeline a generated solution starts with. The template's own Build Pipeline stays out. -->
     <None Include="ci.yml" Pack="true" PackagePath="content/.github/workflows/" />
-    <None Include="../*.sln;../Directory.Build.props;../Directory.Packages.props;../global.json;../NuGet.config;../Dockerfile;../docker-compose.yml;../otel-collector.yaml;../icon.png;../.*ignore;../.editorconfig;../.gitattributes" Pack="true" PackagePath="content/" />
+    <None Include="../*.slnx;../Directory.Build.props;../Directory.Packages.props;../global.json;../NuGet.config;../Dockerfile;../docker-compose.yml;../otel-collector.yaml;../icon.png;../.*ignore;../.editorconfig;../.gitattributes" Pack="true" PackagePath="content/" />
     <None Include="../icon.png" Pack="true" PackagePath="images/" />
     <None Include="../LICENSE.md" Pack="true" PackagePath="docs/" />
     <None Include="../NUGET.md" Pack="true" PackagePath="docs/" />

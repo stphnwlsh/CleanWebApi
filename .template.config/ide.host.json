@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host",
+  "icon": "icon.png",
+  "tags": [
+    {
+      "type": "platform",
+      "add": [
+        "Linux",
+        "macOS",
+        "Windows"
+      ]
+    },
+    {
+      "type": "projectType",
+      "add": [
+        "Web",
+        "Service"
+      ]
+    }
+  ],
+  "symbolInfo": [
+    {
+      "id": "authorName",
+      "name": {
+        "text": "Author name"
+      },
+      "description": {
+        "text": "Your name, for the Authors and Copyright lines."
+      },
+      "isVisible": true,
+      "persistenceScope": "shared",
+      "persistenceScopeName": "LeanMeanCleanApps"
+    },
+    {
+      "id": "includeAuth",
+      "name": {
+        "text": "Include authentication"
+      },
+      "description": {
+        "text": "Add JWT bearer token authentication. Leave it unticked for an API with no auth code at all. Default: off."
+      },
+      "isVisible": true
+    },
+    {
+      "id": "authority",
+      "name": {
+        "text": "Token authority"
+      },
+      "description": {
+        "text": "The OAuth server that issues access tokens. Needed when authentication is on."
+      },
+      "isVisible": true
+    },
+    {
+      "id": "audience",
+      "name": {
+        "text": "Token audience (optional)"
+      },
+      "description": {
+        "text": "Who the tokens are for, usually the API's own URL."
+      },
+      "isVisible": true
+    }
+  ]
+}

@@ -2,41 +2,96 @@
   "$schema": "https://json.schemastore.org/template",
   "author": "Stephen Walsh",
   "classifications": [
-    "Clean Architecture",
     "Web",
+    "WebAPI",
     "API",
-    "Web API",
-    "Dotnet",
-    "Docker"
+    "Service",
+    "Clean Architecture"
   ],
   "identity": "CleanWebApi.Template",
+  "groupIdentity": "CleanWebApi",
+  "generatorVersions": "[1.0.0.0-*)",
+  "precedence": "100",
   "name": "Clean Web API Template",
-  "description": "A dotnet new template for an ASP.NET Core Web API with controllers, built with a streamlined Clean Architecture on .NET 10.",
+  "description": "An ASP.NET Core Web API with controllers on .NET 10, built with Clean Architecture minus the ceremony.",
   "shortName": "cleanwebapi",
   "tags": {
     "language": "C#",
-    "type": "project"
+    "type": "solution"
   },
   "sourceName": "CleanWebApi",
+  "defaultName": "WorksOnMyMachine.Movies",
   "preferNameDirectory": true,
+  "constraints": {
+    "sdk": {
+      "type": "sdk-version",
+      "args": "[10.0.100,)"
+    }
+  },
+  "primaryOutputs": [
+    {
+      "path": "CleanWebApi.slnx"
+    },
+    {
+      "path": "docs/RUN.md",
+      "condition": "(HostIdentifier != \"dotnetcli\" && HostIdentifier != \"dotnetcli-preview\")"
+    }
+  ],
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!includeAuth)",
+          "exclude": [
+            "src/Presentation/Authentication/**",
+            "src/Presentation/OpenApi/BearerSecurityTransformer.cs",
+            "tests/Presentation.Tests.Unit/Authentication/**",
+            "tests/Presentation.Tests.Unit/OpenApi/BearerSecurityTransformerTests.cs",
+            "tests/Presentation.Tests.Integration/Authentication/**"
+          ]
+        }
+      ]
+    }
+  ],
   "symbols": {
     "authorName": {
       "type": "parameter",
-      "displayName": "The name of the author of the solution.",
+      "datatype": "string",
+      "displayName": "Author name",
+      "description": "Who gets the credit in the Authors and Copyright of the Presentation project. Leave it and Stephen Walsh gets the credit, which he'd enjoy more than you would.",
       "defaultValue": "Stephen Walsh",
       "replaces": "Stephen Walsh"
+    },
+    "includeAuth": {
+      "type": "parameter",
+      "datatype": "bool",
+      "displayName": "Include authentication",
+      "description": "Add JWT bearer token authentication. Leave it off and the API has no auth code at all, which is fine on your machine and brave anywhere else. Default: off.",
+      "defaultValue": "false"
     },
     "authority": {
       "type": "parameter",
       "datatype": "string",
-      "displayName": "The OAuth authorization server that issues access tokens. Leave empty to run the API without authentication.",
-      "defaultValue": ""
+      "displayName": "Token authority",
+      "description": "The OAuth authorization server that issues access tokens. Required with --include-auth.",
+      "defaultValue": "",
+      "isEnabled": "includeAuth",
+      "isRequired": "includeAuth"
     },
     "audience": {
       "type": "parameter",
       "datatype": "string",
-      "displayName": "The audience access tokens must be issued for, usually the API's own URL.",
-      "defaultValue": ""
+      "displayName": "Token audience (optional)",
+      "description": "The audience access tokens must be issued for, usually the API's own URL. Not the people in the room, who are lovely but don't carry tokens.",
+      "defaultValue": "",
+      "isEnabled": "includeAuth"
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "displayName": "Skip restore",
+      "description": "Don't restore packages after the solution is created. Handy on a plane, offline, or when you like to do things yourself.",
+      "defaultValue": "false"
     },
     "authorityValue": {
       "type": "generated",
@@ -79,6 +134,51 @@
           }
         ]
       }
+    },
+    "HostIdentifier": {
+      "type": "bind",
+      "binding": "host:HostIdentifier"
     }
-  }
+  },
+  "postActions": [
+    {
+      "id": "restore",
+      "condition": "(!skipRestore)",
+      "description": "Restore the NuGet packages the solution needs, so the first build has less to do.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'. It takes less time than reading this sentence twice."
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    },
+    {
+      "id": "open-run-guide",
+      "condition": "(HostIdentifier != \"dotnetcli\" && HostIdentifier != \"dotnetcli-preview\")",
+      "description": "Open the guide to running the solution.",
+      "manualInstructions": [
+        {
+          "text": "Open docs/RUN.md for how to run the solution."
+        }
+      ],
+      "actionId": "84C0DA21-51C8-4541-9940-6CA19AF04EE6",
+      "args": {
+        "files": "1"
+      },
+      "continueOnError": true
+    },
+    {
+      "id": "next-steps",
+      "condition": "(HostIdentifier == \"dotnetcli\" || HostIdentifier == \"dotnetcli-preview\")",
+      "description": "What to do next.",
+      "manualInstructions": [
+        {
+          "text": "All set. Change into the new folder and run 'dotnet run --project ./src/Presentation'. docs/RUN.md covers the rest, and AGENTS.md briefs your coding agents."
+        }
+      ],
+      "actionId": "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C",
+      "continueOnError": true
+    }
+  ]
 }

@@ -219,12 +219,26 @@ jobs:
         # would fail the generated solution's format check.
         run: |
           dotnet new install packages/*.nupkg
-          dotnet new "$(jq -r .shortName .template.config/template.json)" --name Template.Verification --output verification
-          dotnet format verification --verify-no-changes
-          dotnet test verification --configuration Release
-          test -f verification/.github/workflows/ci.yml
+          SHORT_NAME=$(jq -r .shortName .template.config/template.json)
+
+          verify() {
+            dotnet new "$SHORT_NAME" --name "$1" --output "$1" "${@:2}"
+            dotnet format "$1" --verify-no-changes
+            dotnet test "$1" --configuration Release
+            test -f "$1/.github/workflows/ci.yml"
+          }
+
+          verify Template.Verification
+          VARIANTS="the generated solution passes its format check, builds and passes its tests"
+
+          # Templates with an auth option are verified a second time with it on.
+          if jq -e '.symbols.includeAuth' .template.config/template.json > /dev/null; then
+            verify Template.Authentication --include-auth --authority https://login.example.com --audience https://api.example.com
+            VARIANTS="the generated solution passes its format check, builds and passes its tests with and without --include-auth"
+          fi
+
           echo "### Template" >> "$GITHUB_STEP_SUMMARY"
-          echo "The packed template installs, and the generated solution passes its format check, builds and passes its tests." >> "$GITHUB_STEP_SUMMARY"
+          echo "The packed template installs, and $VARIANTS." >> "$GITHUB_STEP_SUMMARY"
         shell: bash
 
   analysis:
