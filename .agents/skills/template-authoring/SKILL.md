@@ -14,8 +14,7 @@ The repository is both a working solution and a `dotnet new` template. `.templat
 | Symbol | Option | Replaces |
 | --- | --- | --- |
 | `authorName` | `--authorName`, `-an` | `Stephen Walsh` (`--author` is reserved by `dotnet new`) |
-| `auth` | `--auth` | Nothing by itself. A choice of `none` (the default) or `bearer` (`oauth` in the MCP server) that switches `authority` and `audience` on through `isEnabled`, and makes `authority` required through `isRequired`. The conditions quote the value, as in `(auth == "bearer")`, because an unquoted `oauth` doesn't parse (web templates) |
-| `authority`, `audience` | `--authority`, `-iss`, `--audience`, `-aud` | The empty `Authentication` settings in `appsettings.json`, only when `auth` isn't `none`. A disabled option passed on the command line is ignored without a word (web templates) |
+| `authority`, `audience` | `--authority`, `-iss`, `--audience`, `-aud` | The empty `Authentication` settings in `appsettings.json` (web templates) |
 | `skipRestore` | `--no-restore` | Nothing; it turns the restore post action off |
 
 Three files in `.template.config` make up the template, and every symbol appears in each one that applies:

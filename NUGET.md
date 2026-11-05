@@ -21,8 +21,7 @@ cd WorksOnMyMachine.Movies
 | --- | --- |
 | `--name`, `-n` | Names the solution and its root namespace |
 | `--authorName`, `-an` | Puts your name on the assembly instead of ours |
-| `--auth` | `none` (the default) leaves the API open, `bearer` switches on JWT bearer tokens |
-| `--authority`, `-iss` | Your OAuth authorization server, required with `--auth bearer` |
+| `--authority`, `-iss` | Your OAuth authorization server. Leave it out and the API runs without authentication |
 | `--audience`, `-aud` | The audience tokens must be issued for, usually the API's own URL |
 | `--no-restore` | Skips the package restore that normally runs once the solution is created |
 
@@ -43,7 +42,7 @@ dotnet test
 
 Then open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8080/scalar> to browse and try every endpoint.
 
-The API is open until you pass `--auth bearer` with `--authority` and `--audience`, and then it asks for a JWT bearer token.
+The API is open until you pass `--authority` and `--audience`, and then it asks for a JWT bearer token.
 
 ## What's inside
 

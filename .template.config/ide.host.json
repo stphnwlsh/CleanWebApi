@@ -35,42 +35,12 @@
       "persistenceScopeName": "LeanMeanCleanApps"
     },
     {
-      "id": "auth",
-      "name": {
-        "text": "Authentication"
-      },
-      "description": {
-        "text": "How the API checks who is calling. None leaves it open, and you can switch it on later in appsettings.json."
-      },
-      "isVisible": true,
-      "choices": [
-        {
-          "id": "none",
-          "name": {
-            "text": "None"
-          },
-          "description": {
-            "text": "No sign in. Everything is open."
-          }
-        },
-        {
-          "id": "bearer",
-          "name": {
-            "text": "JWT bearer tokens"
-          },
-          "description": {
-            "text": "Access tokens from your authorization server."
-          }
-        }
-      ]
-    },
-    {
       "id": "authority",
       "name": {
-        "text": "Token authority"
+        "text": "Token authority (optional)"
       },
       "description": {
-        "text": "The OAuth authorization server that issues access tokens."
+        "text": "The OAuth server that issues access tokens. Leave it empty to run without authentication on your machine."
       },
       "isVisible": true
     },
