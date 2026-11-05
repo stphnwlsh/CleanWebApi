@@ -20,8 +20,8 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). [
 dotnet new install CleanWebApi.Template
 
 # Create a solution
-dotnet new cleanwebapi --name Acme.Reviews --authorName "Your Name"
-cd Acme.Reviews
+dotnet new cleanwebapi --name WorksOnMyMachine.Movies --authorName "Your Name"
+cd WorksOnMyMachine.Movies
 ```
 
 | Option | What it does |

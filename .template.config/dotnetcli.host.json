@@ -19,8 +19,8 @@
     }
   },
   "usageExamples": [
-    "--name Acme.Movies --authorName \"Your Name\"",
-    "--name Acme.Movies --authority https://login.example.com --audience https://api.example.com",
-    "--name Acme.Movies --no-restore"
+    "--name WorksOnMyMachine.Movies --authorName \"Your Name\"",
+    "--name WorksOnMyMachine.Movies --authority https://login.example.com --audience https://api.example.com",
+    "--name WorksOnMyMachine.Movies --no-restore"
   ]
 }
