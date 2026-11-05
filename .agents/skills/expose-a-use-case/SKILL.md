@@ -9,7 +9,7 @@ metadata:
 
 ## The rule
 
-Controllers live in `src/Presentation/Controllers/<Feature>/<Feature>Controller.cs`, one per resource, and inherit `ApiControllerBase`. The base class carries `[ApiController]`, `[Authorize]` and `[Consumes("application/json")]`, and takes the `ISender` through its constructor. Each action builds the Application request, sends it with `this.Sender` and returns an `ActionResult`. The action's XML comments become the operation's documentation in Scalar. Actions contain no logic: validation, not-found and everything else happen in Application, and `ApplicationExceptionHandler` turns exceptions into problem details.
+Controllers live in `src/Presentation/Controllers/<Feature>/<Feature>Controller.cs`, one per resource, and inherit `ApiControllerBase`. The base class carries `[ApiController]`, `[Consumes("application/json")]` and, in a solution with authentication, `[Authorize]`, and takes the `ISender` through its constructor. Each action builds the Application request, sends it with `this.Sender` and returns an `ActionResult`. The action's XML comments become the operation's documentation in Scalar. Actions contain no logic: validation, not-found and everything else happen in Application, and `ApplicationExceptionHandler` turns exceptions into problem details.
 
 ## Steps
 
@@ -59,7 +59,7 @@ public async Task<ActionResult<Entities.Review>> CreateReview(CreateReviewReques
 - Catch exceptions, check `null` or read `ModelState` in an action. `[ApiController]` and the exception handler do that.
 - Put `[Produces]` on the base class. It adds an empty JSON body to `204` responses; set the content type on each `[ProducesResponseType]` instead.
 - Return an entity without `this.Ok(...)`. Keep every action's result explicit.
-- Put `[Authorize]` on single actions. The base class protects everything; `[AllowAnonymous]` is the exception (`optional-token-auth`).
+- Put `[Authorize]` on single actions. With authentication the base class protects everything and `[AllowAnonymous]` is the exception; without it there's nothing to protect (`optional-token-auth`).
 
 ## Check
 

@@ -25,14 +25,14 @@ Settings that exist today:
 | --- | --- |
 | `ConnectionStrings:MovieReviews` | SQLite connection string. `Data Source=Name;Mode=Memory;Cache=Shared` keeps everything in memory. |
 | `Database:SeedSampleData` | Seed sample data into an empty database (`sample-data`). |
-| `Authentication:Authority`, `Authentication:Audience` | Turn on token authentication (`optional-token-auth`). MCP also has `Authentication:Scopes`, published in its protected resource metadata. |
+| `Authentication:Authority`, `Authentication:Audience` | Only in a solution created with `--include-auth`: turn on token authentication (`optional-token-auth`). MCP also has `Authentication:Scopes`, published in its protected resource metadata. |
 | `Serilog:*` | Logging (`serilog`). |
 
 ## Steps
 
 1. Put the safe default in `appsettings.json`. If the default is "off" or empty, still write the key so people can find it.
 2. Override it only in the environment files that need a different value.
-3. Read a single value with `configuration.GetValue<T>("Section:Key")`; read a group into a settings class with a `SectionName` constant and a `FromConfiguration(IConfiguration)` method, like `AuthenticationSettings`.
+3. Read a single value with `configuration.GetValue<T>("Section:Key")`; read a group into a settings class with a `SectionName` constant and a `FromConfiguration(IConfiguration)` method, like `AuthenticationSettings` in a solution with authentication.
 4. Document the key in `docs/RUN.md` if someone running the app might change it.
 5. Tests override settings in memory (`integration-tests`), never by editing the JSON.
 

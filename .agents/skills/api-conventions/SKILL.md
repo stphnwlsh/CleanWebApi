@@ -21,7 +21,7 @@ metadata:
 | Not found | `404` problem details with a readable `detail` |
 | Unexpected | `500` problem details with no internals. `ApplicationExceptionHandler` logs the exception as `Error` (`serilog`) |
 | JSON | camelCase names, enums as camelCase strings, nulls left out, numbers strict (no numbers as strings) |
-| Auth | `ApiControllerBase` has `[Authorize]`; only health, the OpenAPI document and Scalar are anonymous (`optional-token-auth`) |
+| Auth | In a solution created with `--include-auth`, `ApiControllerBase` has `[Authorize]` and only health, the OpenAPI document and Scalar are anonymous (`optional-token-auth`). Without it, nothing asks for authorization |
 | Tags | One OpenAPI tag per resource, taken from the controller name |
 
 Errors are RFC 9457 problem details. `ApplicationExceptionHandler` (`src/Presentation/Errors/`) writes them for exceptions from Application, `[ApiController]` writes them when a body or route value can't be bound, and `AddProblemDetails()` with `UseStatusCodePages()` covers the rest (an unknown route, an unsupported media type).

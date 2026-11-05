@@ -66,7 +66,7 @@
       "type": "parameter",
       "datatype": "bool",
       "displayName": "Include authentication",
-      "description": "Add JWT bearer token authentication. Leave it off and the API has no auth code at all, which is fine on your machine and brave anywhere else. Default: off.",
+      "description": "Add JWT bearer token authentication. Leave it off and the API has no auth code at all, which is fine on your machine and brave anywhere else.",
       "defaultValue": "false"
     },
     "authority": {

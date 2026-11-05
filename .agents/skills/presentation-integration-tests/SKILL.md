@@ -28,7 +28,7 @@ Responses are read with the `Deserialize<T>()` helper in `Extensions/JsonSeriali
 3. Assert the status code first, then the body. Read success bodies as the Application entity, failures as `ProblemDetails` or `ValidationProblemDetails`, and check `Errors` or `Detail` exactly.
 4. Find the rows you need through the API (list, then pick one with the property you need), not by hard-coded ids. Sample data ids are random.
 5. Write one test per documented status code of the action (`test-design`), plus one for a body that can't be read, such as a number sent as a string.
-6. Authentication: tests that need it pass `Authentication:Authority` and `Authentication:Audience` in `settings`, and swap the signing key in `configureServices`. See `Authentication/AuthenticationTests.cs`.
+6. Authentication, in a solution that has it: tests that need it pass `Authentication:Authority` and `Authentication:Audience` in `settings`, and swap the signing key in `configureServices`. See `Authentication/AuthenticationTests.cs`.
 
 ## Example
 
@@ -54,7 +54,7 @@ public async Task CreateReview_ShouldReturn_ValidationProblem()
 ```
 
 ```csharp
-// tests/Presentation.Tests.Integration/Authentication/AuthenticationTests.cs
+// tests/Presentation.Tests.Integration/Authentication/AuthenticationTests.cs (only with --include-auth)
 private readonly WebApiApplication application = new(
     settings: new Dictionary<string, string?>
     {
