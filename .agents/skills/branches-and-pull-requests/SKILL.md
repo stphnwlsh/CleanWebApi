@@ -11,6 +11,8 @@ metadata:
 
 Every change goes through a pull request against `main`. A branch ruleset rejects any branch name except `main`, `feature/...`, `fix/...`, `chore/...` and `dependabot/...`. The prefix sets the release notes label automatically (`.github/labeler.yml`), and `.github/release.yml` groups the generated notes by label. The maintainer reviews and squash-merges; nobody merges their own pull request.
 
+One pull request per completed feature, which tracks to one issue: the issue is cut at the size of the pull request worth reviewing. A decision made partway through a feature goes on that feature's branch, not a new pull request. A small, unrelated fix gets its own `fix/` branch.
+
 | Prefix | For | Label | Release notes section |
 | --- | --- | --- | --- |
 | `feature/` | Something new for users of the template | `enhancement` | New features |
