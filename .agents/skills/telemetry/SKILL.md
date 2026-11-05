@@ -31,7 +31,7 @@ What each presentation layer adds:
 
 | Template | Instrumentation |
 | --- | --- |
-| Minimal API, Web API | ASP.NET Core and HttpClient traces and metrics, runtime metrics, the authentication and authorization meters. Health endpoints aren't traced |
+| Minimal API, Web API | ASP.NET Core and HttpClient traces and metrics, runtime metrics and, with authentication, its meters. Health endpoints aren't traced |
 | GraphQL | The same, plus Hot Chocolate's resolver and operation spans from `HotChocolate.Diagnostics` |
 | MCP | The same, plus the MCP SDK's own `Experimental.ModelContextProtocol` spans and `mcp.*.operation.duration` metrics |
 | Lambda | A span per invocation from `OpenTelemetry.Instrumentation.AWSLambda`, and runtime metrics. Traces and metrics are flushed before the function returns, because Lambda can freeze the environment as soon as it does |

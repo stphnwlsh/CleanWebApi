@@ -220,21 +220,41 @@ jobs:
         run: |
           dotnet new install packages/*.nupkg
           SHORT_NAME=$(jq -r .shortName .template.config/template.json)
+          SOURCE_NAME=$(jq -r .sourceName .template.config/template.json)
+
+          # Nothing of the template itself leaks into a generated solution: no toggle markers, and no trace of the
+          # template's own name, which dotnet new replaces everywhere.
+          clean() {
+            if grep -rqi --exclude-dir=bin --exclude-dir=obj "$2" "$1"; then
+              echo "::error::$1 still contains '$2'"
+              grep -rni --exclude-dir=bin --exclude-dir=obj "$2" "$1"
+              return 1
+            fi
+          }
 
           verify() {
             dotnet new "$SHORT_NAME" --name "$1" --output "$1" "${@:2}"
+            clean "$1" includeAuth
+            clean "$1" "$SOURCE_NAME"
+            test ! -e "$1/icon.png"
+            test -f "$1/.github/workflows/ci.yml"
             dotnet format "$1" --verify-no-changes
             dotnet test "$1" --configuration Release
-            test -f "$1/.github/workflows/ci.yml"
           }
 
           verify Template.Verification
-          VARIANTS="the generated solution passes its format check, builds and passes its tests"
+          VARIANTS="the generated solution carries nothing of the template, passes its format check, builds and passes its tests"
 
-          # Templates with an auth option are verified a second time with it on.
+          # Templates with an auth option are verified a second time with it on, and --include-auth without
+          # --authority has to stop before anything is written (exit code 102, a missing mandatory option).
           if jq -e '.symbols.includeAuth' .template.config/template.json > /dev/null; then
             verify Template.Authentication --include-auth --authority https://login.example.com --audience https://api.example.com
-            VARIANTS="the generated solution passes its format check, builds and passes its tests with and without --include-auth"
+            set +e
+            dotnet new "$SHORT_NAME" --name Template.NoAuthority --output Template.NoAuthority --include-auth
+            NO_AUTHORITY=$?
+            set -e
+            test "$NO_AUTHORITY" -eq 102 || { echo "::error::--include-auth without --authority exited $NO_AUTHORITY, not 102"; exit 1; }
+            VARIANTS="$VARIANTS with and without --include-auth, and --include-auth without --authority is refused"
           fi
 
           echo "### Template" >> "$GITHUB_STEP_SUMMARY"

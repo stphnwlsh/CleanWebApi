@@ -66,13 +66,13 @@
       "type": "parameter",
       "datatype": "bool",
       "displayName": "Include authentication",
-      "description": "Add JWT bearer token authentication. Leave it off and the API has no auth code at all, which is fine on your machine and brave anywhere else. Default: off.",
+      "description": "Add JWT bearer token authentication. Leave it off and the API has no auth code at all, which is fine on your machine and brave anywhere else.",
       "defaultValue": "false"
     },
     "authority": {
       "type": "parameter",
       "datatype": "string",
-      "displayName": "Token authority",
+      "displayName": "Authentication authority",
       "description": "The OAuth authorization server that issues access tokens. Required with --include-auth.",
       "defaultValue": "",
       "isEnabled": "includeAuth",
@@ -81,7 +81,7 @@
     "audience": {
       "type": "parameter",
       "datatype": "string",
-      "displayName": "Token audience (optional)",
+      "displayName": "Authentication audience (optional)",
       "description": "The audience access tokens must be issued for, usually the API's own URL. Not the people in the room, who are lovely but don't carry tokens.",
       "defaultValue": "",
       "isEnabled": "includeAuth"

@@ -51,7 +51,9 @@ Not set. Replace this line with where your team plans work, such as a GitHub pro
 - Suppress a warning instead of fixing it, unless a skill says that exact suppression is ours.
 - Add a package with a commercial or paid licence, such as MediatR, MassTransit or AutoMapper.
 - Commit secrets, connection strings with passwords, or tokens.
+<!--#if (false) -->
 - Change `.template.config/` or the template package without following `template-authoring`.
+<!--#endif -->
 
 ## Skills
 

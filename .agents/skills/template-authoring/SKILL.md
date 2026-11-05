@@ -32,16 +32,16 @@ The words in those files are the first thing people read, in a terminal or a dia
 
 Every optional feature is a toggle, and every toggle has the same shape, so people learn it once:
 
-- A `bool` symbol named `include<Feature>` in `template.json`, such as `includeAuth`, with a `displayName` of "Include <feature>" and a description that ends with its default, such as "Default: off."
+- A `bool` symbol named `include<Feature>` in `template.json`, such as `includeAuth`, with a `displayName` of "Include <feature>". Its description doesn't state the default, because `dotnet new --help` prints that under every option.
 - A `longName` of `include-<feature>` in `dotnetcli.host.json`, so it's `--include-auth` on the command line. No short flag.
-- A checkbox labelled "Include <feature>" in `ide.host.json`, whose description also ends with its default.
+- A checkbox labelled "Include <feature>" in `ide.host.json`, whose description ends with its default, such as "Default: off.", because the IDE dialogs don't show defaults.
 - One row in the options table of the README, `NUGET.md` and the docs site's template options page, which list every toggle with a Default column.
 
 Off means absent, not switched off. Files that only exist for a toggle go in a `(!include<Feature>)` exclude list under `sources` in `template.json`, and code inside shared files is wrapped so `dotnet new` can leave it out. In C#, `#if includeAuth` and `#endif` start at the beginning of the line, with no brackets (the build fails IDE0047 and IDE0055 otherwise). In project files it's `<!--#if (includeAuth) -->` and `<!--#endif -->`, and in `appsettings.json` it's `//#if (includeAuth)` and `//#endif`. A file type the template engine doesn't know, such as the GraphQL schema snapshot, gets `#if (includeAuth)` and `#endif` lines through `SpecialCustomOperations` in `template.json`.
 
 The repository itself stays all on. The Presentation project and the presentation integration tests define each toggle's constant, such as `includeAuth`, inside `<!--#if (false) -->`, which `dotnet new` always removes. The template's skills and `AGENTS.md` ship either way.
 
-A toggle's inputs, such as `authority` and `audience`, are separate symbols, enabled with `isEnabled` and made required with `isRequired` only when the toggle is on. A toggle that needs another one says so in its conditions, such as `(includeTests && includeArchitectureTests)`. Verify Template checks the defaults, everything on, everything off, and each toggle flipped on its own.
+A toggle's inputs, such as `authority` and `audience`, are separate symbols, enabled with `isEnabled` and made required with `isRequired` only when the toggle is on. Only `dotnet new` honours those two. Visual Studio and Rider show every input whatever the toggle says ([dotnet/templating#7860](https://github.com/dotnet/templating/issues/7860)), and Rider lists checkboxes first, then text fields in alphabetical order by label. So an input's label starts with its feature, such as "Authentication authority", to sit right under its checkbox, and its IDE description says it's only used when that box is ticked. A toggle that needs another one says so in its conditions, such as `(includeTests && includeArchitectureTests)`. Verify Template checks the defaults, everything on, everything off, and each toggle flipped on its own.
 
 The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It also packs `template/ci.yml` as the generated solution's `.github/workflows/ci.yml`, a small pipeline with no template name in it. It leaves out the rest of `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
 
@@ -83,4 +83,4 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 
 ## Check
 
-The Test job's Verify Template step installs the packed template, generates a solution, checks its format, runs its tests and checks it has `.github/workflows/ci.yml`, and does it again with `--include-auth` where the template has it.
+The Test job's Verify Template step installs the packed template, generates a solution and checks that nothing of the template leaked into it (no `includeAuth` markers, no trace of the template's own name, no `icon.png`) and that it has `.github/workflows/ci.yml`, then checks its format and runs its tests. Where the template has `--include-auth` it does it again with the toggle on, and checks that `--include-auth` without `--authority` is refused with exit code 102.

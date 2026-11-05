@@ -52,7 +52,7 @@ updatedReview.DateModified.ShouldBe(this.database.TimeProvider.GetUtcNow().UtcDa
 - Store local times.
 - Assert a date with a tolerance ("within a second of now"). Fix the clock and assert the exact value.
 
-The one exception is a test that creates a token for the real JWT handler, which checks expiry against the system clock (`tests/Presentation.Tests.Integration/Authentication/AuthenticationTests.cs`).
+The one exception, in a solution with authentication, is the test that creates a token for the real JWT handler, which checks expiry against the system clock (`tests/Presentation.Tests.Integration/Authentication/AuthenticationTests.cs`).
 
 ## Check
 

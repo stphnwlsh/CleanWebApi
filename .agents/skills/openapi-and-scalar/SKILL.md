@@ -14,7 +14,7 @@ The OpenAPI document is generated at runtime by `Microsoft.AspNetCore.OpenApi` a
 | Transformer | Adds |
 | --- | --- |
 | `DocumentInfoTransformer` | Title (with the environment name), description, contact, licence, external docs and the tag descriptions |
-| `BearerSecurityTransformer` | Only when `Authentication:Authority` is set: the `Bearer` security scheme, a security requirement and a `401` response on every operation that needs a token |
+| `BearerSecurityTransformer` | Only in a solution with authentication, and only when `Authentication:Authority` is set: the `Bearer` security scheme, a security requirement and a `401` response on every operation that needs a token |
 
 Scalar is set up in `ProgramExtensions.ConfigureApplication` with the title, C# `HttpClient` as the default code sample, and its developer tools, agent, MCP and telemetry features turned off.
 
@@ -36,6 +36,7 @@ _ = builder.Services.AddOpenApi(options =>
 {
     _ = options.AddDocumentTransformer<DocumentInfoTransformer>();
 
+    // Only with --include-auth.
     if (authentication.Enabled)
     {
         _ = options.AddDocumentTransformer<BearerSecurityTransformer>();
