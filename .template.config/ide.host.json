@@ -44,20 +44,20 @@
     {
       "id": "authority",
       "name": {
-        "text": "Token authority"
+        "text": "Authentication authority"
       },
       "description": {
-        "text": "The OAuth server that issues access tokens. Needed when authentication is on."
+        "text": "The OAuth server that issues access tokens. Only used when Include authentication is ticked, and needed then."
       },
       "isVisible": true
     },
     {
       "id": "audience",
       "name": {
-        "text": "Token audience (optional)"
+        "text": "Authentication audience (optional)"
       },
       "description": {
-        "text": "Who the tokens are for, usually the API's own URL."
+        "text": "Who the tokens are for, usually the API's own URL. Only used when Include authentication is ticked."
       },
       "isVisible": true
     }
