@@ -32,6 +32,10 @@ dotnet run --project ./src/Presentation        # the API at http://localhost:808
 
 The `coverage` skill has the command that checks the 95% line coverage gate locally.
 
+## Where we track work
+
+Not set. Replace this line with where your team plans work, such as a GitHub project, a Jira board or Azure Boards, so agents put their plans and handoffs there. In the template repository itself, it's issues in [LeanMeanCleanApps/.github](https://github.com/LeanMeanCleanApps/.github/issues).
+
 ## Rules that fail a change
 
 - The build has zero warnings. `TreatWarningsAsErrors`, `latest-recommended` analysers and `.editorconfig` style are all enforced by the build.

@@ -29,7 +29,7 @@ Bigger work goes wrong at the start, not the end. Before you write code for a ch
 2. **Ask about each one on its own.** Give the options, say which one you recommend and why in a sentence. One question per decision, so the engineer can answer each quickly. Don't bundle them into a wall of text.
 3. **Don't ask what you can reasonably decide.** A small choice that's easy to undo isn't a question: pick the likely option, say which, and carry on.
 4. **Say the scope back.** One short paragraph of what will and won't change. Start only when the engineer agrees.
-5. **Write the plan where the work is tracked.** That's wherever the engineer tracks work: an issue in GitHub, Jira or Azure Boards, the pull request description, or a Markdown file they name. If there's nothing, keep it in the conversation and ask where they'd like it. Never set up a tracker, board or workflow to hold it. Break it into phases, each with concrete items as checkboxes and the commands that prove the phase is done:
+5. **Write the plan where the work is tracked.** That's wherever "Where we track work" in `AGENTS.md` says. If it says not set, ask the engineer once (an issue in GitHub, Jira or Azure Boards, the pull request description, or a Markdown file they name) and offer to fill in that line. Until then, keep the plan in the conversation. Never set up a tracker, board or workflow to hold it. Break it into phases, each with concrete items as checkboxes and the commands that prove the phase is done:
 
    ``` markdown
    ## Phase 1: Add the GetReviewsByAuthor query
