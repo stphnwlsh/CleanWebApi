@@ -5,6 +5,10 @@
       "longName": "authorName",
       "shortName": "an"
     },
+    "auth": {
+      "longName": "auth",
+      "shortName": ""
+    },
     "authority": {
       "longName": "authority",
       "shortName": "iss"
@@ -20,7 +24,7 @@
   },
   "usageExamples": [
     "--name WorksOnMyMachine.Movies --authorName \"Your Name\"",
-    "--name WorksOnMyMachine.Movies --authority https://login.example.com --audience https://api.example.com",
+    "--name WorksOnMyMachine.Movies --auth bearer --authority https://login.example.com --audience https://api.example.com",
     "--name WorksOnMyMachine.Movies --no-restore"
   ]
 }

@@ -9,7 +9,7 @@ metadata:
 
 ## The rule
 
-Authentication is off until someone sets `Authentication:Authority` (and usually `Authentication:Audience`). Then every request needs a valid JWT bearer token from that authority. The `dotnet new` options `--authority` and `--audience` fill those settings in.
+Authentication is off until someone sets `Authentication:Authority` (and usually `Authentication:Audience`). Then every request needs a valid JWT bearer token from that authority. The `dotnet new` option `--auth bearer`, with `--authority` and `--audience`, fills those settings in. `--auth none`, the default, leaves them empty.
 
 Endpoints always ask for authorization, whether or not authentication is on. When it's off, the default policy lets every request through, so turning it on is a settings change, not a code change. Only health checks and the API reference (where a template has them) are anonymous. The version endpoint is protected like everything else; telemetry carries `service.version` for anyone who needs to know what's deployed. The Lambda template has no token authentication; API Gateway or the caller's IAM role does that job.
 

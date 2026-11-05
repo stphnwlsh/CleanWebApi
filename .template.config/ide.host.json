@@ -1,6 +1,26 @@
 {
   "$schema": "https://json.schemastore.org/ide.host",
   "icon": "icon.png",
+  "description": {
+    "text": "An ASP.NET Core Web API with controllers on .NET 10, built with Clean Architecture minus the ceremony. Mug not included."
+  },
+  "tags": [
+    {
+      "type": "platform",
+      "add": [
+        "Linux",
+        "macOS",
+        "Windows"
+      ]
+    },
+    {
+      "type": "projectType",
+      "add": [
+        "Web",
+        "Service"
+      ]
+    }
+  ],
   "symbolInfo": [
     {
       "id": "authorName",
@@ -8,17 +28,49 @@
         "text": "Author name"
       },
       "description": {
-        "text": "Your name, for the Authors and Copyright lines. Is that enough detail for Richard to send you a .NET Rocks mug?"
+        "text": "Your name, for the Authors and Copyright lines."
       },
-      "isVisible": true
+      "isVisible": true,
+      "persistenceScope": "shared",
+      "persistenceScopeName": "LeanMeanCleanApps"
+    },
+    {
+      "id": "auth",
+      "name": {
+        "text": "Authentication"
+      },
+      "description": {
+        "text": "How the API checks who is calling. None leaves it open, and you can switch it on later in appsettings.json."
+      },
+      "isVisible": true,
+      "choices": [
+        {
+          "id": "none",
+          "name": {
+            "text": "None"
+          },
+          "description": {
+            "text": "No sign in. Everything is open."
+          }
+        },
+        {
+          "id": "bearer",
+          "name": {
+            "text": "JWT bearer tokens"
+          },
+          "description": {
+            "text": "Access tokens from your authorization server."
+          }
+        }
+      ]
     },
     {
       "id": "authority",
       "name": {
-        "text": "Token authority (optional)"
+        "text": "Token authority"
       },
       "description": {
-        "text": "The OAuth server that issues access tokens. Leave it empty to run without authentication on your machine."
+        "text": "The OAuth authorization server that issues access tokens."
       },
       "isVisible": true
     },
