@@ -248,11 +248,11 @@ def build_headline(needs: dict) -> str:
     return SEPARATOR.join(parts) or "built"
 
 
-def test_headline(result: str, tests: TestResults | None, tests_outcome: str = "") -> str:
+def test_headline(result: str, tests: TestResults | None, tests_outcome: str = "", full: bool = True) -> str:
     parts = []
     if tests is not None:
         parts.append(f"{tests.passed} passed{SEPARATOR}{tests.failed} failed{SEPARATOR}{tests.skipped} skipped")
-    if result == "success":
+    if result == "success" and full:
         parts.append("template installs, builds and passes its tests")
     elif result == "failure" and tests_outcome == "passed":
         parts.append("the generated template failed to build or test")
@@ -306,6 +306,18 @@ def dependency_headline(needs: dict) -> str:
     if vulnerable is None and licences is None:
         return "no dependency changes to review" if stage_result(needs, "dependencies") == "success" else "review failed"
     return f"{vulnerable or 0} vulnerable package{'s' if vulnerable != 1 else ''}{SEPARATOR}{licences or 0} licence problem{'s' if licences != 1 else ''}"
+
+
+NOT_RUN_OUTSIDE = "runs in the LeanMeanCleanApps repositories only; see the ci-for-your-solution skill to add it"
+
+
+def full_pipeline() -> bool:
+    """False in a copy outside our organisation, where only build and test run."""
+    return os.environ.get("FULL", "true").strip().lower() != "false"
+
+
+def outside_stage(name: str) -> Stage:
+    return Stage(name, "n/a", NOT_RUN_OUTSIDE)
 
 
 def count_ignored(path: str) -> int:
@@ -490,12 +502,13 @@ def command_summary(results: str) -> int:
     ignored = count_ignored(".trivyignore")
 
     test = stage_result(needs, "test")
+    full = full_pipeline()
     stages = [
         Stage("Build", stage_result(needs, "build"), build_headline(needs), job_link("Build")),
         Stage(
             "Test",
             test,
-            test_headline(test, tests, needs.get("test", {}).get("outputs", {}).get("tests", "")),
+            test_headline(test, tests, needs.get("test", {}).get("outputs", {}).get("tests", ""), full),
             job_link("Test"),
             f"{tests.failed} test{'s' if tests.failed != 1 else ''} failed" if tests and tests.failed else "",
         ),
@@ -521,6 +534,8 @@ def command_summary(results: str) -> int:
             "the image didn't start or answer a request" if needs.get("scan", {}).get("outputs", {}).get("smoke") == "failed" else "",
         ),
     ]
+    if not full:
+        stages = [outside_stage(s.name) if s.name in ("Static Analysis", "Dependency Review", "Container Scan") else s for s in stages]
 
     body = render_summary(stages, pull_request, run_url, sha)
     write_step_summary(body.replace(MARKER + "\n", ""))

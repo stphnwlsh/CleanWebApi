@@ -16,7 +16,7 @@ The repository is both a working solution and a `dotnet new` template. `.templat
 | `authorName` | `--authorName` | `Stephen Walsh` (`--author` is reserved by `dotnet new`) |
 | `authority`, `audience` | `--authority`, `--audience` | The empty `Authentication` settings in `appsettings.json` (web templates) |
 
-The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It leaves out `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
+The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It also packs `template/ci.yml` as the generated solution's `.github/workflows/ci.yml`, a small pipeline with no template name in it. It leaves out the rest of `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
 
 ## Steps
 

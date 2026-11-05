@@ -2,13 +2,13 @@ namespace CleanWebApi.Presentation.Tests.Unit.Errors;
 
 using System.Threading;
 using System.Threading.Tasks;
-using CleanWebApi.Application.Common.Exceptions;
-using CleanWebApi.Presentation.Errors;
+using Application.Common.Exceptions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
+using Presentation.Errors;
 using Shouldly;
 using Xunit;
 
