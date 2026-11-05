@@ -1,7 +1,7 @@
 namespace CleanWebApi.Presentation.Tests.Unit.Serialization;
 
 using System.Text.Json;
-using CleanWebApi.Presentation.Serialization;
+using Presentation.Serialization;
 using Shouldly;
 using Xunit;
 

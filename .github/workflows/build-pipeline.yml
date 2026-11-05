@@ -35,6 +35,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Outside the LeanMeanCleanApps organisation, a copy made with "Use this template" runs only the
+# format check, build and tests. The scans need GitHub Advanced Security on a private repository,
+# and packing, verifying and publishing the template only matter here. Skipped jobs count as passed
+# for required checks, so a copy goes green with no setup. See the ci-for-your-solution skill.
 env:
   COVERAGE_THRESHOLD: 95
   TEMPLATE_MAX_SIZE: 1048576
@@ -109,6 +113,7 @@ jobs:
 
       - name: Pack
         id: pack
+        if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
         run: |
           dotnet pack template/template.csproj -p:PackageVersion="$VERSION" --configuration Release --output packages
           SIZE=$(stat --format=%s packages/*.nupkg)
@@ -128,6 +133,7 @@ jobs:
 
       - name: Upload Image
         id: upload-image
+        if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
         uses: actions/upload-artifact@v7
         with:
           name: image
@@ -136,6 +142,7 @@ jobs:
 
       - name: Upload Template
         id: upload-template
+        if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
         uses: actions/upload-artifact@v7
         with:
           name: template
@@ -192,12 +199,14 @@ jobs:
 
       - name: Setup .NET
         id: setup
+        if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
 
       - name: Download Template
         id: download-template
+        if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
         uses: actions/download-artifact@v8
         with:
           name: template
@@ -205,18 +214,24 @@ jobs:
 
       - name: Verify Template
         id: verify-template
+        if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
+        # The name sorts differently from the template's own, so a using that names the template
+        # would fail the generated solution's format check.
         run: |
           dotnet new install packages/*.nupkg
           dotnet new "$(jq -r .shortName .template.config/template.json)" --name Template.Verification --output verification
+          dotnet format verification --verify-no-changes
           dotnet test verification --configuration Release
+          test -f verification/.github/workflows/ci.yml
           echo "### Template" >> "$GITHUB_STEP_SUMMARY"
-          echo "The packed template installs, and the generated solution builds and passes its tests." >> "$GITHUB_STEP_SUMMARY"
+          echo "The packed template installs, and the generated solution passes its format check, builds and passes its tests." >> "$GITHUB_STEP_SUMMARY"
         shell: bash
 
   analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
     needs: test
+    if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
     permissions:
       actions: read
       contents: read
@@ -250,7 +265,7 @@ jobs:
     name: Dependency Review
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && github.repository_owner == 'LeanMeanCleanApps' }}
     permissions:
       contents: read
       pull-requests: write
@@ -273,6 +288,7 @@ jobs:
     name: Container Scan
     runs-on: ubuntu-latest
     needs: [build, test]
+    if: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
     permissions:
       contents: read
       security-events: write
@@ -438,6 +454,7 @@ jobs:
           results: results
           coverage-threshold: ${{ env.COVERAGE_THRESHOLD }}
           needs: ${{ toJSON(needs) }}
+          full: ${{ github.repository_owner == 'LeanMeanCleanApps' }}
 
   release:
     name: Release Check

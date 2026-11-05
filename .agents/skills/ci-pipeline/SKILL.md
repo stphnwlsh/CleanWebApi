@@ -22,7 +22,7 @@ One workflow, `.github/workflows/build-pipeline.yml`, runs on every pull request
 
 After those, Release Check and Publish only run on the monthly release (`releases`).
 
-A copy made with GitHub's "Use this template" gets this workflow and runs it as is, with no secrets or setup. Release Check and Publish only run when the repository owner is LeanMeanCleanApps, so a copy builds, tests and scans but never publishes. A solution made with `dotnet new` gets no workflow at all; `ci-for-your-solution` covers building one.
+A copy made with GitHub's "Use this template" gets this workflow with no secrets or setup. Outside the LeanMeanCleanApps organisation it runs only the format check, build and tests: Static Analysis, Dependency Review, Container Scan, the template's pack and verify steps, Release Check and Publish all check `github.repository_owner` and skip, and the Summary shows them as not run. Skipped jobs count as passed for required checks, so a private copy goes green without Advanced Security. A solution made with `dotnet new` gets the much smaller `template/ci.yml` as `.github/workflows/ci.yml` instead. `ci-for-your-solution` covers both. Keep any new job that needs Advanced Security, a secret or the template folders behind the same owner check.
 
 ## Steps
 

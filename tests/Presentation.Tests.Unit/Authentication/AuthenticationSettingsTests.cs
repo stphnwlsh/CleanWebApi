@@ -1,7 +1,7 @@
 namespace CleanWebApi.Presentation.Tests.Unit.Authentication;
 
-using CleanWebApi.Presentation.Authentication;
 using Microsoft.Extensions.Configuration;
+using Presentation.Authentication;
 using Shouldly;
 using Xunit;
 

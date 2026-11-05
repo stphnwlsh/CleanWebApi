@@ -1,8 +1,8 @@
 namespace CleanWebApi.Application.Tests.Unit.Common.Exceptions;
 
 using Application.Authors.Entities;
-using CleanWebApi.Application.Common.Enums;
-using CleanWebApi.Application.Common.Exceptions;
+using Application.Common.Enums;
+using Application.Common.Exceptions;
 using Shouldly;
 using Xunit;
 
