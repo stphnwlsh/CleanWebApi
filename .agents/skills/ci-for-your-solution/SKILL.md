@@ -1,6 +1,6 @@
 ---
 name: ci-for-your-solution
-description: How to build a CI pipeline for a solution created with dotnet new, which ships without one - the checks to run, the local commands they must match, what to leave out, and the template's own Build Pipeline as the reference. Use when the solution has no pipeline yet, when adding a check to one, or when the engineer asks how to set up CI on GitHub Actions, Azure Pipelines, GitLab or anything else.
+description: How to build a CI pipeline for a solution created with dotnet new, which ships without one - the checks to run, the local commands they must match, what to leave out, and the template's Set up CI guide as the reference. Use when the solution has no pipeline yet, when adding a check to one, or when the engineer asks how to set up CI on GitHub Actions, Azure Pipelines, GitLab or anything else.
 metadata:
   scope: shared
 ---
@@ -11,7 +11,7 @@ metadata:
 
 A solution created with `dotnet new` has no pipeline, because every team runs a different CI system. Build one with the engineer, on the system they use, that runs the same checks as the commands in `AGENTS.md`. Then the pipeline and a laptop always agree on what "green" means.
 
-The template's own [Build Pipeline](https://github.com/LeanMeanCleanApps/CleanWebApi/blob/main/.github/workflows/build-pipeline.yml) is the reference: a GitHub Actions workflow that runs every check below on every pull request. Read it for the details, then build the engineer's own version. Don't call it from their pipeline. It isn't a reusable workflow, and it also packs and publishes the template.
+The reference is the **Set up CI** guide for your template on the [Lean Mean Clean Apps docs site](https://leanmeancleanapps.github.io/). It lists these checks and links the template's own Build Pipeline, a GitHub Actions workflow that runs every check below on every pull request. Read them for the details, then build the engineer's own version. Don't copy the Build Pipeline as it is. It also packs and publishes the template, which a solution doesn't need.
 
 | Check | Local command | Fails when |
 | --- | --- | --- |
