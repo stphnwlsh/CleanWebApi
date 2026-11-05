@@ -34,7 +34,7 @@ The `coverage` skill has the command that checks the 95% line coverage gate loca
 
 ## Where we track work
 
-Not set. Replace this line with where your team plans work, such as a GitHub project, a Jira board or Azure Boards, so agents put their plans and handoffs there. In the template repository itself, it's issues in [LeanMeanCleanApps/.github](https://github.com/LeanMeanCleanApps/.github/issues).
+Not set. Replace this line with where your team plans work, such as a GitHub project, a Jira board or Azure Boards, so agents put their plans and handoffs there.
 
 ## Rules that fail a change
 

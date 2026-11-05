@@ -19,11 +19,15 @@ Every change goes through a pull request against `main`. A branch ruleset reject
 
 Changed files add labels too: `.github/**`, `Dockerfile` or `docker-compose.yml` add `build`; a change made only of Markdown or `docs/` adds `documentation`. Add `breaking-change` by hand when generated solutions or template options change in a way users will notice.
 
+## Where we track work
+
+`AGENTS.md` ships with "Where we track work" not set, because it's for the teams who use the template. In the template repository itself, plans and handoffs live in issues in [LeanMeanCleanApps/.github](https://github.com/LeanMeanCleanApps/.github/issues), on the Lean Mean Clean templates project. The `planning` skill in that repository has the details. Don't fill in the line in `AGENTS.md` here.
+
 ## Steps
 
 1. Branch from an up-to-date `main`: `git switch -c fix/review-validation`. Short, lowercase, hyphenated.
 2. Write commit messages as a sentence about the change, in the imperative: "Validate the star rating on update".
-3. Open the pull request and fill in `.github/pull_request_template.md`: a two or three sentence summary, the linked issue, the type of change, and whether the shared layers are touched.
+3. Open the pull request and fill in `.github/pull_request_template.md`: a two or three sentence summary, the linked issue (`Part of` or `Closes LeanMeanCleanApps/.github#<number>`), the type of change, and whether the shared layers are touched.
 4. If shared layers, skills or repository setup changed, say so; the same change has to go to all five templates (`family-sync`).
 5. Wait for every required check (`ci-pipeline`). Fix failures with new commits; don't force-push over review comments.
 
