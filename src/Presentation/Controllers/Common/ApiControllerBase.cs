@@ -1,16 +1,20 @@
 namespace CleanWebApi.Presentation.Controllers.Common;
 
 using Mediator;
+#if auth
 using Microsoft.AspNetCore.Authorization;
+#endif
 using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
-/// The base for every controller: JSON in, a token required unless an action allows anonymous access, and the
-/// sender that passes each request to its Application handler.
+/// The base for every controller: JSON in, and the sender that passes each request to its Application handler.
 /// </summary>
 /// <param name="sender">Sends commands and queries to their Application handlers.</param>
 [ApiController]
+#if auth
+// Every action needs a token unless it allows anonymous access.
 [Authorize]
+#endif
 [Consumes("application/json")]
 public abstract class ApiControllerBase(ISender sender) : ControllerBase
 {

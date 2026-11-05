@@ -28,8 +28,9 @@ cd WorksOnMyMachine.Movies
 | --- | --- |
 | `--name`, `-n` | Names the solution and its root namespace |
 | `--authorName`, `-an` | Puts your name on the assembly instead of ours |
-| `--authority`, `-iss` | Your OAuth authorization server. Leave it out and the API runs without authentication |
-| `--audience`, `-aud` | The audience tokens must be issued for, usually the API's own URL |
+| `--auth` | Adds JWT bearer token authentication. Leave it out and the API has no auth code at all |
+| `--authority`, `-iss` | Your OAuth authorization server. Required with `--auth` |
+| `--audience`, `-aud` | The audience tokens must be issued for, usually the API's own URL. Only used with `--auth` |
 | `--no-restore` | Skips the package restore that normally runs once the solution is created |
 
 Rather click than type? Visual Studio and Rider show the same options in their new project dialogs, and `dotnet new cleanwebapi --help` lists them in the terminal.
@@ -76,7 +77,7 @@ Open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8080/scalar
 
 No Docker? `dotnet run --project src/Presentation` works too. Every other way to run it, from plain `docker run` to stamping a version into the image, is in [docs/RUN.md](docs/RUN.md).
 
-The API is open until you give it an authorization server. Pass `--authority` and `--audience` when you create the solution, or set `Authentication:Authority` later, and the movie, author and review endpoints start asking for a JWT bearer token. The version endpoint asks for one too. Health checks, the OpenAPI document and Scalar stay open, and Scalar has a spot to paste your token. [Securing the API](https://leanmeancleanapps.github.io/webapi/guides/secure-the-api/) has the details.
+The API is open unless you ask for authentication. Create the solution with `--auth --authority https://login.example.com --audience https://api.example.com` and the movie, author and review endpoints ask for a JWT bearer token. The version endpoint asks for one too. Health checks, the OpenAPI document and Scalar stay open, and Scalar has a spot to paste your token. Leave `--auth` out and there's no authentication code in the solution at all, so there's nothing to leave switched off by accident. [Securing the API](https://leanmeancleanapps.github.io/webapi/guides/secure-the-api/) has the details, including how to add it later.
 
 ## What's inside
 

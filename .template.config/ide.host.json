@@ -35,12 +35,22 @@
       "persistenceScopeName": "LeanMeanCleanApps"
     },
     {
-      "id": "authority",
+      "id": "auth",
       "name": {
-        "text": "Token authority (optional)"
+        "text": "Authentication"
       },
       "description": {
-        "text": "The OAuth server that issues access tokens. Leave it empty to run without authentication on your machine."
+        "text": "Add JWT bearer token authentication. Leave it unticked for an API with no auth code at all."
+      },
+      "isVisible": true
+    },
+    {
+      "id": "authority",
+      "name": {
+        "text": "Token authority"
+      },
+      "description": {
+        "text": "The OAuth server that issues access tokens. Needed when authentication is on."
       },
       "isVisible": true
     },

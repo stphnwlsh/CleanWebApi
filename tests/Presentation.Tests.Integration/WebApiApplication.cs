@@ -20,6 +20,11 @@ internal sealed class WebApiApplication(
             ["ConnectionStrings:MovieReviews"] = $"Data Source=Tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared",
             ["Database:SeedSampleData"] = "true"
         };
+#if auth
+
+        // appsettings.json holds the real authority, so tests run without one unless they set it themselves.
+        testSettings["Authentication:Authority"] = string.Empty;
+#endif
 
         foreach (var setting in settings ?? [])
         {

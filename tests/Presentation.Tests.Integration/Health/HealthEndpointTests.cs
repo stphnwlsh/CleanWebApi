@@ -7,12 +7,16 @@ using Xunit;
 
 public class HealthEndpointTests : IDisposable
 {
+#if auth
     private readonly WebApiApplication application = new(settings: new Dictionary<string, string?>
     {
         // Health checks have to answer without a token, so they're tested with authentication on.
         ["Authentication:Authority"] = "https://login.example.com",
         ["Authentication:Audience"] = "https://api.example.com"
     });
+#else
+    private readonly WebApiApplication application = new();
+#endif
 
     [Theory]
     [InlineData("/health/live")]
