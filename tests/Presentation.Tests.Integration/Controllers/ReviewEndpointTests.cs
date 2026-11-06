@@ -24,6 +24,35 @@ public class ReviewEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task GetReviews_ShouldFilter_ByTextAndStars()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync("/api/reviews?query=great&minStars=4&limit=50");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Entities.Review>>();
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        result.Items.ShouldNotBeEmpty();
+        result.Items.ShouldAllBe(r => r.Stars >= 4 && r.Text!.Contains("great", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task GetReviews_WithBadMinStars_ShouldReturn_BadRequest()
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync("/api/reviews?minStars=6");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
     public async Task CreateReview_ShouldReturn_Created()
     {
         // Arrange

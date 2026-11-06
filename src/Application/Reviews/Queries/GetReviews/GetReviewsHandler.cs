@@ -8,6 +8,6 @@ public class GetReviewsHandler(IReviewsRepository repository) : IRequestHandler<
 {
     public async ValueTask<Page<Review>> Handle(GetReviewsQuery request, CancellationToken cancellationToken)
     {
-        return await repository.GetReviews(request.MovieId, request.AuthorId, new PageRequest(request.Offset, request.Limit), cancellationToken);
+        return await repository.GetReviews(request.MovieId, request.AuthorId, request.Query, request.MinStars, new PageRequest(request.Offset, request.Limit), cancellationToken);
     }
 }
