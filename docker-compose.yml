@@ -7,7 +7,7 @@ services:
         VERSION_PREFIX: 1.0.0.0
         VERSION_SUFFIX: docker
     ports:
-      - "8080:8080"
+      - "8740:8080"
     environment:
       DOTNET_ENVIRONMENT: docker
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
@@ -23,8 +23,8 @@ services:
     volumes:
       - ./otel-collector.yaml:/etc/otelcol/config.yaml:ro
     ports:
-      - "4317:4317"
-      - "4318:4318"
+      - "8743:4317"
+      - "8744:4318"
     networks:
       - cleanwebapi_network
     depends_on:
@@ -32,7 +32,7 @@ services:
   aspire-dashboard:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:13.6.2
     ports:
-      - "18888:18888"
+      - "8742:18888"
     environment:
       ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
     networks:

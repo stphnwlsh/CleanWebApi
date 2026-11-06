@@ -40,7 +40,7 @@ The Lambda template builds its tracer and meter providers once in `Startup` with
 
 The app sends to an OpenTelemetry Collector, never straight to a backend, because that's how it should run in production: the collector owns batching, retries, sampling, scrubbing and the choice of backend, so none of that lives in the app. `otel-collector.yaml` holds its configuration: an OTLP receiver on 4317 (gRPC) and 4318 (HTTP), the `memory_limiter` and `batch` processors, and one exporter per backend.
 
-Locally, Docker Compose runs the collector (`otel/opentelemetry-collector`) and the Aspire dashboard (`mcr.microsoft.com/dotnet/aspire-dashboard`), and the collector forwards everything to the dashboard. The dashboard is only a container that receives OTLP and shows logs, traces and metrics at <http://localhost:18888>; it keeps everything in memory, so it's empty after a restart. In production, run a collector beside the app or as a gateway and swap the dashboard exporter for your backend's.
+Locally, Docker Compose runs the collector (`otel/opentelemetry-collector`) and the Aspire dashboard (`mcr.microsoft.com/dotnet/aspire-dashboard`), and the collector forwards everything to the dashboard. The dashboard is only a container that receives OTLP and shows logs, traces and metrics on the template's dashboard port (`docker-and-compose`); it keeps everything in memory, so it's empty after a restart. In production, run a collector beside the app or as a gateway and swap the dashboard exporter for your backend's.
 
 ## Steps
 
@@ -51,7 +51,7 @@ Locally, Docker Compose runs the collector (`otel/opentelemetry-collector`) and 
 5. Use stable packages only. When the only instrumentation is a prerelease package, go without that signal and add it to the watch list below.
 6. Test spans with an `ActivityListener` that keeps only the test's own trace (`unit-tests`). The integration tests send a `traceparent` header and check the request and use case spans join up.
 7. To send telemetry somewhere new, add an exporter to `otel-collector.yaml` and list it in the pipelines. The app's settings don't change.
-8. To see it locally, run `docker compose up -d --build` and open <http://localhost:18888>. For a `dotnet run`, start the collector with `docker compose up -d otel-collector` and set `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317`.
+8. To see it locally, run `docker compose up -d --build` and open the dashboard on the port `docs/RUN.md` lists. For a `dotnet run`, start the collector with `docker compose up -d otel-collector` and set `OTEL_EXPORTER_OTLP_ENDPOINT` to its gRPC port, `http://$(docker compose port otel-collector 4317)`.
 
 ## Example
 
@@ -110,5 +110,5 @@ These signals and packages aren't stable for .NET yet. Check them when dependenc
 
 ``` bash
 dotnet test --filter "FullyQualifiedName~Telemetry|FullyQualifiedName~LoggingBehaviour"   # use case span and end-to-end trace tests
-docker compose up -d --build                         # then open http://localhost:18888 and make a request
+docker compose up -d --build                         # then open the dashboard on the port docs/RUN.md lists and make a request
 ```

@@ -65,5 +65,5 @@ public async Task<ActionResult<Entities.Review>> CreateReview(CreateReviewReques
 
 ``` bash
 dotnet test tests/Presentation.Tests.Integration
-dotnet run --project ./src/Presentation   # then read the action at http://localhost:8080/scalar
+dotnet run --project ./src/Presentation   # then read the action at http://localhost:8740/scalar
 ```
