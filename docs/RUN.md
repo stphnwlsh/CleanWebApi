@@ -21,6 +21,8 @@ dotnet ef migrations add <Name> --project ./src/Infrastructure --output-dir Data
 dotnet run --project ./src/Presentation
 ```
 
+It listens on <https://localhost:8081>, and on <http://localhost:8080>, which redirects there. If your browser or `curl` doesn't trust the .NET development certificate yet, run `dotnet dev-certs https --trust` once.
+
 ## Docker Compose
 
 `docker-compose.yml` starts the app, and the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone), which shows its logs, traces and metrics. The app sends everything to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), and the collector forwards it to the dashboard, the same shape as a production setup. The dashboard is only a container that receives OTLP; nothing in the solution depends on Aspire. The dashboard has no login and the collector accepts OTLP from anyone on ports 4317 and 4318. That's on purpose for a developer's machine, so don't run this compose file anywhere other people can reach.
@@ -59,7 +61,7 @@ Every span, metric and log carries `service.version`, so you can always tell whi
 
 ## HTTPS
 
-Outside the `local` and `Development` environments the app sends an HSTS header and redirects HTTP to HTTPS. The container only listens on HTTP, so in production put it behind a proxy or load balancer that ends TLS, and set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` so the app knows the original request was HTTPS.
+The app redirects HTTP to HTTPS whenever it has an HTTPS port, which is why `dotnet run` sends <http://localhost:8080> on to <https://localhost:8081>. Outside the `local` and `Development` environments it also sends an HSTS header. The container only listens on HTTP, so in production put it behind a proxy or load balancer that ends TLS, and set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` so the app knows the original request was HTTPS.
 
 ## Tests
 
