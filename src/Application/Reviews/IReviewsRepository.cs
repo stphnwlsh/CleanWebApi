@@ -17,6 +17,8 @@ public interface IReviewsRepository
     public Task<Page<Review>> GetReviews(
         Guid? movieId,
         Guid? authorId,
+        string? query,
+        int? minStars,
         PageRequest page,
         CancellationToken cancellationToken);
 

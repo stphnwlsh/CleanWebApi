@@ -487,6 +487,59 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task GetReviews_ShouldMatch_TextIgnoringCase()
+    {
+        // Arrange
+        var repository = this.database.Repository;
+        using var tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+        var reviewId = this.database.Context.Reviews.First(r => r.Stars == 2).Id;
+
+        _ = await repository.UpdateReview(reviewId, 2, "A quiet triumph", token);
+
+        // Act
+        var (items, _, _, totalCount) = await repository.GetReviews(null, null, "QUIET", null, new PageRequest(0, 50), token);
+
+        // Assert
+        totalCount.ShouldBe(1);
+        items.ShouldHaveSingleItem().Id.ShouldBe(reviewId);
+    }
+
+    [Fact]
+    public async Task GetReviews_ShouldTreat_WildcardsAsText()
+    {
+        // Arrange
+        var repository = this.database.Repository;
+        using var tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+        var reviewId = this.database.Context.Reviews.First(r => r.Stars == 2).Id;
+
+        _ = await repository.UpdateReview(reviewId, 2, "A quiet triumph", token);
+
+        // Act
+        var (items, _, _, _) = await repository.GetReviews(null, null, "%", null, new PageRequest(0, 50), token);
+
+        // Assert
+        items.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetReviews_ShouldReturn_ReviewsWithEnoughStars()
+    {
+        // Arrange
+        var repository = this.database.Repository;
+        using var tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+
+        // Act
+        var (items, _, _, _) = await repository.GetReviews(null, null, null, 4, new PageRequest(0, 50), token);
+
+        // Assert
+        items.ShouldNotBeEmpty();
+        items.ShouldAllBe(r => r.Stars >= 4);
+    }
+
+    [Fact]
     public async Task GetReviews_ShouldReturn_ReviewsForMovie()
     {
         // Arrange
@@ -496,7 +549,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var movieId = this.database.Context.Movies.First(m => m.Title == "Two").Id;
 
         // Act
-        var (items, _, _, totalCount) = await repository.GetReviews(movieId, null, new PageRequest(0, 50), token);
+        var (items, _, _, totalCount) = await repository.GetReviews(movieId, null, null, null, new PageRequest(0, 50), token);
 
         // Assert
         items.ShouldNotBeEmpty();
@@ -516,7 +569,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var authorId = this.database.Context.Authors.First(a => a.FirstName == "Two").Id;
 
         // Act
-        var (items, _, _, _) = await repository.GetReviews(movieId, authorId, new PageRequest(0, 50), token);
+        var (items, _, _, _) = await repository.GetReviews(movieId, authorId, null, null, new PageRequest(0, 50), token);
 
         // Assert
         items.ShouldAllBe(r => r.ReviewedMovie!.Id == movieId && r.ReviewAuthor!.Id == authorId);
@@ -531,7 +584,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var (items, _, _, totalCount) = await repository.GetReviews(null, null, new PageRequest(0, 2), token);
+        var (items, _, _, totalCount) = await repository.GetReviews(null, null, null, null, new PageRequest(0, 2), token);
 
         // Assert
         items.Count.ShouldBe(2);

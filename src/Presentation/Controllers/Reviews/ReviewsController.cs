@@ -17,7 +17,8 @@ public class ReviewsController(ISender sender) : ApiControllerBase(sender)
     /// </summary>
     /// <remarks>
     /// Returns one page of reviews, ordered by movie then author, along with the movie each is about and the
-    /// author who wrote it. Optionally return only the reviews of one movie, by one author, or both. To fetch
+    /// author who wrote it. Optionally return only the reviews of one movie, by one author, with some text in them, or with at least
+    /// some stars. To fetch
     /// the next page, add the limit to the offset.
     ///
     /// Sample request:
@@ -26,10 +27,12 @@ public class ReviewsController(ISender sender) : ApiControllerBase(sender)
     /// </remarks>
     /// <param name="movieId">Only return reviews of this movie. Leave it out for every movie.</param>
     /// <param name="authorId">Only return reviews by this author. Leave it out for every author.</param>
+    /// <param name="query">Only return reviews whose text contains this, ignoring case. Leave it out for every review.</param>
+    /// <param name="minStars">Only return reviews with at least this many stars, from 1 to 5. Leave it out for every rating.</param>
     /// <param name="offset">The number of reviews to skip, 0 for the first page.</param>
     /// <param name="limit">The largest number of reviews to return, from 1 to 50.</param>
     /// <response code="200">One page of Reviews.</response>
-    /// <response code="400">An Id, the offset or the limit is not valid.</response>
+    /// <response code="400">An Id, the search text, the minimum stars, the offset or the limit is not valid.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet]
     [EndpointName(nameof(GetReviews))]
@@ -40,6 +43,8 @@ public class ReviewsController(ISender sender) : ApiControllerBase(sender)
         [FromQuery] Guid? movieId,
         [FromQuery] Guid? authorId,
         CancellationToken cancellationToken,
+        [FromQuery] string? query = null,
+        [FromQuery] int? minStars = null,
         [FromQuery] int offset = 0,
         [FromQuery] int limit = Paging.DefaultLimit)
     {
@@ -47,6 +52,8 @@ public class ReviewsController(ISender sender) : ApiControllerBase(sender)
         {
             MovieId = movieId,
             AuthorId = authorId,
+            Query = query,
+            MinStars = minStars,
             Offset = offset,
             Limit = limit
         }, cancellationToken));

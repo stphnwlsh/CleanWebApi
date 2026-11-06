@@ -17,20 +17,20 @@ public class GetReviewsHandlerTests
     public async Task Handle_ShouldReturn_Page()
     {
         // Arrange
-        var query = new GetReviewsQuery { MovieId = MovieId, AuthorId = AuthorId, Offset = 20, Limit = 5 };
+        var query = new GetReviewsQuery { MovieId = MovieId, AuthorId = AuthorId, Query = "great", MinStars = 4, Offset = 20, Limit = 5 };
 
         var repository = Substitute.For<IReviewsRepository>();
         var handler = new GetReviewsHandler(repository);
         using var tokenSource = new CancellationTokenSource();
         var token = tokenSource.Token;
 
-        _ = repository.GetReviews(MovieId, AuthorId, new PageRequest(20, 5), token).Returns(new Page<Review>([new Review(Guid.Empty, 5)], 20, 5, 21));
+        _ = repository.GetReviews(MovieId, AuthorId, "great", 4, new PageRequest(20, 5), token).Returns(new Page<Review>([new Review(Guid.Empty, 5)], 20, 5, 21));
 
         // Act
         var result = await handler.Handle(query, token);
 
         // Assert
-        _ = await repository.Received(1).GetReviews(MovieId, AuthorId, new PageRequest(20, 5), token);
+        _ = await repository.Received(1).GetReviews(MovieId, AuthorId, "great", 4, new PageRequest(20, 5), token);
 
         _ = result.ShouldNotBeNull();
         result.Items.Count.ShouldBe(1);
@@ -51,13 +51,13 @@ public class GetReviewsHandlerTests
         using var tokenSource = new CancellationTokenSource();
         var token = tokenSource.Token;
 
-        _ = repository.GetReviews(null, null, new PageRequest(0, Paging.DefaultLimit), token).Returns(new Page<Review>([new Review(Guid.Empty, 5)], 0, Paging.DefaultLimit, 1));
+        _ = repository.GetReviews(null, null, null, null, new PageRequest(0, Paging.DefaultLimit), token).Returns(new Page<Review>([new Review(Guid.Empty, 5)], 0, Paging.DefaultLimit, 1));
 
         // Act
         var result = await handler.Handle(query, token);
 
         // Assert
-        _ = await repository.Received(1).GetReviews(null, null, new PageRequest(0, Paging.DefaultLimit), token);
+        _ = await repository.Received(1).GetReviews(null, null, null, null, new PageRequest(0, Paging.DefaultLimit), token);
 
         result.Offset.ShouldBe(0);
         result.Limit.ShouldBe(Paging.DefaultLimit);

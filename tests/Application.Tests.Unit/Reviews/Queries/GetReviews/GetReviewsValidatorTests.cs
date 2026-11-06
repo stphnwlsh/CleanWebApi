@@ -10,6 +10,50 @@ public class GetReviewsValidatorTests
 
     [Theory]
     [InlineData(0)]
+    [InlineData(6)]
+    public void Validator_ShouldHaveValidationErrorFor_MinStars(int minStars)
+    {
+        // Arrange
+        var query = new GetReviewsQuery { MinStars = minStars };
+
+        // Act
+        var result = Validator.TestValidate(query);
+
+        // Assert
+        _ = result.ShouldHaveValidationErrorFor(query => query.MinStars).WithErrorMessage("A minimum star rating must be between 1 and 5.");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(1)]
+    [InlineData(5)]
+    public void Validator_ShouldNotHaveValidationErrorFor_MinStars(int? minStars)
+    {
+        // Arrange
+        var query = new GetReviewsQuery { MinStars = minStars };
+
+        // Act
+        var result = Validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveValidationErrorFor(query => query.MinStars);
+    }
+
+    [Fact]
+    public void Validator_ShouldHaveValidationErrorFor_LongQuery()
+    {
+        // Arrange
+        var query = new GetReviewsQuery { Query = new string('a', 201) };
+
+        // Act
+        var result = Validator.TestValidate(query);
+
+        // Assert
+        _ = result.ShouldHaveValidationErrorFor(query => query.Query);
+    }
+
+    [Theory]
+    [InlineData(0)]
     [InlineData(51)]
     public void Validator_ShouldHaveValidationErrorFor_Limit(int limit)
     {

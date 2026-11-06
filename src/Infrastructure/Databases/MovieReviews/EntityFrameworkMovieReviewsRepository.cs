@@ -188,6 +188,8 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
     public async Task<Page<ApplicationReview>> GetReviews(
         Guid? movieId,
         Guid? authorId,
+        string? query,
+        int? minStars,
         PageRequest page,
         CancellationToken cancellationToken)
     {
@@ -201,6 +203,18 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         if (authorId is Guid reviewAuthorId)
         {
             reviews = reviews.Where(r => r.ReviewAuthorId == reviewAuthorId);
+        }
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var pattern = ContainsPattern(query);
+
+            reviews = reviews.Where(r => EF.Functions.Like(r.Text, pattern, EscapeCharacter));
+        }
+
+        if (minStars is int lowestStars)
+        {
+            reviews = reviews.Where(r => r.Stars >= lowestStars);
         }
 
         var totalCount = await reviews.CountAsync(cancellationToken);
