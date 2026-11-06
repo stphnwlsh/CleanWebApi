@@ -4,10 +4,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <PackageType>Template</PackageType>
     <PackageId>CleanWebApi.Template</PackageId>
-    <Title>Clean Web API Template</Title>
+    <Title>Clean Web API (Controllers) Template</Title>
     <Authors>Stephen Walsh</Authors>
     <Description>A dotnet new template for an ASP.NET Core Web API with controllers, built with a streamlined Clean Architecture on .NET 10.</Description>
-    <PackageTags>dotnet;csharp;dotnet-template;template;clean-architecture;cqrs;mediator;fluentvalidation;mapperly;entity-framework-core;docker;aspnetcore;web-api;controllers;rest-api;openapi</PackageTags>
+    <PackageTags>dotnet;csharp;dotnet-template;template;clean-architecture;cqrs;mediator;fluentvalidation;mapperly;entity-framework-core;docker;aspnetcore;web-api;controllers;rest-api;openapi;clean;cleanarchitecture;lmc;lmca;leanmeanclean;leanmeancleanapps;project-template;solution-template;net10;dotnet10;sqlite;efcore;serilog;opentelemetry;webapi;mvc;api;rest;scalar</PackageTags>
     <PackageProjectUrl>https://leanmeancleanapps.github.io/webapi/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/LeanMeanCleanApps/CleanWebApi</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

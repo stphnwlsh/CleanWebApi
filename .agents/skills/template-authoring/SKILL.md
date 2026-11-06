@@ -45,6 +45,17 @@ A toggle's inputs, such as `authority` and `audience`, are separate symbols, ena
 
 The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGENTS.md`, `CLAUDE.md`, the persona and the engineering skills. It also packs `template/ci.yml` as the generated solution's `.github/workflows/ci.yml`, a small pipeline with no template name in it. It leaves out the rest of `.github/`, the community files and the repository and maintainer skills, which only make sense in the template repository. Those skills are listed in `RepositorySkills` in `template/template.csproj`; a new one is added there. The pipeline fails a package over 1 MB.
 
+## Getting found
+
+`dotnet new search` and `dotnet new list` match any part of the template `name` or of any short name, and nothing else. `--tag` matches a whole classification, and nuget.org and `dotnet package search` read the package's `PackageTags`. So every template puts its search words in all three:
+
+- `shortName` is a list. The first entry is the template's own name in lower case, such as `cleanminimalapi`, and never changes. After it come one or two shorter aliases, such as `cleanminimal` or `cleanmcp`, then `lmca-<key>` and `leanmeancleanapps-<key>`, where the key is the docs site's (`minimalapi`, `mcp`, `graphql`, `webapi`, `lambda`). Those two make searches for clean, lmc, lmca, lean, mean and leanmeanclean find every template. Never a bare short name such as `mcp`, which clashes with other people's templates.
+- The `name` and the package `Title` match, and carry the words people search for that the name lacks, such as "(MCP)", "(Hot Chocolate)", "(Controllers)" or "AWS".
+- Every template has the `Lean Mean Clean Apps` classification, so `dotnet new list --tag "Lean Mean Clean Apps"` shows the family.
+- `PackageTags` carry the tags all five share, brand words included (`clean`, `cleanarchitecture`, `lmc`, `lmca`, `leanmeanclean`, `leanmeancleanapps`), then the template's own.
+
+The README and `NUGET.md` name the aliases under the install commands, and the docs site's template options page lists them. The pipeline's Verify Template step uses the first short name.
+
 ## Steps
 
 1. Change `template.json` or `template.csproj`. `template.csproj` references `Microsoft.TemplateEngine.Authoring.Tasks`, Microsoft's template validator, which checks `.template.config` on every build and pack; keep its output free of messages, not just errors. A new option also goes in `dotnetcli.host.json` with a short flag that doesn't clash with `dotnet new`'s own (`-n`, `-o`, `-lang`, `-h`), and in `ide.host.json` with `isVisible` set, or Visual Studio hides it.
@@ -74,7 +85,7 @@ The package includes `src/`, `tests/`, `docs/RUN.md`, the root build files, `AGE
 
 ## Don't
 
-- Change `identity` or the first `shortName`; existing installs and docs depend on them. Adding a shorter alias after it is fine.
+- Change `identity` or the first `shortName`; existing installs and docs depend on them. Adding aliases after it is fine (see Getting found).
 - Make a primary output that isn't a project visible to the CLI. The restore post action restores every primary output it can see, so `docs/RUN.md` carries the same `HostIdentifier` condition as the action that opens it.
 - Add a `.sln`. The solution is `.slnx` only, and `primaryOutputs`, the Dockerfile and the package all point at it.
 - Reuse a short flag across options, or give one to `--no-restore`; the `dotnet new` templates from Microsoft leave it long, and so do we.
