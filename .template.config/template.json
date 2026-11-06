@@ -7,15 +7,21 @@
     "API",
     "Service",
     "Controllers",
+    "Lean Mean Clean Apps",
     "Clean Architecture"
   ],
   "identity": "CleanWebApi.Template",
   "groupIdentity": "CleanWebApi",
   "generatorVersions": "[1.0.0.0-*)",
   "precedence": "100",
-  "name": "Clean Web API Template",
+  "name": "Clean Web API (Controllers) Template",
   "description": "An ASP.NET Core Web API with controllers on .NET 10, built with Clean Architecture minus the ceremony.",
-  "shortName": "cleanwebapi",
+  "shortName": [
+    "cleanwebapi",
+    "cleancontrollers",
+    "lmca-webapi",
+    "leanmeancleanapps-webapi"
+  ],
   "tags": {
     "language": "C#",
     "type": "solution"

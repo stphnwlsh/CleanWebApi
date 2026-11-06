@@ -219,7 +219,7 @@ jobs:
         # would fail the generated solution's format check.
         run: |
           dotnet new install packages/*.nupkg
-          SHORT_NAME=$(jq -r .shortName .template.config/template.json)
+          SHORT_NAME=$(jq -r '[.shortName] | flatten | first' .template.config/template.json)
           SOURCE_NAME=$(jq -r .sourceName .template.config/template.json)
 
           # Nothing of the template itself leaks into a generated solution: no toggle markers, and no trace of the

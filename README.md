@@ -24,6 +24,8 @@ dotnet new cleanwebapi --name WorksOnMyMachine.Movies --authorName "Your Name"
 cd WorksOnMyMachine.Movies
 ```
 
+`cleancontrollers` works too, for anyone who'd rather not type `cleanwebapi` every time, and so do `lmca-webapi` and `leanmeancleanapps-webapi`. `dotnet new search leanmeanclean` lists the whole family.
+
 | Option | Default | What it does |
 | --- | --- | --- |
 | `--name`, `-n` | The folder's name | Names the solution and its root namespace |
