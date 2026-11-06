@@ -6,7 +6,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "scalar",
-      "applicationUrl": "https://localhost:8741;http://localhost:8740",
+      "applicationUrl": "https://localhost:7341;http://localhost:7340",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "local"
       }

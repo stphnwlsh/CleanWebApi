@@ -23,16 +23,16 @@ dotnet run --project ./src/Presentation
 
 ## Docker Compose
 
-`docker-compose.yml` starts the app, and the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone), which shows its logs, traces and metrics. The app sends everything to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), and the collector forwards it to the dashboard, the same shape as a production setup. The dashboard is only a container that receives OTLP; nothing in the solution depends on Aspire. The dashboard has no login and the collector accepts OTLP from anyone on ports 8743 and 8744. That's on purpose for a developer's machine, so don't run this compose file anywhere other people can reach.
+`docker-compose.yml` starts the app, and the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone), which shows its logs, traces and metrics. The app sends everything to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), and the collector forwards it to the dashboard, the same shape as a production setup. The dashboard is only a container that receives OTLP; nothing in the solution depends on Aspire. The dashboard has no login and the collector accepts OTLP from anyone on ports 7343 and 7344. That's on purpose for a developer's machine, so don't run this compose file anywhere other people can reach.
 
 ``` bash
 docker compose up -d --build
 ```
 
-- App: <http://localhost:8740/scalar> (Scalar API reference)
-- OpenAPI document: <http://localhost:8740/openapi/v1.json>
-- Aspire dashboard: <http://localhost:8742>
-- Health checks: <http://localhost:8740/health/live> (the process is up) and <http://localhost:8740/health/ready> (the database can be reached). Both answer without a token. The image's `HEALTHCHECK` uses the live one.
+- App: <http://localhost:7340/scalar> (Scalar API reference)
+- OpenAPI document: <http://localhost:7340/openapi/v1.json>
+- Aspire dashboard: <http://localhost:7342>
+- Health checks: <http://localhost:7340/health/live> (the process is up) and <http://localhost:7340/health/ready> (the database can be reached). Both answer without a token. The image's `HEALTHCHECK` uses the live one.
 
 The container runs as the image's non-root `app` user.
 
@@ -44,17 +44,17 @@ docker compose down
 
 ## Ports
 
-Every Lean Mean Clean template has its own block of ten ports on your machine, so this solution runs beside one made from another template without a clash. This one uses 8740 to 8749:
+Every Lean Mean Clean template has its own block of ten ports on your machine, so this solution runs beside one made from another template without a clash. This one uses 7340 to 7349:
 
 | Port | What listens |
 | --- | --- |
-| 8740 | The app over HTTP, from Docker Compose or `dotnet run` |
-| 8741 | The app over HTTPS, `dotnet run` only |
-| 8742 | The Aspire dashboard |
-| 8743 | The OpenTelemetry Collector, OTLP over gRPC |
-| 8744 | The OpenTelemetry Collector, OTLP over HTTP |
+| 7340 | The app over HTTP, from Docker Compose or `dotnet run` |
+| 7341 | The app over HTTPS, `dotnet run` only |
+| 7342 | The Aspire dashboard |
+| 7343 | The OpenTelemetry Collector, OTLP over gRPC |
+| 7344 | The OpenTelemetry Collector, OTLP over HTTP |
 
-Inside the containers nothing moves: the app listens on 8080, the .NET default, so the image runs anywhere without changes, and the dashboard and collector keep their usual ports. To move a port, change the left-hand side of its mapping in `docker-compose.yml`, or `applicationUrl` in `launchSettings.json`. 8745 to 8749 are spare for anything you add.
+The app listens on 7340 everywhere: under `dotnet run`, inside its container and on your machine, so `docker run -p 7340:7340` works the same way. The dashboard and collector keep their usual ports inside their containers. To move the app, change `applicationUrl` in `launchSettings.json`, `ASPNETCORE_HTTP_PORTS`, `EXPOSE` and the `HEALTHCHECK` in the `Dockerfile`, and its mapping in `docker-compose.yml`. When you deploy the image, point the platform's target port at 7340. 7345 to 7349 are spare for anything you add.
 
 ## Telemetry
 
@@ -66,7 +66,7 @@ To see a `dotnet run` in the dashboard, start the collector and the dashboard, a
 
 ``` bash
 docker compose up -d otel-collector
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:8743 dotnet run --project ./src/Presentation
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:7343 dotnet run --project ./src/Presentation
 ```
 
 Every span, metric and log carries `service.version`, so you can always tell which build sent it.

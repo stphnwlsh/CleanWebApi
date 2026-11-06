@@ -59,7 +59,8 @@ RUN dotnet publish ./src/**/Presentation.csproj --no-restore -c Release -v quiet
 # Runtime Image
 FROM ${BASE_IMAGE_REPO}/${BASE_IMAGE_RUNTIME}:${BASE_IMAGE_RUNTIME_TAG} AS run
 WORKDIR /app
-EXPOSE 8080
+ENV ASPNETCORE_HTTP_PORTS=7340
+EXPOSE 7340
 COPY --from=publish /sln/app .
 
 # The database lives in /app/data, the only folder the non-root app user can write to.
@@ -67,6 +68,6 @@ RUN mkdir -p /app/data && chown $APP_UID /app/data
 USER $APP_UID
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget -qO- http://localhost:8080/health/live || exit 1
+    CMD wget -qO- http://localhost:7340/health/live || exit 1
 
 ENTRYPOINT ["dotnet", "Presentation.dll"]

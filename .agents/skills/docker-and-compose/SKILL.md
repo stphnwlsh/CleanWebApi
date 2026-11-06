@@ -21,11 +21,11 @@ One multi-stage `Dockerfile` does everything the pipeline needs:
 
 `docker-compose.yml` runs the app with `DOTNET_ENVIRONMENT=docker`, the `movie-reviews-data` volume a pinned OpenTelemetry Collector that receives the app's OTLP logs, traces and metrics, configured by `otel-collector.yaml`, and a pinned Aspire dashboard the collector forwards them to (`telemetry`). The dashboard UI and the collector's OTLP ports are published on the template's own ports (below), so a `dotnet run` can send to the collector too. The dashboard runs with `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS` and the collector's OTLP ports take anything sent to them, on purpose: the compose file is for a developer's machine, with nothing to sign in to. Keep it that way rather than adding sign-in, and don't offer the compose file for a shared or deployed environment. Images are built by CI but not pushed anywhere; the template ships the Dockerfile so users can.
 
-The Lambda template's `run` stage is the AWS Lambda .NET base image instead. It runs as user `65534` from `/var/task`, keeps its database in `/tmp`, and has no `HEALTHCHECK`. Its compose file runs the collector and the Aspire dashboard as well. Compose maps the runtime interface emulator to 8750, so the function can be invoked with a `POST` to `/2015-03-31/functions/function/invocations`.
+The Lambda template's `run` stage is the AWS Lambda .NET base image instead. It runs as user `65534` from `/var/task`, keeps its database in `/tmp`, and has no `HEALTHCHECK`. Its compose file runs the collector and the Aspire dashboard as well. Compose maps the runtime interface emulator to 7350, so the function can be invoked with a `POST` to `/2015-03-31/functions/function/invocations`.
 
 ### Ports
 
-Every port published on the developer's machine, by the compose file or by `launchSettings.json`, sits in the template's own block of ten, so any two Lean Mean Clean solutions run side by side. The blocks follow the template order: Minimal API 8710, MCP 8720, GraphQL 8730, Web API 8740, Lambda Function 8750. Each port has the same place in every block:
+Every port published on the developer's machine, by the compose file or by `launchSettings.json`, sits in the template's own block of ten, so any two Lean Mean Clean solutions run side by side. The blocks follow the template order: Minimal API 7310, MCP 7320, GraphQL 7330, Web API 7340, Lambda Function 7350. Each port has the same place in every block:
 
 | Offset | Port |
 | --- | --- |
@@ -38,7 +38,7 @@ Every port published on the developer's machine, by the compose file or by `laun
 | +6 | The MCP chat demo |
 | +7 to +9 | Spare |
 
-`docs/RUN.md` lists the ports this solution uses. Inside the containers nothing moves: the app listens on 8080, the .NET default, the dashboard on 18888 and the collector on 4317 and 4318, so only the left-hand side of a mapping is ours and the image deploys anywhere unchanged. A new service takes a spare port from the block, never a product's well-known one such as 3000, 5432 or 9000. `docker compose port <service> <container port>` prints where a port ended up.
+`docs/RUN.md` lists the ports this solution uses. The app listens on its own port everywhere: under `dotnet run`, in the image (the `Dockerfile` sets `ASPNETCORE_HTTP_PORTS`, `EXPOSE` and the `HEALTHCHECK` to it) and in the compose file, so `docker run -p` maps it to the same number. Change all four together. The Lambda template is the one exception: Lambda's runtime interface emulator always listens on 8080 inside its container, so only the host side of its mapping is ours. The dashboard, the collector and other third-party images keep their usual ports inside (18888, 4317 and 4318), and only the host side of their mappings moves. A new service takes a spare port from the block, never a product's well-known one such as 3000, 5432 or 9000. `docker compose port <service> <container port>` prints where a port ended up.
 
 ## Steps
 
@@ -59,7 +59,7 @@ Every port published on the developer's machine, by the compose file or by `laun
 
 ``` bash
 docker build . --target run --tag local-check
-docker compose up -d --build && curl -fsS "http://$(docker compose port api 8080)/health/ready"
+docker compose up -d --build --wait   # waits for the image's HEALTHCHECK
 # Lambda: curl -fsS -X POST "http://$(docker compose port function 8080)/2015-03-31/functions/function/invocations" -d '{}'
 docker compose down
 ```

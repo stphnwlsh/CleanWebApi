@@ -45,13 +45,13 @@ Rather click than type? Visual Studio and Rider show the same options in their n
 docker compose up -d --build
 
 # Ask it for a page of movies
-curl "http://localhost:8740/api/movies?query=space&limit=2"
+curl "http://localhost:7340/api/movies?query=space&limit=2"
 
 # Run the tests while you're here
 dotnet test
 ```
 
-Then open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8740/scalar> to browse and try every endpoint.
+Then open [Scalar](https://github.com/scalar/scalar) at <http://localhost:7340/scalar> to browse and try every endpoint.
 
 The API is open unless you create it with `--include-auth --authority` (and usually `--audience`), and then it asks for a JWT bearer token. Leave `--include-auth` out and there's no auth code at all.
 
