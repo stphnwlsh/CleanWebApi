@@ -67,11 +67,66 @@ internal static class MovieReviewsDbContextExtensions
     // What reviewers say, one row per star rating.
     private static readonly string[][] ReviewTexts =
     [
-        ["Two hours I will never get back.", "I asked for a refund and a hug.", "The popcorn had a better plot."],
-        ["Some good ideas, lost in the second act.", "The trailer was better.", "Pretty to look at, hard to care about."],
-        ["Fine for a rainy Sunday.", "Solid, if you've got nothing else on.", "Not bad, not great, mostly fine."],
-        ["Great film, with one scene too many.", "Funny, warm and better than it needed to be.", "I'd happily watch it again."],
-        ["An instant favourite.", "Great film. I cried at the ending.", "Perfect from the first scene to the last."]
+        [
+            "Two hours I will never get back.",
+            "I asked for a refund and a hug.",
+            "The popcorn had a better plot.",
+            "I checked my watch more often than the hero did.",
+            "Somebody should apologise, and I'm not fussy who.",
+            "I've had more fun at the dentist, and they gave me a sticker.",
+            "The credits were the best twist.",
+            "Even the dog left the room.",
+            "A brave attempt at being a film.",
+            "I stayed to the end out of spite."
+        ],
+        [
+            "Some good ideas, lost in the second act.",
+            "The trailer was better.",
+            "Pretty to look at, hard to care about.",
+            "It starts well, then wanders off and never comes back.",
+            "One good scene, and I've forgotten which one.",
+            "The lead tries hard, but the script doesn't help.",
+            "Twenty minutes too long, in a film that needed to be an hour shorter.",
+            "I liked the music more than the movie.",
+            "Not terrible, which is the nicest thing I can say.",
+            "It's trying to be three films and manages half of one."
+        ],
+        [
+            "Fine for a rainy Sunday.",
+            "Solid, if you've got nothing else on.",
+            "Not bad, not great, mostly fine.",
+            "You'll enjoy it and forget it by Tuesday.",
+            "A decent watch with a very predictable ending.",
+            "It does what it says on the poster.",
+            "Good cast, shame about the middle.",
+            "Perfectly pleasant, like a sandwich.",
+            "Worth streaming, not worth the cinema ticket.",
+            "I laughed twice and looked at my phone once."
+        ],
+        [
+            "Great film, with one scene too many.",
+            "Funny, warm and better than it needed to be.",
+            "I'd happily watch it again.",
+            "Smart, quick and well acted, with a slightly soft ending.",
+            "The best surprise I've had at the movies this year.",
+            "It takes a while to warm up, then it really goes.",
+            "A lovely little film that knows exactly what it is.",
+            "Strong performances all round, and the ending earns it.",
+            "Not perfect, but I've been thinking about it all week.",
+            "I took my mum, and we both loved it."
+        ],
+        [
+            "An instant favourite.",
+            "Great film. I cried at the ending.",
+            "Perfect from the first scene to the last.",
+            "I walked out and bought a ticket for the next session.",
+            "The kind of movie you tell strangers about.",
+            "Funny, sad and completely gripping.",
+            "I can't find a single thing wrong with it, and I tried.",
+            "Everyone involved should be very proud.",
+            "It's the best thing I've seen in years.",
+            "I want to watch it again for the first time."
+        ]
     ];
 
     public static MovieReviewsDbContext AddData(this MovieReviewsDbContext context)
