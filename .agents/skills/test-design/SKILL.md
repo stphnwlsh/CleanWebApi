@@ -64,7 +64,7 @@ public async Task Handle_ShouldThrowException_ReviewDoesNotExist()
 
     // Assert
     exception.Message.ShouldBe("The Review with the supplied id was not found.");
-    _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
+    _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, command.Text, token);
 }
 ```
 

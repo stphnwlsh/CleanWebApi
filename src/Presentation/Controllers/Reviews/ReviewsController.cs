@@ -111,7 +111,8 @@ public class ReviewsController(ISender sender) : ApiControllerBase(sender)
         {
             AuthorId = request.AuthorId,
             MovieId = request.MovieId,
-            Stars = request.Stars
+            Stars = request.Stars,
+            Text = request.Text
         };
 
         var response = await this.Sender.Send(command, cancellationToken);
@@ -178,7 +179,8 @@ public class ReviewsController(ISender sender) : ApiControllerBase(sender)
         var command = new Commands.UpdateReview.UpdateReviewCommand
         {
             Id = id,
-            Stars = request.Stars
+            Stars = request.Stars,
+            Text = request.Text
         };
 
         _ = await this.Sender.Send(command, cancellationToken);

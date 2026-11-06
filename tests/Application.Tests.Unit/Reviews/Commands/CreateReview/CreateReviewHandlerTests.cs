@@ -19,7 +19,8 @@ public class CreateHandlerTests
         {
             AuthorId = Guid.Empty,
             MovieId = Guid.Empty,
-            Stars = 5
+            Stars = 5,
+            Text = "Great film"
         };
 
         var authorsRepository = Substitute.For<IAuthorsRepository>();
@@ -39,7 +40,7 @@ public class CreateHandlerTests
         // Assert
         _ = await authorsRepository.Received(1).AuthorExists(command.AuthorId, token);
         _ = await moviesRepository.Received(1).MovieExists(command.MovieId, token);
-        _ = await reviewsRepository.Received(1).CreateReview(command.AuthorId, command.MovieId, command.Stars, token);
+        _ = await reviewsRepository.Received(1).CreateReview(command.AuthorId, command.MovieId, command.Stars, command.Text, token);
     }
 
     [Fact]
@@ -72,7 +73,7 @@ public class CreateHandlerTests
 
         _ = await authorsRepository.Received(1).AuthorExists(command.AuthorId, token);
         _ = await moviesRepository.DidNotReceive().MovieExists(command.MovieId, token);
-        _ = await reviewsRepository.DidNotReceive().CreateReview(command.AuthorId, command.MovieId, command.Stars, token);
+        _ = await reviewsRepository.DidNotReceive().CreateReview(command.AuthorId, command.MovieId, command.Stars, command.Text, token);
     }
 
     [Fact]
@@ -104,6 +105,6 @@ public class CreateHandlerTests
 
         _ = await authorsRepository.Received(1).AuthorExists(command.AuthorId, token);
         _ = await moviesRepository.Received(1).MovieExists(command.MovieId, token);
-        _ = await reviewsRepository.DidNotReceive().CreateReview(command.AuthorId, command.MovieId, command.Stars, token);
+        _ = await reviewsRepository.DidNotReceive().CreateReview(command.AuthorId, command.MovieId, command.Stars, command.Text, token);
     }
 }

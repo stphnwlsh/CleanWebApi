@@ -25,6 +25,6 @@ public class CreateReviewHandler(
         }
 
         return await reviewsRepository
-            .CreateReview(request.AuthorId, request.MovieId, request.Stars, cancellationToken);
+            .CreateReview(request.AuthorId, request.MovieId, request.Stars, request.Text, cancellationToken);
     }
 }

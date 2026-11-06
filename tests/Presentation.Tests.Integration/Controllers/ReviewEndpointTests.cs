@@ -33,7 +33,7 @@ public class ReviewEndpointTests : IDisposable
         var authorResult = (await authorResponse.Content.ReadAsStringAsync()).Deserialize<Page<AuthorSummary>>().Items[0];
         using var movieResponse = await client.GetAsync("/api/movies");
         var movieResult = (await movieResponse.Content.ReadAsStringAsync()).Deserialize<Page<MovieSummary>>().Items[0];
-        var json = (new { Stars = 5, AuthorId = authorResult.Id, MovieId = movieResult.Id }).Serialize();
+        var json = (new { Stars = 5, AuthorId = authorResult.Id, MovieId = movieResult.Id, Text = "Great film" }).Serialize();
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
@@ -42,6 +42,7 @@ public class ReviewEndpointTests : IDisposable
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        result.Text.ShouldBe("Great film");
         response.Headers.Location.ShouldNotBeNull().ToString().ShouldEndWith($"/api/reviews/{result.Id}");
 
         _ = result.ShouldNotBeNull();

@@ -7,6 +7,8 @@ internal record Review : Entity
 {
     public int Stars { get; set; }
 
+    public string? Text { get; set; }
+
     public Guid ReviewedMovieId { get; set; }
 
     public Movie ReviewedMovie { get; init; } = null!;

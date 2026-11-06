@@ -9,7 +9,7 @@ public class UpdateReviewHandler(IReviewsRepository reviewsRepository) : IReques
 {
     public async ValueTask<Review> Handle(UpdateReviewCommand request, CancellationToken cancellationToken)
     {
-        var review = await reviewsRepository.UpdateReview(request.Id, request.Stars, cancellationToken);
+        var review = await reviewsRepository.UpdateReview(request.Id, request.Stars, request.Text, cancellationToken);
 
         NotFoundException.ThrowIfNull(review, EntityType.Review);
 

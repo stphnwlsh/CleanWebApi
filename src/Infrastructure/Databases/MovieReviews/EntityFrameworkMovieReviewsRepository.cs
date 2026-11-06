@@ -148,6 +148,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         Guid authorId,
         Guid movieId,
         int stars,
+        string? text,
         CancellationToken cancellationToken)
     {
         var now = this.timeProvider.GetUtcNow().UtcDateTime;
@@ -157,6 +158,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
             ReviewAuthorId = authorId,
             ReviewedMovieId = movieId,
             Stars = stars,
+            Text = text,
             DateCreated = now,
             DateModified = now
         };
@@ -254,7 +256,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
         return result is null ? null : this.mapper.ToDomain(result);
     }
 
-    public async Task<ApplicationReview?> UpdateReview(Guid id, int stars, CancellationToken cancellationToken)
+    public async Task<ApplicationReview?> UpdateReview(Guid id, int stars, string? text, CancellationToken cancellationToken)
     {
         var now = this.timeProvider.GetUtcNow().UtcDateTime;
 
@@ -264,6 +266,7 @@ internal class EntityFrameworkMovieReviewsRepository : IAuthorsRepository, IMovi
             .ExecuteUpdateAsync(
                 setters => setters
                     .SetProperty(r => r.Stars, stars)
+                    .SetProperty(r => r.Text, r => text ?? r.Text)
                     .SetProperty(r => r.DateModified, now),
                 cancellationToken);
 

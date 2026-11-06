@@ -126,4 +126,44 @@ public class CreateReviewValidatorTests
         // Assert
         _ = result.ShouldHaveValidationErrorFor(command => command.Stars).WithErrorMessage("A star rating must be between 1 and 5.");
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1000)]
+    public void Validator_ShouldNotHaveValidationErrorFor_Text(int length)
+    {
+        // Arrange
+        var command = new CreateReviewCommand
+        {
+            AuthorId = Guid.NewGuid(),
+            MovieId = Guid.NewGuid(),
+            Stars = 5,
+            Text = new string('a', length)
+        };
+
+        // Act
+        var result = new CreateReviewValidator().TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationErrorFor(r => r.Text);
+    }
+
+    [Fact]
+    public void Validator_ShouldHaveValidationErrorFor_LongText()
+    {
+        // Arrange
+        var command = new CreateReviewCommand
+        {
+            AuthorId = Guid.NewGuid(),
+            MovieId = Guid.NewGuid(),
+            Stars = 5,
+            Text = new string('a', 1001)
+        };
+
+        // Act
+        var result = new CreateReviewValidator().TestValidate(command);
+
+        // Assert
+        _ = result.ShouldHaveValidationErrorFor(r => r.Text).WithErrorMessage("Review text can't be longer than 1000 characters.");
+    }
 }

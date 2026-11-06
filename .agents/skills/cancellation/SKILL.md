@@ -31,7 +31,7 @@ var token = tokenSource.Token;
 var result = await handler.Handle(command, token);
 
 // Assert
-_ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
+_ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, command.Text, token);
 ```
 
 ## Don't

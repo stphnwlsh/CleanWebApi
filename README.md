@@ -46,32 +46,32 @@ That's three layers, four test projects, a Dockerfile and a CI pipeline. Go and 
 docker compose up -d --build
 
 # Ask it for a page of movies
-curl "http://localhost:8080/api/movies?query=global&limit=2"
+curl "http://localhost:8080/api/movies?query=space&limit=2"
 ```
 
 ```json
 {
   "items": [
     {
-      "id": "30fca414-247a-779e-105a-d81aa2506f58",
-      "title": "Assimilated global infrastructure",
-      "reviewCount": 1,
-      "averageStars": 1
+      "id": "cb188ef6-14e7-f85f-2f78-924c2ab26b28",
+      "title": "Deep Space Gardeners",
+      "reviewCount": 5,
+      "averageStars": 3.4
     },
     {
-      "id": "c27d6600-79a6-9346-2595-a52b7f07dc3e",
-      "title": "Automated global alliance",
-      "reviewCount": 3,
-      "averageStars": 3.3
+      "id": "dfefa450-5454-6a4d-a4aa-95a9b047c17b",
+      "title": "Postcards from Outer Space",
+      "reviewCount": 1,
+      "averageStars": 3
     }
   ],
   "offset": 0,
   "limit": 2,
-  "totalCount": 2
+  "totalCount": 4
 }
 ```
 
-Yes, the sample movies are named by a corporate buzzword generator, and the critics are harsh.
+The sample movies are all made up, and the critics are harsh.
 
 Every list endpoint returns one page at a time, with its `offset`, `limit` and a `totalCount`, so you always know how much more there is. Movies and authors come with their review count and average stars, worked out by the database rather than in a loop somewhere. Ask for one by id and its reviews come along for the ride.
 

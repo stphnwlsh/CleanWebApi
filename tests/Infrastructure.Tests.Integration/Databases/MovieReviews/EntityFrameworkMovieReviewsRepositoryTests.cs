@@ -320,7 +320,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var result = await this.database.Repository.CreateReview(review.AuthorId, review.MovieId, review.Stars, token);
+        var result = await this.database.Repository.CreateReview(review.AuthorId, review.MovieId, review.Stars, "Great film", token);
 
         // Assert
         _ = result.ShouldNotBeNull();
@@ -328,6 +328,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         result.ReviewAuthor.ShouldNotBeNull().Id.ShouldBe(review.AuthorId);
         result.ReviewedMovie.ShouldNotBeNull().Id.ShouldBe(review.MovieId);
         result.Stars.ShouldBe(review.Stars);
+        result.Text.ShouldBe("Great film");
     }
 
     [Fact]
@@ -415,7 +416,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var result = await this.database.Repository.UpdateReview(review.Id, review.Stars, token);
+        var result = await this.database.Repository.UpdateReview(review.Id, review.Stars, null, token);
 
         // Assert
         _ = result.ShouldNotBeNull();
@@ -434,6 +435,39 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task UpdateReview_ShouldChange_Text()
+    {
+        // Arrange
+        var id = this.database.Context.Reviews.First(r => r.Stars == 2).Id;
+        using var tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+
+        // Act
+        var result = await this.database.Repository.UpdateReview(id, 2, "Better the second time", token);
+
+        // Assert
+        result.ShouldNotBeNull().Text.ShouldBe("Better the second time");
+    }
+
+    [Fact]
+    public async Task UpdateReview_WithoutText_ShouldKeep_Text()
+    {
+        // Arrange
+        var id = this.database.Context.Reviews.First(r => r.Stars == 2).Id;
+        using var tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+
+        _ = await this.database.Repository.UpdateReview(id, 2, "Better the second time", token);
+
+        // Act
+        var result = await this.database.Repository.UpdateReview(id, 3, null, token);
+
+        // Assert
+        result.ShouldNotBeNull().Stars.ShouldBe(3);
+        result.Text.ShouldBe("Better the second time");
+    }
+
+    [Fact]
     public async Task UpdateReview_ShouldReturn_Null()
     {
         // Arrange
@@ -446,7 +480,7 @@ public sealed class EntityFrameworkMovieReviewsRepositoryTests : IDisposable
         var token = tokenSource.Token;
 
         // Act
-        var result = await this.database.Repository.UpdateReview(review.Id, review.Stars, token);
+        var result = await this.database.Repository.UpdateReview(review.Id, review.Stars, null, token);
 
         // Assert
         result.ShouldBeNull();

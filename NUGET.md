@@ -45,7 +45,7 @@ Rather click than type? Visual Studio and Rider show the same options in their n
 docker compose up -d --build
 
 # Ask it for a page of movies
-curl "http://localhost:8080/api/movies?query=global&limit=2"
+curl "http://localhost:8080/api/movies?query=space&limit=2"
 
 # Run the tests while you're here
 dotnet test
