@@ -23,7 +23,7 @@ public class UpdateReviewHandlerTests
         var review = new Review(command.Id, command.Stars);
         var reviewsRepository = Substitute.For<IReviewsRepository>();
 
-        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(review);
+        _ = reviewsRepository.UpdateReview(default, default, default, default).ReturnsForAnyArgs(review);
 
         var handler = new UpdateReviewHandler(reviewsRepository);
         using var tokenSource = new CancellationTokenSource();
@@ -35,7 +35,7 @@ public class UpdateReviewHandlerTests
         // Assert
         result.ShouldBe(review);
 
-        _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
+        _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, command.Text, token);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class UpdateReviewHandlerTests
 
         var reviewsRepository = Substitute.For<IReviewsRepository>();
 
-        _ = reviewsRepository.UpdateReview(default, default, default).ReturnsForAnyArgs(Task.FromResult<Review?>(null));
+        _ = reviewsRepository.UpdateReview(default, default, default, default).ReturnsForAnyArgs(Task.FromResult<Review?>(null));
 
         var handler = new UpdateReviewHandler(reviewsRepository);
         using var tokenSource = new CancellationTokenSource();
@@ -62,6 +62,6 @@ public class UpdateReviewHandlerTests
         // Assert
         exception.Message.ShouldBe("The Review with the supplied id was not found.");
 
-        _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, token);
+        _ = await reviewsRepository.Received(1).UpdateReview(command.Id, command.Stars, command.Text, token);
     }
 }

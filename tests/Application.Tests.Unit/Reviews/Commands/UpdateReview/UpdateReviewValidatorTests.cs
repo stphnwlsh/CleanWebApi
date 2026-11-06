@@ -60,4 +60,42 @@ public class UpdateReviewValidatorTests
         // Assert
         _ = result.ShouldHaveValidationErrorFor(command => command.Stars);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1000)]
+    public void Validator_ShouldNotHaveValidationErrorFor_Text(int length)
+    {
+        // Arrange
+        var command = new UpdateReviewCommand
+        {
+            Id = Guid.NewGuid(),
+            Stars = 5,
+            Text = new string('a', length)
+        };
+
+        // Act
+        var result = new UpdateReviewValidator().TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationErrorFor(r => r.Text);
+    }
+
+    [Fact]
+    public void Validator_ShouldHaveValidationErrorFor_LongText()
+    {
+        // Arrange
+        var command = new UpdateReviewCommand
+        {
+            Id = Guid.NewGuid(),
+            Stars = 5,
+            Text = new string('a', 1001)
+        };
+
+        // Act
+        var result = new UpdateReviewValidator().TestValidate(command);
+
+        // Assert
+        _ = result.ShouldHaveValidationErrorFor(r => r.Text).WithErrorMessage("Review text can't be longer than 1000 characters.");
+    }
 }

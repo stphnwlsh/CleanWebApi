@@ -21,9 +21,10 @@ Sample data is only added when `Database:SeedSampleData` is `true` (on in `appse
 ## Steps
 
 1. New column on a model? Add a `RuleFor` to the matching `Faker<T>` in `AddData`, and a value to the rows in `AddTestData` if tests need it.
-2. Keep the fixed `Seed` and `ReferenceDate`. Dates come from `f.Date.Past(refDate: ReferenceDate)`, never from the clock, so every run gives the same data.
-3. Tests that need a specific row look it up by its known value (`Authors.First(a => a.FirstName == "One")`), not by position.
-4. Presentation integration tests that need a row with children pick one that has them. Bogus spreads reviews at random, so a few movies and authors have none.
+2. Movie titles and review text come from the `Titles` and `ReviewTexts` lists in `AddData`. Keep them made up, with no real films, characters or brands, and keep a few titles for common searches such as "space" or "love".
+3. Keep the fixed `Seed` and `ReferenceDate`. Dates come from `f.Date.Past(refDate: ReferenceDate)`, never from the clock, so every run gives the same data.
+4. Tests that need a specific row look it up by its known value (`Authors.First(a => a.FirstName == "One")`), not by position.
+5. Presentation integration tests that need a row with children pick one that has them. Bogus spreads reviews at random, so a few movies and authors have none.
 
 ## Don't
 

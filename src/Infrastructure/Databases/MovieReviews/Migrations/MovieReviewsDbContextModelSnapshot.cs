@@ -91,6 +91,10 @@ namespace CleanWebApi.Infrastructure.Databases.MovieReviews.Migrations
                     b.Property<int>("Stars")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Text")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReviewAuthorId");

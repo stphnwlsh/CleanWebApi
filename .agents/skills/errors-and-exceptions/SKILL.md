@@ -36,7 +36,7 @@ The presentation layer maps each exception to its own shape in one place (in a w
 
 ```csharp
 // src/Application/Reviews/Commands/UpdateReview/UpdateReviewHandler.cs
-var review = await reviewsRepository.UpdateReview(request.Id, request.Stars, cancellationToken);
+var review = await reviewsRepository.UpdateReview(request.Id, request.Stars, request.Text, cancellationToken);
 
 NotFoundException.ThrowIfNull(review, EntityType.Review);
 

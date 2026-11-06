@@ -1,7 +1,7 @@
 namespace CleanWebApi.Presentation.Controllers.Reviews.Requests;
 
 /// <summary>
-/// The new star rating of a review. The author and the movie of a review can't change.
+/// The new star rating and text of a review. The author and the movie of a review can't change.
 /// </summary>
 public class UpdateReviewRequest
 {
@@ -10,4 +10,10 @@ public class UpdateReviewRequest
     /// </summary>
     /// <example>5</example>
     public int Stars { get; init; }
+
+    /// <summary>
+    /// The new text, up to 1000 characters. Leave it out to keep the text the review has.
+    /// </summary>
+    /// <example>Better the second time.</example>
+    public string? Text { get; init; }
 }

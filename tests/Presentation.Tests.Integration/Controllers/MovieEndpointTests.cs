@@ -19,6 +19,24 @@ public class MovieEndpointTests : IDisposable
         this.application = new();
     }
 
+    [Theory]
+    [InlineData("space")]
+    [InlineData("love")]
+    [InlineData("murder")]
+    [InlineData("dragon")]
+    public async Task GetMovies_ShouldFind_SampleMovies(string query)
+    {
+        // Arrange
+        using var client = this.application.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync($"/api/movies?query={query}");
+        var result = (await response.Content.ReadAsStringAsync()).Deserialize<Page<Entities.MovieSummary>>();
+
+        // Assert
+        result.Items.ShouldNotBeEmpty();
+    }
+
     [Fact]
     public async Task GetMovies_ShouldReturn_Ok()
     {

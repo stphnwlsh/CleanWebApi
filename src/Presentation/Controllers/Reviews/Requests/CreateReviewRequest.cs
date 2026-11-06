@@ -22,4 +22,10 @@ public class CreateReviewRequest
     /// </summary>
     /// <example>5</example>
     public int Stars { get; init; }
+
+    /// <summary>
+    /// What the author has to say about the movie, up to 1000 characters.
+    /// </summary>
+    /// <example>Great film. I cried at the ending.</example>
+    public string? Text { get; init; }
 }
