@@ -21,7 +21,7 @@ dotnet ef migrations add <Name> --project ./src/Infrastructure --output-dir Data
 dotnet run --project ./src/Presentation
 ```
 
-It listens on <https://localhost:8081>, and on <http://localhost:8080>, which redirects there. If your browser or `curl` doesn't trust the .NET development certificate yet, run `dotnet dev-certs https --trust` once.
+It listens on <https://localhost:7341>, and on <http://localhost:7340>, which redirects there. If your browser or `curl` doesn't trust the .NET development certificate yet, run `dotnet dev-certs https --trust` once.
 
 ## Docker Compose
 
@@ -75,7 +75,7 @@ Every span, metric and log carries `service.version`, so you can always tell whi
 
 ## HTTPS
 
-The app redirects HTTP to HTTPS whenever it has an HTTPS port, which is why `dotnet run` sends <http://localhost:8080> on to <https://localhost:8081>. Outside the `local` and `Development` environments it also sends an HSTS header. The container only listens on HTTP, so in production put it behind a proxy or load balancer that ends TLS, and set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` so the app knows the original request was HTTPS.
+The app redirects HTTP to HTTPS whenever it has an HTTPS port, which is why `dotnet run` sends <http://localhost:7340> on to <https://localhost:7341>. Outside the `local` and `Development` environments it also sends an HSTS header. The container only listens on HTTP, so in production put it behind a proxy or load balancer that ends TLS, and set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` so the app knows the original request was HTTPS.
 
 ## Tests
 
