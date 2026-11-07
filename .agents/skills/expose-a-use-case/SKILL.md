@@ -26,7 +26,8 @@ Controllers live in `src/Presentation/Controllers/<Feature>/<Feature>Controller.
 5. Return `ActionResult<T>` for actions with a body and `IActionResult` for `204`. Use `this.Ok(...)`, `this.CreatedAtAction(nameof(this.GetReviewById), new { id = response.Id }, response)` for creates, and `this.NoContent()` for updates and deletes.
 6. Bodies use a request class in `Controllers/<Feature>/Requests/` with XML docs and `<example>` values. Map it to the command in the action.
 7. Document the action: `<summary>` (short, title case, shown as the operation name), `<remarks>` with a sentence or two and a sample request, `<param>` for each input except the token, and a `<response code="...">` for each status.
-8. Test it with real requests in `tests/Presentation.Tests.Integration/Controllers/<Feature>EndpointTests.cs` (`presentation-integration-tests`). Cover every documented status code (`test-design`).
+8. Add a sample request for the action to `src/Presentation/Presentation.http`, including the `#if (includeAuth)` bearer token header block.
+9. Test it with real requests in `tests/Presentation.Tests.Integration/Controllers/<Feature>EndpointTests.cs` (`presentation-integration-tests`). Cover every documented status code (`test-design`).
 
 ## Example
 

@@ -21,7 +21,7 @@ dotnet ef migrations add <Name> --project ./src/Infrastructure --output-dir Data
 dotnet run --project ./src/Presentation
 ```
 
-It listens on <https://localhost:7341>, and on <http://localhost:7340>, which redirects there. If your browser or `curl` doesn't trust the .NET development certificate yet, run `dotnet dev-certs https --trust` once.
+It listens on <https://localhost:7341>, and on <http://localhost:7340>, which redirects there. If your browser or `curl` doesn't trust the .NET development certificate yet, run `dotnet dev-certs https --trust` once. Open `src/Presentation/Presentation.http` in Visual Studio, Rider or VS Code to call every endpoint with one click.
 
 ## Docker Compose
 
