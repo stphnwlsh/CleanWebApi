@@ -237,6 +237,7 @@ jobs:
             clean "$1" includeAuth
             clean "$1" "$SOURCE_NAME"
             test ! -e "$1/icon.png"
+            test -f "$1/README.md"
             test -f "$1/.github/workflows/ci.yml"
             dotnet format "$1" --verify-no-changes
             dotnet test "$1" --configuration Release
