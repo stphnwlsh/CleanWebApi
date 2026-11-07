@@ -14,7 +14,7 @@ Serilog is the logger. Application and Infrastructure code log through `Microsof
 | Environment | Sink | Where to look |
 | --- | --- | --- |
 | `local` | Console, with the output template in `appsettings.local.json` | The terminal |
-| `docker` | Console, and OTLP through the collector to the Aspire dashboard | <http://localhost:18888>, or `docker compose logs` |
+| `docker` | Console, and OTLP through the collector to the Aspire dashboard | The Aspire dashboard, on the port `docs/RUN.md` lists, or `docker compose logs` |
 | Lambda, anywhere | Console, as compact JSON, and OTLP when the endpoint is set | CloudWatch Logs, or `docker compose logs` for the emulator, and the Aspire dashboard in Docker Compose |
 | Any, when `OTEL_EXPORTER_OTLP_ENDPOINT` is set | Also OTLP, through `Serilog.Sinks.OpenTelemetry` | Whatever receives the OTLP (`telemetry`) |
 
@@ -108,6 +108,6 @@ _ = builder.Services.AddSerilog((services, loggerConfiguration) =>
 
 ``` bash
 dotnet run --project ./src/Presentation   # watch the console, then make a request
-docker compose up -d --build              # then open http://localhost:18888
+docker compose up -d --build              # then open the Aspire dashboard on the port docs/RUN.md lists
 dotnet test tests/Application.Tests.Unit  # LoggingBehaviourTests check the messages with FakeLogger
 ```

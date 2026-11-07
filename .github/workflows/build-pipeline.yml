@@ -357,16 +357,16 @@ jobs:
           echo "smoke=failed" >> "$GITHUB_OUTPUT"
           # The database goes in /app/data, the only folder the non-root user can write to, as it does
           # in docker-compose.yml. Logs stay on the console so a failure shows up below.
-          docker run --detach --name api --publish 8080:8080 \
+          docker run --detach --name api --publish 7340:7340 \
             --env ConnectionStrings__MovieReviews="Data Source=/app/data/movie-reviews.db" \
             --env Database__SeedSampleData=true "$IMAGE"
           for attempt in $(seq 1 30); do
-            if curl --silent --fail --max-time 5 http://localhost:8080/health/ready > /dev/null; then
+            if curl --silent --fail --max-time 5 http://localhost:7340/health/ready > /dev/null; then
               break
             fi
             sleep 1
           done
-          RESPONSE=$(curl --silent --fail --max-time 30 "http://localhost:8080/api/movies?limit=2" || true)
+          RESPONSE=$(curl --silent --fail --max-time 30 "http://localhost:7340/api/movies?limit=2" || true)
           echo "$RESPONSE"
           if echo "$RESPONSE" | python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("items") else 1)'; then
             echo "smoke=passed" >> "$GITHUB_OUTPUT"

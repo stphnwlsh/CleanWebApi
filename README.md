@@ -46,7 +46,7 @@ That's three layers, four test projects, a Dockerfile and a CI pipeline. Go and 
 docker compose up -d --build
 
 # Ask it for a page of movies
-curl "http://localhost:8080/api/movies?query=space&limit=2"
+curl "http://localhost:7340/api/movies?query=space&limit=2"
 ```
 
 ```json
@@ -75,7 +75,7 @@ The sample movies are all made up, and the critics are harsh.
 
 Every list endpoint returns one page at a time, with its `offset`, `limit` and a `totalCount`, so you always know how much more there is. Movies and authors come with their review count and average stars, worked out by the database rather than in a loop somewhere. Ask for one by id and its reviews come along for the ride.
 
-Open [Scalar](https://github.com/scalar/scalar) at <http://localhost:8080/scalar> to browse and try every endpoint. Each one is documented with XML comments that the .NET 10 OpenAPI generator reads at build time, so the document at `/openapi/v1.json` can't drift from the code. Its logs, traces and metrics land in the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone) at <http://localhost:18888>.
+Open [Scalar](https://github.com/scalar/scalar) at <http://localhost:7340/scalar> to browse and try every endpoint. Each one is documented with XML comments that the .NET 10 OpenAPI generator reads at build time, so the document at `/openapi/v1.json` can't drift from the code. Its logs, traces and metrics land in the [Aspire dashboard](https://learn.microsoft.com/dotnet/aspire/fundamentals/dashboard/standalone) at <http://localhost:7342>.
 
 No Docker? `dotnet run --project src/Presentation` works too. Every other way to run it, from plain `docker run` to stamping a version into the image, is in [docs/RUN.md](docs/RUN.md).
 
