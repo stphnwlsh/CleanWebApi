@@ -1,0 +1,113 @@
+# Run the API with dotnet run (7341) or Docker Compose (7340).
+@host = https://localhost:7341
+# @host = http://localhost:7340
+
+# Sample data ids from the fixed local and docker seed.
+@movieId = cb188ef6-14e7-f85f-2f78-924c2ab26b28
+@authorId = 01fa8b58-05d2-abd4-e55c-2633222dd0a5
+@reviewId = 45911e6f-a366-417b-1453-f34097338ee2
+#if (includeAuth)
+
+# Paste a JWT bearer token here and uncomment the Authorization headers below.
+# @token = eyJ...
+#endif
+
+### List movies
+GET {{host}}/api/movies?query=space&offset=0&limit=10
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Look up a movie by id
+GET {{host}}/api/movies/{{movieId}}
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### List authors
+GET {{host}}/api/authors?query=auer&offset=0&limit=10
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Look up an author by id
+GET {{host}}/api/authors/{{authorId}}
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### List reviews for a movie
+GET {{host}}/api/reviews?movieId={{movieId}}&offset=0&limit=10
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Search reviews by text and minimum stars
+GET {{host}}/api/reviews?query=funny&minStars=4&offset=0&limit=10
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Look up a review by id
+GET {{host}}/api/reviews/{{reviewId}}
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Create a review
+POST {{host}}/api/reviews
+Content-Type: application/json
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+{
+  "authorId": "{{authorId}}",
+  "movieId": "{{movieId}}",
+  "stars": 5,
+  "text": "Great film. I cried at the ending."
+}
+
+### Create a review (fails validation: stars must be between 1 and 5)
+POST {{host}}/api/reviews
+Content-Type: application/json
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+{
+  "authorId": "{{authorId}}",
+  "movieId": "{{movieId}}",
+  "stars": 6,
+  "text": "Six stars out of five."
+}
+
+### Update a review
+PUT {{host}}/api/reviews/{{reviewId}}
+Content-Type: application/json
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+{
+  "stars": 4,
+  "text": "Still holding up on a second watch."
+}
+
+### Delete a review
+DELETE {{host}}/api/reviews/{{reviewId}}
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Application version
+GET {{host}}/api/version
+#if (includeAuth)
+# Authorization: Bearer {{token}}
+#endif
+
+### Liveness health check
+GET {{host}}/health/live
+
+### Readiness health check
+GET {{host}}/health/ready
