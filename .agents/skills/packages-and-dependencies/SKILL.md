@@ -1,6 +1,6 @@
 ---
 name: packages-and-dependencies
-description: How NuGet packages are managed with Central Package Management and monthly grouped Dependabot updates, and which packages are not allowed. Use when adding, updating or removing a package.
+description: How NuGet packages are managed with Central Package Management and a monthly update, and which packages are not allowed. Use when adding, updating or removing a package.
 metadata:
   scope: shared
 ---
@@ -9,7 +9,7 @@ metadata:
 
 ## The rule
 
-Versions live in one file, `Directory.Packages.props`, and project files only name the package. Dependabot opens one grouped pull request a month (on the 15th) for NuGet, Docker Compose images and GitHub Actions together. Every package must be free and open source, with no paid or commercial licence tier.
+Versions live in one file, `Directory.Packages.props`, and project files only name the package. Packages are updated once a month, all together in one pull request. If the repository has `.github/dependabot.yml`, Dependabot opens that pull request. If it doesn't, update by hand: `dotnet list package --outdated` lists what's behind. Every package must be free and open source, with no paid or commercial licence tier.
 
 ## Steps
 
@@ -25,7 +25,7 @@ Versions live in one file, `Directory.Packages.props`, and project files only na
 - Put `Version=` on a `PackageReference`.
 - Add MediatR, MassTransit (v9 and later), AutoMapper, FluentAssertions (v8 and later), or any other library that moved to a commercial licence. Use `Mediator`, `Riok.Mapperly` and `Shouldly`.
 - Add a package to quiet a warning or save a few lines.
-- Update one package by hand between Dependabot runs unless it fixes a vulnerability.
+- Update one package on its own between the monthly updates unless it fixes a vulnerability.
 
 ## Check
 
@@ -33,4 +33,5 @@ Versions live in one file, `Directory.Packages.props`, and project files only na
 dotnet restore
 dotnet build
 dotnet list package --vulnerable
+dotnet list package --outdated
 ```
