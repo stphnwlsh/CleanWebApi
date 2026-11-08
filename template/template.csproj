@@ -41,7 +41,8 @@
     <None Include="../docs/RUN.md" Pack="true" PackagePath="content/docs/" />
     <None Include="../.agents/**/*" Exclude="$(TemplateExcludes);$(RepositorySkills)" Pack="true" PackagePath="content/.agents/" />
     <None Include="../AGENTS.md;../CLAUDE.md" Pack="true" PackagePath="content/" />
-    <!-- The small pipeline a generated solution starts with. The template's own Build Pipeline stays out. -->
+    <!-- The starter README and small pipeline a generated solution starts with. The template's own README and Build Pipeline stay out. -->
+    <None Include="README.md" Pack="true" PackagePath="content/" />
     <None Include="ci.yml" Pack="true" PackagePath="content/.github/workflows/" />
     <None Include="../*.slnx;../Directory.Build.props;../Directory.Packages.props;../global.json;../NuGet.config;../Dockerfile;../docker-compose.yml;../otel-collector.yaml;../.*ignore;../.editorconfig;../.gitattributes" Pack="true" PackagePath="content/" />
     <None Include="../icon.png" Pack="true" PackagePath="images/" />
