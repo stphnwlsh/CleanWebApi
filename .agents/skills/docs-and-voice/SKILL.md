@@ -1,6 +1,6 @@
 ---
 name: docs-and-voice
-description: Where documentation lives (README, docs/RUN.md, the Lean Mean Clean Apps docs site) and the house voice - professional with a dry sense of humour, Australian spelling, no humour in reference or steps. Use when writing a README, docs page, release note, issue reply or pull request description.
+description: Where documentation lives (README, docs/RUN.md, the Lean Mean Clean Apps docs site) and the house voice - professional with a dry sense of humour, Australian spelling, humour in prose but never in steps, commands or tables. Use when writing a README, docs page, release note, issue reply or pull request description.
 metadata:
   scope: repository
 ---
@@ -22,7 +22,8 @@ The voice is a small team that knows its stuff and doesn't take itself too serio
 | Kind of writing | Humour |
 | --- | --- |
 | Home pages, introductions, explanations, contributing guides | Yes, lightly, one line at a time |
-| Reference tables, steps, commands, error messages, skills | None |
+| Guides and reference pages, troubleshooting included | Yes, one dry line in an introduction or a section's prose |
+| Steps, commands, tables, error messages, skills | None |
 
 The templates are always listed in the same order: Minimal API, MCP, GraphQL, Web API, Lambda Function.
 
@@ -37,7 +38,7 @@ The templates are always listed in the same order: Minimal API, MCP, GraphQL, We
 ## Don't
 
 - Use marketing words ("blazing fast", "revolutionary", "seamless").
-- Put jokes in steps, tables or error messages.
+- Put jokes in steps, commands, tables or error messages, or let one bend a fact.
 - Duplicate a guide from the docs site in the README.
 - Write in the first person singular; it's "we" and "the team".
 
