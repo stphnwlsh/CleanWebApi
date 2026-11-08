@@ -19,5 +19,5 @@ See [docs/RUN.md](docs/RUN.md) for the local ports, `dotnet run`, the Aspire das
 
 ## Docs and coding agents
 
-- [AGENTS.md](AGENTS.md) — architecture rules, project map and the skills in `.agents/skills/` for coding agents.
-- [Template documentation](https://leanmeancleanapps.github.io/webapi/) — guides, reference pages and design decisions.
+- [AGENTS.md](AGENTS.md): architecture rules, project map and the skills in `.agents/skills/` for coding agents.
+- [Template documentation](https://leanmeancleanapps.github.io/webapi/): guides, reference pages and design decisions.
