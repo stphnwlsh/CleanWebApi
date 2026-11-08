@@ -15,7 +15,7 @@ dotnet test
 docker compose up -d --build
 ```
 
-See [docs/RUN.md](docs/RUN.md) for the local ports, `dotnet run`, the Aspire dashboard, database migrations and health checks.
+See [docs/RUN.md](docs/RUN.md) for the ports, the database and its migrations, the Aspire dashboard and the tests.
 
 ## Docs and coding agents
 
