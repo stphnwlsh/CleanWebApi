@@ -44,7 +44,7 @@ Every port published on the developer's machine, by the compose file or by `laun
 
 1. Keep restore before `COPY . .` so a code change doesn't redo the restore layer. A new project folder needs nothing extra; the loops pick up every `src/*/*.csproj` and `tests/*/*.csproj`.
 2. Anything the app writes goes under `/app/data`, the only folder the app user can write to.
-3. Pin every image in compose to a version. Dependabot keeps them current.
+3. Pin every image in compose to a version, and bump them with the monthly package update (`packages-and-dependencies`).
 4. Change base images through the `ARG`s at the top, not inside a `FROM`.
 5. Test locally with `docker compose up -d --build`, then hit `/health/ready` and the API reference.
 
